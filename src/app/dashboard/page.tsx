@@ -2,11 +2,13 @@
 
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { useUser } from '@/components/auth/UserProvider';
+import { CreditDisplay } from '@/components/credits/CreditDisplay';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { formatCredits, shouldWarnLowCredits } from '@/lib/utils/credits';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { User, CreditCard, Settings, LogOut, AlertTriangle } from 'lucide-react';
+import { User, CreditCard, Settings, LogOut, AlertTriangle, TestTube } from 'lucide-react';
+import Link from 'next/link';
 
 function DashboardContent() {
   const { user, logout, availableCredits, subscription } = useUser();
@@ -110,59 +112,44 @@ function DashboardContent() {
           </Card>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Getting Started</CardTitle>
-              <CardDescription>
-                Learn how to integrate Dify AI into your applications
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  You have <strong>{formatCredits(availableCredits)} credits</strong> to start 
-                  building AI-powered features. Each credit equals approximately 1,000 tokens.
-                </p>
-                <Button className="w-full" disabled>
-                  View Documentation (Coming Soon)
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Credit History</CardTitle>
-              <CardDescription>
-                Track your AI usage and spending
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {user.admin.creditHistory.length === 0 ? (
+        {/* Credit Management */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <CreditDisplay variant="card" showHistory={true} />
+          </div>
+          
+          {/* Quick Actions */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Getting Started</CardTitle>
+                <CardDescription>
+                  Learn how to integrate Dify AI into your applications
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
                   <p className="text-sm text-muted-foreground">
-                    No activity yet. Start using AI features to see your usage history.
+                    You have <strong>{formatCredits(availableCredits)} credits</strong> to start 
+                    building AI-powered features. Each credit equals approximately 1,000 tokens.
                   </p>
-                ) : (
+                  
                   <div className="space-y-2">
-                    {user.admin.creditHistory.slice(0, 3).map((transaction, index) => (
-                      <div key={index} className="flex justify-between text-sm">
-                        <span>{transaction.operation}</span>
-                        <span className={transaction.amount > 0 ? 'text-green-600' : 'text-red-600'}>
-                          {transaction.amount > 0 ? '+' : ''}{transaction.amount}
-                        </span>
-                      </div>
-                    ))}
+                    <Button className="w-full" disabled>
+                      View Documentation (Coming Soon)
+                    </Button>
+                    
+                    <Button variant="outline" className="w-full" asChild>
+                      <Link href="/test-credits">
+                        <TestTube className="mr-2 h-4 w-4" />
+                        Test Credit System
+                      </Link>
+                    </Button>
                   </div>
-                )}
-                <Button variant="outline" className="w-full" disabled>
-                  View Full History (Coming Soon)
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </main>
     </div>
