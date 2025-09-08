@@ -1,0 +1,29 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read/update their own profile data, but NOT admin data
+    match /users/{userId} {
+      // Users can read their own document (including admin data for display)
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // Users can create their own document during registration
+      allow create: if request.auth != null && 
+        request.auth.uid == userId &&
+        // Ensure they can't set admin fields during creation
+        !("admin" in request.resource.data);
+      
+      // Users can update their profile, but NOT the admin field
+      allow update: if request.auth != null && 
+        request.auth.uid == userId &&
+        // Block updates to admin field unless via Admin SDK (custom claim)
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin']) ||
+         // Allow admin SDK updates (server-side only)
+         request.auth.token.admin == true);
+    }
+    
+    // Block all other collections by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
