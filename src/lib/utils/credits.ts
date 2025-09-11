@@ -1,12 +1,13 @@
 import { CREDIT_CONFIG } from '@/lib/config/constants';
 
 /**
- * Calculate credits required based on token usage
+ * Calculate credits required based on token usage with configurable profit margin
  * @param tokens Number of tokens used
- * @returns Number of credits to deduct (always rounds up)
+ * @returns Number of credits to deduct (always rounds up, includes profit margin)
  */
 export function calculateCreditsFromTokens(tokens: number): number {
-  return Math.ceil(tokens / CREDIT_CONFIG.TOKENS_PER_CREDIT);
+  const baseCredits = tokens / CREDIT_CONFIG.TOKENS_PER_CREDIT;
+  return Math.ceil(baseCredits * CREDIT_CONFIG.PROFIT_MARGIN);
 }
 
 /**

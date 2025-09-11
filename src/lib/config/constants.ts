@@ -1,10 +1,11 @@
 // Credit system configuration
 export const CREDIT_CONFIG = {
-  INITIAL_CREDITS: 100,         // Credits for new users
-  WARNING_THRESHOLD: 10,        // Show warning below this amount
-  TOKENS_PER_CREDIT: 1000,      // 1 credit = 1000 tokens
-  FREE_TIER_CREDITS: 100,       // New users get 100 credits
-  MIN_CREDITS_WARNING: 10,      // Warn when below 10 credits
+  INITIAL_CREDITS: 100, // Credits for new users
+  WARNING_THRESHOLD: 10, // Show warning below this amount
+  TOKENS_PER_CREDIT: 1000, // 1 credit = 1000 tokens
+  FREE_TIER_CREDITS: 100, // New users get 100 credits
+  MIN_CREDITS_WARNING: 10, // Warn when below 10 credits
+  PROFIT_MARGIN: 1.1, // 10% profit margin (1.10 = 10% buffer)
 } as const;
 
 // Analytics configuration
