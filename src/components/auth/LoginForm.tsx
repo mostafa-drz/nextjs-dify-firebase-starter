@@ -43,7 +43,7 @@ export function LoginForm() {
       if (result.success) {
         setEmail(''); // Clear email on success
       }
-    } catch (error) {
+    } catch {
       setMessage({ 
         type: 'error', 
         text: 'An unexpected error occurred. Please try again.' 
@@ -103,7 +103,7 @@ export function LoginForm() {
 
         <div className="mt-6 text-center text-sm text-muted-foreground">
           <p>
-            We'll send you a secure link to sign in instantly.
+            We&apos;ll send you a secure link to sign in instantly.
             <br />
             No password required!
           </p>

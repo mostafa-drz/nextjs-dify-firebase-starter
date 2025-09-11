@@ -3,7 +3,6 @@
 import { 
   DifyChatRequest, 
   DifyConversationResponse, 
-  DifyStreamResponse,
   DifyConversation,
   DifyApiResponse 
 } from '@/types/dify';
@@ -189,7 +188,7 @@ export async function getDifyConversationMessages(
   conversationId: string,
   limit: number = 20,
   firstId?: string
-): Promise<DifyApiResponse<{ data: any[]; has_more: boolean; first_id: string }>> {
+): Promise<DifyApiResponse<{ data: unknown[]; has_more: boolean; first_id: string }>> {
   try {
     const params = new URLSearchParams({
       user: userId,

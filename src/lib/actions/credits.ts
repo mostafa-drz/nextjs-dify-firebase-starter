@@ -44,10 +44,10 @@ export async function deductCredits(
       const newUsedCredits = (userData?.admin?.usedCredits || 0) + creditsToDeduct;
 
       // Create transaction record
-      const transactionRecord: Omit<CreditTransaction, 'id'> = {
+      const transactionRecord: Omit<CreditTransaction, 'id' | 'timestamp'> & { timestamp: FieldValue } = {
         amount: -creditsToDeduct,
         operation,
-        timestamp: FieldValue.serverTimestamp() as any,
+        timestamp: FieldValue.serverTimestamp(),
         metadata
       };
 
@@ -67,11 +67,11 @@ export async function deductCredits(
     });
 
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error deducting credits:', error);
     return {
       success: false,
-      message: error.message || 'Failed to deduct credits'
+      message: error instanceof Error ? error.message : 'Failed to deduct credits'
     };
   }
 }
@@ -83,7 +83,7 @@ export async function addCredits(
   userId: string,
   creditsToAdd: number,
   reason: string,
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 ): Promise<{ success: boolean; message: string; newBalance?: number }> {
   try {
     const db = getFirestoreAdmin();
@@ -101,10 +101,10 @@ export async function addCredits(
       const newBalance = currentCredits + creditsToAdd;
 
       // Create transaction record
-      const transactionRecord: Omit<CreditTransaction, 'id'> = {
+      const transactionRecord: Omit<CreditTransaction, 'id' | 'timestamp'> & { timestamp: FieldValue } = {
         amount: creditsToAdd,
         operation: reason,
-        timestamp: FieldValue.serverTimestamp() as any,
+        timestamp: FieldValue.serverTimestamp(),
         metadata
       };
 
@@ -123,11 +123,11 @@ export async function addCredits(
     });
 
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error adding credits:', error);
     return {
       success: false,
-      message: error.message || 'Failed to add credits'
+      message: error instanceof Error ? error.message : 'Failed to add credits'
     };
   }
 }
@@ -188,7 +188,7 @@ export async function checkUserCredits(
         ? 'Sufficient credits available' 
         : `Insufficient credits. Required: ${requiredCredits}, Available: ${availableCredits}`
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error checking credits:', error);
     return {
       hasEnough: false,
@@ -222,9 +222,14 @@ export async function getUserCreditHistory(userId: string): Promise<{
     
     return {
       success: true,
-      history: history.sort((a: any, b: any) => b.timestamp - a.timestamp) // Sort by newest first
+      history: history.sort((a: CreditTransaction, b: CreditTransaction) => {
+        // Handle both Timestamp and FieldValue types
+        const aTime = a.timestamp instanceof Object && 'seconds' in a.timestamp ? a.timestamp.seconds : 0;
+        const bTime = b.timestamp instanceof Object && 'seconds' in b.timestamp ? b.timestamp.seconds : 0;
+        return bTime - aTime;
+      }) // Sort by newest first
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error getting credit history:', error);
     return {
       success: false,

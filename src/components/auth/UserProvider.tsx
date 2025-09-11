@@ -83,7 +83,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const initResult = await initializeNewUser(
             firebaseUser.uid, 
             firebaseUser.email!,
-            firebaseUser.displayName
+            firebaseUser.displayName || undefined
           );
           
           if (initResult.success) {
@@ -145,11 +145,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         success: true, 
         message: 'Magic link sent! Check your email.' 
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error sending sign-in email:', error);
       return { 
         success: false, 
-        message: error.message || 'Failed to send sign-in email' 
+        message: error instanceof Error ? error.message : 'Failed to send sign-in email' 
       };
     }
   };
@@ -172,11 +172,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         return { success: false, message: 'Invalid sign-in link.' };
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error signing in with email link:', error);
       return { 
         success: false, 
-        message: error.message || 'Failed to sign in' 
+        message: error instanceof Error ? error.message : 'Failed to sign in' 
       };
     }
   };

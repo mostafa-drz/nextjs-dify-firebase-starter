@@ -76,7 +76,7 @@ Thank you!`);
             </div>
             <CardTitle>Insufficient Credits</CardTitle>
             <CardDescription>
-              You don't have enough credits to continue
+              You don&apos;t have enough credits to continue
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

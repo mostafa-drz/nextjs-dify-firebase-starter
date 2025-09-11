@@ -26,10 +26,10 @@ export function useCredits() {
     try {
       const result = await deductCreditsForTokens(user.uid, tokensUsed, operation, metadata);
       return result;
-    } catch (error: any) {
+    } catch (error: unknown) {
       return { 
         success: false, 
-        message: error.message || 'Failed to deduct credits' 
+        message: error instanceof Error ? error.message : 'Failed to deduct credits' 
       };
     } finally {
       setIsProcessing(false);
@@ -45,10 +45,10 @@ export function useCredits() {
     try {
       const result = await addCredits(user.uid, amount, reason);
       return result;
-    } catch (error: any) {
+    } catch (error: unknown) {
       return { 
         success: false, 
-        message: error.message || 'Failed to add credits' 
+        message: error instanceof Error ? error.message : 'Failed to add credits' 
       };
     } finally {
       setIsProcessing(false);

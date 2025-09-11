@@ -38,7 +38,7 @@ export function DifyChat({
   placeholder = 'Type your message...',
   welcomeMessage 
 }: DifyChatProps) {
-  const { user, availableCredits, hasEnoughCredits } = useUser();
+  const { user, availableCredits, checkCredits } = useUser();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -47,6 +47,8 @@ export function DifyChat({
   const [appInfo, setAppInfo] = useState<{
     opening_statement?: string;
     suggested_questions?: string[];
+    speech_to_text?: { enabled: boolean };
+    retriever_resource?: { enabled: boolean };
   } | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -55,7 +57,7 @@ export function DifyChat({
     const loadAppInfo = async () => {
       try {
         const result = await getDifyAppInfo(apiKey);
-        if (result.success) {
+        if (result.success && result.data) {
           setAppInfo(result.data);
           
           // Add welcome message if available and no messages yet
@@ -114,7 +116,7 @@ export function DifyChat({
 
   // Estimate credit requirement (minimum 1 credit for safety)
   const estimatedCredits = Math.max(1, Math.ceil(input.length / 1000));
-  const canAffordMessage = hasEnoughCredits(estimatedCredits);
+  const canAffordMessage = checkCredits(estimatedCredits);
 
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading || !canAffordMessage) return;
@@ -312,7 +314,7 @@ export function DifyChat({
         )}
 
         {/* Suggested questions */}
-        {messages.length <= 1 && appInfo?.suggested_questions?.length > 0 && (
+        {messages.length <= 1 && appInfo?.suggested_questions && appInfo.suggested_questions.length > 0 && (
           <div className="space-y-2">
             <p className="text-sm font-medium text-muted-foreground">Suggested questions:</p>
             <div className="flex flex-wrap gap-2">
