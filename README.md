@@ -138,9 +138,9 @@ The project is configured with modern development tools for the best developer e
 
 #### Code Quality Tools
 
-- **Prettier**: Automatic code formatting with Tailwind CSS class sorting
-- **ESLint**: Code linting with Next.js, TypeScript, and Prettier integration
-- **TypeScript**: Full type checking with strict mode enabled
+- **Prettier**: Simple, standard code formatting with Tailwind CSS class sorting
+- **ESLint**: Minimal linting with Next.js and TypeScript defaults
+- **TypeScript**: Type checking for build validation
 - **Husky**: Git hooks for automated quality checks
 
 #### IDE Configuration
@@ -228,13 +228,13 @@ The project includes `.vscode/` configuration with:
 
 ### Code Formatting Rules
 
-The project follows these formatting conventions:
+The project uses minimal, standard formatting conventions:
 
 - **Print width**: 100 characters
-- **Quotes**: Single quotes for JavaScript/TypeScript
-- **Semi-colons**: Required
-- **Trailing commas**: ES5 compatible
-- **Tailwind classes**: Automatically sorted by functionality
+- **Single quotes** for strings
+- **Semicolons** required
+- **2 spaces** for indentation
+- **Tailwind classes** automatically sorted
 
 ### Quality Checks
 
@@ -366,8 +366,11 @@ User Action → Optimistic Update → API Call → Cache Update → UI Update
 import { useConversationMessages } from '@/lib/hooks/useConversationMessages';
 
 export function ChatComponent() {
-  const { messages, isLoading, addMessageOptimistically, invalidate } =
-    useConversationMessages(conversationId, userId, apiKey);
+  const { messages, isLoading, addMessageOptimistically, invalidate } = useConversationMessages(
+    conversationId,
+    userId,
+    apiKey
+  );
 
   const handleSendMessage = async (content: string) => {
     const tempMessage = { id: 'temp', content, role: 'user' };
@@ -380,7 +383,7 @@ export function ChatComponent() {
   return (
     <div>
       {isLoading && <div>Loading conversation...</div>}
-      {messages.map(message => (
+      {messages.map((message) => (
         <div key={message.id}>{message.content}</div>
       ))}
     </div>
@@ -433,10 +436,7 @@ export function ChatPage() {
 
 ```tsx
 // Add to your Firebase functions
-export const syncConversationToFirestore = async (
-  conversationId: string,
-  messages: unknown[]
-) => {
+export const syncConversationToFirestore = async (conversationId: string, messages: unknown[]) => {
   await db.collection('conversations').doc(conversationId).set({
     messages,
     lastUpdated: new Date(),
@@ -455,10 +455,7 @@ await syncConversationToFirestore(result.data.conversation_id, messages);
 // Add to useConversationMessages hook
 useEffect(() => {
   if (data) {
-    localStorage.setItem(
-      `conversation-${conversationId}`,
-      JSON.stringify(data)
-    );
+    localStorage.setItem(`conversation-${conversationId}`, JSON.stringify(data));
   }
 }, [data, conversationId]);
 ```
@@ -470,7 +467,7 @@ useEffect(() => {
 const useRealtimeMessages = (conversationId: string) => {
   useEffect(() => {
     const ws = new WebSocket(`/ws/conversations/${conversationId}`);
-    ws.onmessage = event => {
+    ws.onmessage = (event) => {
       const newMessage = JSON.parse(event.data);
       addMessageOptimistically(newMessage);
     };

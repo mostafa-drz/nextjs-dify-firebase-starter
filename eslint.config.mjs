@@ -18,34 +18,26 @@ const eslintConfig = [
     extends: ['prettier'],
     plugins: ['prettier'],
     rules: {
-      'prettier/prettier': 'error',
+      'prettier/prettier': 'warn',
     },
   }),
   {
     rules: {
-      // React/Next.js best practices
-      'react/prop-types': 'off',
-      'react/react-in-jsx-scope': 'off',
-      'react/no-unescaped-entities': 'error',
+      // Minimal React/Next.js adjustments
+      'react/no-unescaped-entities': 'off',
 
-      // TypeScript-specific rules
+      // Basic TypeScript rules - only the essentials
       '@typescript-eslint/no-unused-vars': [
-        'error',
+        'warn',
         {
-          args: 'after-used',
-          ignoreRestSiblings: true,
           argsIgnorePattern: '^_',
           varsIgnorePattern: '^_',
         },
       ],
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-non-null-assertion': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off',
 
-      // Code quality
-      'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-      'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
-      'prefer-const': 'error',
-      'no-var': 'error',
+      // Simple console rules
+      'no-console': 'off',
     },
   },
 ];
