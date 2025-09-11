@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { MessageFeedback } from './MessageFeedback';
 import { SuggestedQuestions } from './SuggestedQuestions';
+import { useConversationMessages } from '@/lib/hooks/useConversationMessages';
 
 interface ChatMessage {
   id: string;
@@ -54,6 +55,20 @@ export function DifyChat({
     retriever_resource?: { enabled: boolean };
   } | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  // Load conversation messages if conversationId is provided
+  const {
+    data: conversationData,
+    isLoading: messagesLoading,
+    error: messagesError,
+    addMessageOptimistically,
+    updateMessage: _updateMessage,
+  } = useConversationMessages(
+    conversationId,
+    user?.uid || '',
+    apiKey,
+    !!user && !!conversationId
+  );
 
   // Load app info on mount
   useEffect(() => {
@@ -97,6 +112,40 @@ export function DifyChat({
     }
   }, [welcomeMessage, messages.length]);
 
+  // Load conversation messages when conversationId changes
+  useEffect(() => {
+    if (conversationData?.data && conversationData.data.length > 0) {
+      const loadedMessages: ChatMessage[] = conversationData.data.map((msg: unknown) => {
+        const message = msg as {
+          id: string;
+          role: string;
+          content: string;
+          created_at: number;
+          metadata?: {
+            usage?: {
+              total_tokens: number;
+              credits_deducted?: number;
+            };
+          };
+        };
+        
+        return {
+          id: message.id,
+          role: message.role === 'user' ? 'user' : 'assistant',
+          content: message.content,
+          timestamp: new Date(message.created_at * 1000),
+          tokensUsed: message.metadata?.usage?.total_tokens,
+          creditsDeducted: message.metadata?.usage?.credits_deducted,
+        };
+      });
+      
+      setMessages(loadedMessages);
+    } else if (conversationId && !messagesLoading && !messagesError) {
+      // Clear messages if we're switching to a conversation with no messages
+      setMessages([]);
+    }
+  }, [conversationData, conversationId, messagesLoading, messagesError]);
+
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -131,7 +180,10 @@ export function DifyChat({
       timestamp: new Date()
     };
 
+    // Add user message optimistically
     setMessages(prev => [...prev, userMessage]);
+    addMessageOptimistically(userMessage);
+    
     setInput('');
     setIsLoading(true);
     setError(null);
@@ -161,7 +213,10 @@ export function DifyChat({
         creditsDeducted: result.usage?.total_tokens ? Math.ceil(result.usage.total_tokens / 1000) : undefined
       };
 
+      // Add assistant message optimistically
       setMessages(prev => [...prev, assistantMessage]);
+      addMessageOptimistically(assistantMessage);
+      
       setConversationId(result.data!.conversation_id);
 
     } catch (error) {
@@ -228,6 +283,25 @@ export function DifyChat({
         {/* Messages Area */}
         <ScrollArea className="h-96 w-full rounded-md border p-4" ref={scrollAreaRef}>
           <div className="space-y-4">
+            {/* Loading state for conversation messages */}
+            {messagesLoading && conversationId && (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                <span className="text-sm text-muted-foreground">Loading conversation...</span>
+              </div>
+            )}
+            
+            {/* Error state for conversation messages */}
+            {messagesError && conversationId && (
+              <div className="text-center py-8 text-red-600">
+                <AlertTriangle className="h-6 w-6 mx-auto mb-2" />
+                <p className="text-sm">Failed to load conversation messages</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {messagesError instanceof Error ? messagesError.message : 'Unknown error'}
+                </p>
+              </div>
+            )}
+            
             {messages.map((message, index) => (
               <div key={message.id}>
                 <div className={`flex items-start space-x-3 ${

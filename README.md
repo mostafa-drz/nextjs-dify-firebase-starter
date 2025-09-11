@@ -26,7 +26,8 @@ A secure Next.js 15 boilerplate for integrating [Dify.ai](https://dify.ai) with 
 - ⚡ **Real-time credit updates** via Firestore listeners
 - 💬 **Custom chat interface** with token usage tracking
 - 📊 **Credit history and usage analytics**
-- 🎨 **Modern UI** with loading states and error handling
+- 🎨 **Modern UI** with loading states and error handling- 🔄 **Conversation management** with React Query caching
+- ⚡ **Optimistic updates** for instant UI feedback
 
 ## 📋 Prerequisites
 
@@ -174,12 +175,187 @@ if (result.success) {
 }
 ```
 
+## 💬 Conversation Management
+
+This boilerplate implements a **client-side conversation management system** using React Query for caching and optimistic updates. This approach prioritizes simplicity and performance while providing a solid foundation for developers to extend with their own persistence strategies.
+
+### Architecture Overview
+
+**Why React Query?**
+- **Automatic caching** with intelligent invalidation
+- **Optimistic updates** for instant UI feedback
+- **Background refetching** to keep data fresh
+- **Error handling** with retry logic
+- **DevTools** for debugging (development only)
+
+**Why Not Firebase/Firestore?**
+- **Simplicity**: Avoids additional database complexity
+- **Performance**: Client-side caching is faster than database queries
+- **Flexibility**: Developers can choose their own persistence layer
+- **Cost**: Reduces Firebase read/write operations
+
+### Data Flow
+
+```
+User Action → Optimistic Update → API Call → Cache Update → UI Update
+     ↓              ↓                ↓           ↓           ↓
+  Click Send → Show Message → Call Dify → Update Cache → Show Response
+```
+
+### Usage Examples
+
+#### Basic Conversation Management
+
+```tsx
+import { useConversationMessages } from '@/lib/hooks/useConversationMessages';
+
+export function ChatComponent() {
+  const { 
+    messages, 
+    isLoading, 
+    addMessageOptimistically,
+    invalidate 
+  } = useConversationMessages(
+    conversationId,
+    userId,
+    apiKey
+  );
+
+  const handleSendMessage = async (content: string) => {
+    const tempMessage = { id: 'temp', content, role: 'user' };
+    addMessageOptimistically(tempMessage); // Instant UI update
+    
+    const result = await sendDifyMessage(userId, apiKey, { query: content });
+    // Cache automatically updated with real data
+  };
+
+  return (
+    <div>
+      {isLoading && <div>Loading conversation...</div>}
+      {messages.map(message => (
+        <div key={message.id}>{message.content}</div>
+      ))}
+    </div>
+  );
+}
+```
+
+#### Conversation List Management
+
+```tsx
+import { ConversationList } from '@/components/dify/ConversationList';
+
+export function ChatPage() {
+  const [currentConversationId, setCurrentConversationId] = useState<string>();
+
+  return (
+    <div className="grid lg:grid-cols-4 gap-8">
+      <div className="lg:col-span-1">
+        <ConversationList
+          apiKey="app-demo-key"
+          userId={user.uid}
+          currentConversationId={currentConversationId}
+          onConversationSelect={setCurrentConversationId}
+          onCreateNew={() => setCurrentConversationId(undefined)}
+        />
+      </div>
+      <div className="lg:col-span-3">
+        <DifyChat
+          apiKey="app-demo-key"
+          conversationId={currentConversationId}
+          // ... other props
+        />
+      </div>
+    </div>
+  );
+}
+```
+
+### Performance Features
+
+- **Smart Caching**: 5-minute cache with 1-minute stale time
+- **Background Refetching**: Keep data fresh without user interaction
+- **Prefetching**: Preload messages on conversation hover
+- **Memory Management**: Automatic garbage collection of unused data
+- **Bundle Size**: React Query adds only ~13KB gzipped
+
+### Extending the System
+
+#### Option 1: Add Firebase Persistence
+
+```tsx
+// Add to your Firebase functions
+export const syncConversationToFirestore = async (conversationId: string, messages: unknown[]) => {
+  await db.collection('conversations').doc(conversationId).set({
+    messages,
+    lastUpdated: new Date(),
+    userId: auth.currentUser?.uid
+  });
+};
+
+// Call after successful message send
+const result = await sendDifyMessage(userId, apiKey, request);
+await syncConversationToFirestore(result.data.conversation_id, messages);
+```
+
+#### Option 2: Add Local Storage Backup
+
+```tsx
+// Add to useConversationMessages hook
+useEffect(() => {
+  if (data) {
+    localStorage.setItem(`conversation-${conversationId}`, JSON.stringify(data));
+  }
+}, [data, conversationId]);
+```
+
+#### Option 3: Add Real-time Sync
+
+```tsx
+// Add WebSocket or Server-Sent Events
+const useRealtimeMessages = (conversationId: string) => {
+  useEffect(() => {
+    const ws = new WebSocket(`/ws/conversations/${conversationId}`);
+    ws.onmessage = (event) => {
+      const newMessage = JSON.parse(event.data);
+      addMessageOptimistically(newMessage);
+    };
+    return () => ws.close();
+  }, [conversationId]);
+};
+```
+
+### Debug Tools
+
+React Query DevTools are automatically enabled in development:
+
+```tsx
+// Automatically included in development builds
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+```
+
+### Best Practices
+
+**Do's:**
+- ✅ Use optimistic updates for better UX
+- ✅ Implement proper error boundaries
+- ✅ Add loading states for all async operations
+- ✅ Use TypeScript for type safety
+- ✅ Test with React Query DevTools
+
+**Don'ts:**
+- ❌ Don't bypass the cache for real-time updates
+- ❌ Don't store sensitive data in client-side cache
+- ❌ Don't forget to handle offline scenarios
+- ❌ Don't over-fetch data (use pagination)
+
 ## 🏗️ Project Structure
 
 ```
 src/
 ├── app/                    # Next.js App Router pages
-│   ├── chat/              # Chat demo page
+│   ├── chat/              # Chat demo page with conversation management
+│   ├── conversations/     # Dedicated conversation management page
 │   ├── dashboard/         # User dashboard
 │   ├── login/            # Authentication page
 │   └── test-credits/     # Credit testing utilities
@@ -187,10 +363,20 @@ src/
 │   ├── auth/             # Authentication components
 │   ├── credits/          # Credit management UI
 │   ├── dify/            # Dify integration components
+│   │   ├── DifyChat.tsx           # Main chat interface
+│   │   ├── ConversationList.tsx  # Conversation management
+│   │   ├── MessageFeedback.tsx   # Message feedback system
+│   │   └── SuggestedQuestions.tsx # Suggested questions
+│   ├── providers/        # React context providers
+│   │   └── QueryProvider.tsx     # React Query provider
 │   └── ui/              # shadcn/ui components
 ├── lib/
 │   ├── actions/         # Server actions
 │   ├── hooks/           # Custom React hooks
+│   │   ├── useCredits.ts              # Credit management
+│   │   └── useConversationMessages.ts # Conversation caching
+│   ├── services/        # Dify API services
+│   │   └── dify/        # Modular Dify service architecture
 │   ├── utils/           # Utility functions
 │   └── config/          # Configuration constants
 └── types/               # TypeScript type definitions
@@ -301,10 +487,21 @@ For support and questions:
 
 ## 🚧 Roadmap
 
+### ✅ Completed Features
+- [x] **Conversation Management**: Full conversation history with React Query caching
+- [x] **Optimistic Updates**: Instant UI feedback for better user experience
+- [x] **Message Feedback**: Like/dislike system for assistant messages
+- [x] **Suggested Questions**: Dynamic question suggestions from Dify
+- [x] **Modular Architecture**: Clean service separation for maintainability
+
+### 🔄 Planned Features
 - [ ] Stripe integration for credit purchases
 - [ ] Multiple Dify app management
 - [ ] Usage analytics dashboard
 - [ ] Admin panel for user management
 - [ ] Webhook support for real-time events
+- [ ] Message search functionality
+- [ ] Conversation export/import
+- [ ] Offline message queuing
 - [ ] Docker containerization
 - [ ] End-to-end testing with Cypress
