@@ -2,73 +2,102 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { logError } from '@/lib/sentry';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { 
+  Home, 
+  RefreshCw, 
+  AlertTriangle,
+  Bug
+} from 'lucide-react';
 
-export default function Error({
-  error,
-  reset,
-}: {
+interface ErrorProps {
   error: Error & { digest?: string };
   reset: () => void;
-}) {
+}
+
+export default function Error({ error, reset }: ErrorProps) {
   useEffect(() => {
-    // Log the error to Sentry
-    logError(error, {
-      digest: error.digest,
-      location: 'app/error.tsx',
-    });
+    // Log the error to an error reporting service
+    console.error('Application error:', error);
   }, [error]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md space-y-8 text-center">
-        <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-          <svg
-            className="h-8 w-8 text-red-600"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-            />
-          </svg>
-        </div>
-        
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-            Something went wrong!
-          </h1>
-          <p className="text-base text-gray-600">
-            We&apos;ve encountered an unexpected error. Our team has been notified and is working on a fix.
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="max-w-md w-full space-y-6">
+        {/* Error Icon */}
+        <div className="text-center">
+          <div className="flex justify-center mb-4">
+            <div className="relative">
+              <Bug className="h-16 w-16 text-destructive" />
+              <div className="absolute -top-1 -right-1 h-6 w-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-sm font-bold">
+                !
+              </div>
+            </div>
+          </div>
+          <h1 className="text-4xl font-bold mb-2">Something went wrong</h1>
+          <p className="text-muted-foreground">
+            An unexpected error occurred. Don't worry, we've been notified and are working to fix it.
           </p>
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <button
-            onClick={reset}
-            className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            Try again
-          </button>
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            Go to homepage
-          </Link>
-        </div>
-
-        {process.env.NODE_ENV === 'development' && error.digest && (
-          <div className="mt-8 rounded-lg bg-gray-100 p-4 text-left">
-            <p className="text-xs font-mono text-gray-600">
-              Error ID: {error.digest}
-            </p>
-          </div>
+        {/* Error Details */}
+        {process.env.NODE_ENV === 'development' && (
+          <Card className="border-destructive/20">
+            <CardContent className="pt-6">
+              <div className="space-y-2">
+                <h3 className="font-semibold text-destructive flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  Development Error Details
+                </h3>
+                <div className="bg-muted p-3 rounded-md">
+                  <p className="text-sm font-mono text-destructive">
+                    {error.message}
+                  </p>
+                  {error.digest && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Error ID: {error.digest}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         )}
+
+        {/* Action Card */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-center">Try these solutions</h2>
+              
+              <div className="space-y-3">
+                <Button onClick={reset} className="w-full justify-start">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Try Again
+                </Button>
+                
+                <Button variant="outline" asChild className="w-full justify-start">
+                  <Link href="/">
+                    <Home className="h-4 w-4 mr-2" />
+                    Go to Homepage
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Help Text */}
+        <div className="text-center text-sm text-muted-foreground">
+          <p>
+            If the problem persists, please{' '}
+            <Link href="/support" className="text-primary hover:underline">
+              contact support
+            </Link>
+            {' '}and include the error details above.
+          </p>
+        </div>
       </div>
     </div>
   );
