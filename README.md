@@ -20,6 +20,7 @@ A secure Next.js 15 boilerplate for integrating [Dify.ai](https://dify.ai) with 
 - 🔒 **Credit pre-flight checks** to prevent unauthorized usage
 - 🔒 **Atomic transactions** for credit deduction
 - 🔒 **Firebase security rules** protecting user data
+- 🔒 **Sentry error tracking** with privacy-first configuration
 
 ### User Experience
 - 📱 **Responsive design** for all screen sizes
@@ -79,6 +80,13 @@ FIREBASE_ADMIN_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE K
 # Dify Integration
 DIFY_BASE_URL=https://api.dify.ai/v1
 DIFY_API_KEY=app-your_dify_api_key
+
+# Sentry Configuration (Optional)
+NEXT_PUBLIC_SENTRY_DSN=https://your_public_key@o0.ingest.sentry.io/0
+SENTRY_DSN=https://your_public_key@o0.ingest.sentry.io/0
+SENTRY_AUTH_TOKEN=your_sentry_auth_token_here
+SENTRY_ORG=your_sentry_org_slug
+SENTRY_PROJECT=your_sentry_project_slug
 
 # App Configuration
 SUPPORT_EMAIL=support@yourdomain.com
@@ -427,6 +435,9 @@ Visit `/test-credits` to test credit deduction and management.
 ### Test Dify Integration
 Visit `/chat` to test the Dify chat interface.
 
+### Test Sentry Integration
+Visit `/sentry-test` to test error tracking and logging.
+
 ## 🚀 Deployment
 
 ### Vercel (Recommended)
@@ -452,9 +463,53 @@ This Next.js app can be deployed to any platform supporting Node.js:
 - View Firestore usage and costs
 - Check security rule violations
 
+### Sentry Error Tracking
+
+This project includes production-ready **Sentry integration** with minimal but essential logging:
+
+#### Features
+- **Smart Error Filtering**: Automatically filters non-critical errors (network timeouts, browser quirks)
+- **Privacy-First**: Masks sensitive data, excludes cookies and IP addresses
+- **Performance Monitoring**: Tracks slow operations and API performance
+- **Production Optimized**: Lower sampling rates to reduce noise (10% traces, 1% sessions)
+
+#### Setup
+1. Create a free [Sentry account](https://sentry.io) and project
+2. Copy your DSN and add to `.env.local`:
+   ```bash
+   NEXT_PUBLIC_SENTRY_DSN=https://your_key@o0.ingest.sentry.io/0
+   SENTRY_DSN=https://your_key@o0.ingest.sentry.io/0
+   ```
+3. Test with `/sentry-test` page
+
+#### Usage Examples
+```typescript
+import { logError, logMessage, LogLevel } from '@/lib/sentry';
+
+// Log critical errors
+try {
+  await processPayment();
+} catch (error) {
+  logError(error, { userId, amount, paymentMethod });
+}
+
+// Log important events
+logMessage('User upgraded to premium', LogLevel.INFO);
+```
+
+#### What Gets Logged
+- ✅ API errors (5xx responses)
+- ✅ Authentication failures  
+- ✅ Payment processing errors
+- ✅ Slow operations (>3s)
+- ✅ Unhandled exceptions
+- ❌ Network timeouts (filtered)
+- ❌ Browser extension errors (filtered)
+- ❌ Expected auth errors (filtered)
+
 ### Application Monitoring
 - Credit usage patterns in Firestore
-- Error tracking with console logs
+- Real-time error alerts and performance monitoring
 - User activity via Firebase Analytics
 
 ## 🛡️ Security Considerations
