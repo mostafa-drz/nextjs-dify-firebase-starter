@@ -6,17 +6,14 @@ import {
   DifyConversation,
   DifyApiResponse,
 } from '@/types/dify';
-import { deductCreditsForTokens, checkUserCredits } from '@/lib/actions/credits';
+import {
+  reserveCredits,
+  confirmReservedCredits,
+  releaseReservedCredits,
+} from '@/lib/actions/credits';
 import { calculateCreditsFromTokens } from '@/lib/utils/credits';
 import { validateServerEnv } from '@/lib/config/env-validation';
-import {
-  ExternalApiError,
-  ValidationError,
-  CreditError,
-  withErrorHandling,
-  formatErrorResponse,
-  formatSuccessResponse,
-} from '@/lib/errors/server-errors';
+import { ExternalApiError, ValidationError } from '@/lib/errors/server-errors';
 
 const DIFY_BASE_URL = process.env.DIFY_BASE_URL || 'https://api.dify.ai/v1';
 const DIFY_API_KEY = process.env.DIFY_API_KEY;
@@ -98,40 +95,64 @@ export async function sendDifyMessage(
   // Validate environment variables
   validateServerEnv();
 
-  try {
-    // First check if user has sufficient credits (estimate 50 tokens minimum)
-    const requiredCredits = calculateCreditsFromTokens(50); // Use same calculation function
-    const creditCheck = await checkUserCredits(userId, requiredCredits);
+  // Generate unique reservation ID
+  const reservationId = `dify_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    if (!creditCheck.hasEnough) {
+  try {
+    // Reserve credits before API call (estimate 50 tokens minimum)
+    const estimatedCredits = calculateCreditsFromTokens(50);
+    const reserveResult = await reserveCredits(
+      userId,
+      estimatedCredits,
+      'dify_chat_reservation',
+      reservationId,
+      {
+        difyAppToken: DIFY_API_KEY?.substring(0, 8) + '...',
+        sessionId: request.conversation_id,
+        estimatedTokens: 50,
+      }
+    );
+
+    if (!reserveResult.success) {
       return {
         success: false,
         error: {
           code: 'INSUFFICIENT_CREDITS',
-          message: `Insufficient credits. Required: ${requiredCredits}, Available: ${creditCheck.available}`,
+          message: reserveResult.message,
           status: 402,
         },
       };
     }
 
-    const response = await makeDifyRequest(
-      '/chat-messages',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          ...request,
-          response_mode: 'blocking', // Always use blocking for credit tracking
-        }),
-      },
-      DIFY_API_KEY || ''
-    );
+    let apiResponse: Response;
+    let data: DifyConversationResponse;
 
-    const data: DifyConversationResponse = await response.json();
+    try {
+      // Make API call
+      apiResponse = await makeDifyRequest(
+        '/chat-messages',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            ...request,
+            response_mode: 'blocking', // Always use blocking for credit tracking
+          }),
+        },
+        DIFY_API_KEY || ''
+      );
 
-    // Deduct credits based on actual token usage
+      data = await apiResponse.json();
+    } catch (apiError) {
+      // API call failed - release reserved credits
+      await releaseReservedCredits(userId, reservationId, 'API call failed');
+      throw apiError;
+    }
+
+    // Confirm reserved credits based on actual token usage
     if (data.metadata?.usage?.total_tokens) {
-      const deductResult = await deductCreditsForTokens(
+      const confirmResult = await confirmReservedCredits(
         userId,
+        reservationId,
         data.metadata.usage.total_tokens,
         'dify_chat',
         {
@@ -141,9 +162,28 @@ export async function sendDifyMessage(
         }
       );
 
-      if (!deductResult.success) {
-        console.error('Failed to deduct credits after successful API call:', deductResult.message);
+      if (!confirmResult.success) {
+        // This is a critical error - API succeeded but credit confirmation failed
+        console.error(
+          'CRITICAL: Failed to confirm credits after successful API call:',
+          confirmResult.message
+        );
+
+        // Try to release the reservation as fallback
+        await releaseReservedCredits(userId, reservationId, 'Credit confirmation failed');
+
+        return {
+          success: false,
+          error: {
+            code: 'CREDIT_CONFIRMATION_FAILED',
+            message: 'API call succeeded but credit processing failed. Please contact support.',
+            status: 500,
+          },
+        };
       }
+    } else {
+      // No token usage data - release reserved credits
+      await releaseReservedCredits(userId, reservationId, 'No token usage data received');
     }
 
     return {
