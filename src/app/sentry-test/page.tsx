@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { logMessage, logError, logApiError, LogLevel, addBreadcrumb } from '@/lib/sentry';
 
 export default function SentryTestPage() {
@@ -48,7 +49,8 @@ export default function SentryTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="bg-white shadow rounded-lg p-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
@@ -126,5 +128,6 @@ export default function SentryTestPage() {
         </div>
       </div>
     </div>
+    </ProtectedRoute>
   );
 }

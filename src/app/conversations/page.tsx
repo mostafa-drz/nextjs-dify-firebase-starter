@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/components/auth/UserProvider';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ConversationList } from '@/components/dify/ConversationList';
 import { DifyChat } from '@/components/dify/DifyChat';
 import { CreditDisplay } from '@/components/credits/CreditDisplay';
@@ -30,8 +31,9 @@ export default function ConversationsPage() {
   };
 
   return (
-    <PageLayout currentPage="conversations">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <ProtectedRoute>
+      <PageLayout currentPage="conversations">
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold mb-2">Conversations</h1>
           <p className="text-muted-foreground">
@@ -96,6 +98,7 @@ export default function ConversationsPage() {
         </div>
       </div>
     </div>
-    </PageLayout>
+      </PageLayout>
+    </ProtectedRoute>
   );
 }

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/components/auth/UserProvider';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { DifyChat } from '@/components/dify/DifyChat';
 import { ConversationList } from '@/components/dify/ConversationList';
 import { CreditDisplay } from '@/components/credits/CreditDisplay';
@@ -31,8 +32,9 @@ export default function ChatPage() {
   };
 
   return (
-    <PageLayout currentPage="chat">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <ProtectedRoute>
+      <PageLayout currentPage="chat">
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold mb-2">AI Chat Assistant</h1>
           <p className="text-muted-foreground">
@@ -147,6 +149,7 @@ export default function ChatPage() {
         </div>
       </div>
     </div>
-    </PageLayout>
+      </PageLayout>
+    </ProtectedRoute>
   );
 }
