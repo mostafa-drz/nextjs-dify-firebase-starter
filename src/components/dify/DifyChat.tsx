@@ -21,6 +21,8 @@ import {
   MessageSquare,
   Sparkles
 } from 'lucide-react';
+import { MessageFeedback } from './MessageFeedback';
+import { SuggestedQuestions } from './SuggestedQuestions';
 
 interface ChatMessage {
   id: string;
@@ -36,13 +38,14 @@ export function DifyChat({
   name = 'Dify Assistant',
   className = '',
   placeholder = 'Type your message...',
-  welcomeMessage 
-}: DifyChatProps) {
+  welcomeMessage,
+  conversationId: initialConversationId
+}: DifyChatProps & { conversationId?: string }) {
   const { user, availableCredits, checkCredits } = useUser();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [conversationId, setConversationId] = useState<string>();
+  const [conversationId, setConversationId] = useState<string | undefined>(initialConversationId);
   const [error, setError] = useState<string | null>(null);
   const [appInfo, setAppInfo] = useState<{
     opening_statement?: string;
@@ -236,7 +239,7 @@ export function DifyChat({
                     </div>
                   )}
                   
-                  <div className={`max-w-[80%] rounded-lg px-3 py-2 ${
+                  <div className={`max-w-[80%] rounded-lg px-3 py-2 group ${
                     message.role === 'user' 
                       ? 'bg-primary text-primary-foreground ml-auto' 
                       : 'bg-muted'
@@ -244,11 +247,20 @@ export function DifyChat({
                     <div className="text-sm whitespace-pre-wrap">{message.content}</div>
                     <div className="flex items-center justify-between mt-1 text-xs opacity-70">
                       <span>{message.timestamp.toLocaleTimeString()}</span>
-                      {message.role === 'assistant' && message.tokensUsed && (
-                        <span className="ml-2">
-                          {message.tokensUsed} tokens • {message.creditsDeducted} credits
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {message.role === 'assistant' && message.tokensUsed && (
+                          <span>
+                            {message.tokensUsed} tokens • {message.creditsDeducted} credits
+                          </span>
+                        )}
+                        {message.role === 'assistant' && user && (
+                          <MessageFeedback
+                            messageId={message.id}
+                            userId={user.uid}
+                            apiKey={apiKey}
+                          />
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -315,23 +327,14 @@ export function DifyChat({
 
         {/* Suggested questions */}
         {messages.length <= 1 && appInfo?.suggested_questions && appInfo.suggested_questions.length > 0 && (
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">Suggested questions:</p>
-            <div className="flex flex-wrap gap-2">
-              {appInfo.suggested_questions.slice(0, 3).map((question: string, index: number) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  size="sm"
-                  className="text-xs"
-                  onClick={() => setInput(question)}
-                  disabled={isLoading}
-                >
-                  {question}
-                </Button>
-              ))}
-            </div>
-          </div>
+          <SuggestedQuestions
+            questions={appInfo.suggested_questions}
+            onQuestionSelect={(question) => {
+              setInput(question);
+              handleSendMessage();
+            }}
+            loading={isLoading}
+          />
         )}
       </CardContent>
     </Card>

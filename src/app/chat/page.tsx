@@ -1,16 +1,38 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@/components/auth/UserProvider';
 import { DifyChat } from '@/components/dify/DifyChat';
+import { ConversationList } from '@/components/dify/ConversationList';
 import { CreditDisplay } from '@/components/credits/CreditDisplay';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Info } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Info, MessageSquare, History } from 'lucide-react';
 
 export default function ChatPage() {
+  const { user } = useUser();
+  const router = useRouter();
+  const [currentConversationId, setCurrentConversationId] = useState<string | undefined>();
+
+  if (!user) {
+    router.push('/login');
+    return null;
+  }
+
+  const handleConversationSelect = (conversationId: string) => {
+    setCurrentConversationId(conversationId);
+  };
+
+  const handleCreateNew = () => {
+    setCurrentConversationId(undefined);
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold mb-2">Dify Chat Demo</h1>
+        <h1 className="text-3xl font-bold mb-2">AI Chat Assistant</h1>
         <p className="text-muted-foreground">
           Secure server-side integration with Dify.ai using your API key
         </p>
@@ -25,22 +47,20 @@ export default function ChatPage() {
         </AlertDescription>
       </Alert>
 
-      <div className="grid md:grid-cols-3 gap-8">
-        {/* Chat Interface */}
-        <div className="md:col-span-2">
-          <DifyChat
-            apiKey="app-demo-key" // This will be replaced with actual environment variable server-side
-            name="Demo Assistant"
-            placeholder="Ask me anything..."
-            welcomeMessage="Hello! I'm your AI assistant powered by Dify. I use a secure server-side integration that protects your API keys and tracks token usage for credit deduction. How can I help you today?"
-            className="w-full"
-          />
-        </div>
-
+      <div className="grid lg:grid-cols-4 gap-8">
         {/* Sidebar */}
-        <div className="space-y-6">
+        <div className="lg:col-span-1 space-y-6">
           {/* Credit Display */}
           <CreditDisplay variant="card" />
+
+          {/* Conversation List */}
+          <ConversationList
+            apiKey="app-demo-key"
+            userId={user.uid}
+            currentConversationId={currentConversationId}
+            onConversationSelect={handleConversationSelect}
+            onCreateNew={handleCreateNew}
+          />
 
           {/* Integration Info */}
           <Card>
@@ -77,7 +97,51 @@ export default function ChatPage() {
               </div>
             </CardContent>
           </Card>
+        </div>
 
+        {/* Main Chat Area */}
+        <div className="lg:col-span-3">
+          <Tabs defaultValue="chat" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="chat" className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4" />
+                Chat
+              </TabsTrigger>
+              <TabsTrigger value="conversations" className="flex items-center gap-2">
+                <History className="h-4 w-4" />
+                Conversations
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="chat" className="mt-6">
+              <DifyChat
+                apiKey="app-demo-key"
+                name="Demo Assistant"
+                placeholder="Ask me anything..."
+                welcomeMessage="Hello! I'm your AI assistant powered by Dify. I use a secure server-side integration that protects your API keys and tracks token usage for credit deduction. How can I help you today?"
+                className="w-full"
+                conversationId={currentConversationId}
+              />
+            </TabsContent>
+            
+            <TabsContent value="conversations" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>All Conversations</CardTitle>
+                  <CardDescription>
+                    Browse and manage your conversation history
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-8 text-muted-foreground">
+                    <History className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>Conversation management is available in the sidebar</p>
+                    <p className="text-sm">Use the conversation list on the left to browse your chats</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
