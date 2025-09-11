@@ -7,11 +7,14 @@ import { ThumbsUp, ThumbsDown, Loader2 } from 'lucide-react';
 interface MessageFeedbackProps {
   messageId: string;
   userId: string;
-  apiKey: string;
   onFeedback?: (type: 'like' | 'dislike') => void;
 }
 
-export function MessageFeedback({ messageId: _messageId, userId: _userId, apiKey: _apiKey, onFeedback }: MessageFeedbackProps) {
+export function MessageFeedback({ 
+  messageId: _messageId, // eslint-disable-line @typescript-eslint/no-unused-vars
+  userId: _userId, // eslint-disable-line @typescript-eslint/no-unused-vars
+  onFeedback 
+}: MessageFeedbackProps) {
   const [feedback, setFeedback] = useState<'like' | 'dislike' | null>(null);
   const [loading, setLoading] = useState(false);
 

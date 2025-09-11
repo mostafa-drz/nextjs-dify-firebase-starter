@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useUser } from './UserProvider';
+import { trackAuth } from '@/lib/analytics';
 import { Mail, Loader2 } from 'lucide-react';
 
 export function LoginForm() {
@@ -41,6 +42,7 @@ export function LoginForm() {
       });
       
       if (result.success) {
+        trackAuth('login');
         setEmail(''); // Clear email on success
       }
     } catch {

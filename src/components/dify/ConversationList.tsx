@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ConversationListSkeleton } from '@/components/ui/skeletons';
+import { EmptyConversations } from '@/components/ui/empty-states';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -121,9 +123,7 @@ export function ConversationList({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin" />
-          </div>
+          <ConversationListSkeleton />
         </CardContent>
       </Card>
     );
@@ -158,11 +158,7 @@ export function ConversationList({
           <ScrollArea className="h-[calc(100vh-200px)]">
             <div className="p-2 space-y-1">
               {conversations.length === 0 ? (
-                <div className="p-4 text-center text-muted-foreground">
-                  <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">No conversations yet</p>
-                  <p className="text-xs">Start a new chat to begin</p>
-                </div>
+                <EmptyConversations onCreateNew={onCreateNew} />
               ) : (
                 conversations.map((conversation) => (
                   <div

@@ -7,6 +7,7 @@ import {
   DifyApiResponse 
 } from '@/types/dify';
 import { deductCreditsForTokens, checkUserCredits } from '@/lib/actions/credits';
+import { validateServerEnv } from '@/lib/config/env-validation';
 
 const DIFY_BASE_URL = process.env.DIFY_BASE_URL || 'https://api.dify.ai/v1';
 const DIFY_API_KEY = process.env.DIFY_API_KEY;  
@@ -54,6 +55,8 @@ export async function sendDifyMessage(
   userId: string,
   request: DifyChatRequest
 ): Promise<DifyApiResponse<DifyConversationResponse>> {
+  // Validate environment variables
+  validateServerEnv();
 
   try {
     // First check if user has sufficient credits (estimate 50 tokens minimum)

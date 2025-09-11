@@ -13,6 +13,7 @@ A secure Next.js 15 boilerplate for integrating [Dify.ai](https://dify.ai) with 
 - ✅ **TypeScript** for type safety
 - ✅ **Tailwind CSS 4** with shadcn/ui components
 - ✅ **ESLint & Prettier** for code quality
+- ✅ **Google Analytics** with Firebase Analytics integration
 
 ### Security Features
 - 🔒 **API keys never exposed** to client-side code
@@ -71,6 +72,7 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
 
 # Firebase Admin (Server-side)
 FIREBASE_PROJECT_ID=your_project_id
@@ -441,6 +443,11 @@ Visit `/chat` to test the Dify chat interface.
 ### Test Sentry Integration
 Visit `/sentry-test` to test error tracking and logging.
 
+### Enable Google Analytics
+1. Enable Analytics in your Firebase project console
+2. Copy the Measurement ID from Analytics settings
+3. Add `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX` to `.env.local`
+
 ## 🚀 Deployment
 
 ### Vercel (Recommended)
@@ -514,6 +521,48 @@ logMessage('User upgraded to premium', LogLevel.INFO);
 - Credit usage patterns in Firestore
 - Real-time error alerts and performance monitoring
 - User activity via Firebase Analytics
+
+### Google Analytics Integration
+
+This project includes **privacy-first Google Analytics** using Firebase Analytics with minimal data collection:
+
+#### Features
+- **Production Only**: Analytics only tracks in production environment
+- **Essential Events**: Tracks only business-critical events (auth, chat, credits)
+- **Privacy Focused**: No personal data collection or tracking
+- **Client-Side Only**: Simple Firebase Analytics integration
+
+#### Tracked Events
+- ✅ **Page Views**: User navigation patterns
+- ✅ **Authentication**: Login/logout events  
+- ✅ **Chat Usage**: Message sending and conversation starts
+- ✅ **Credit Usage**: Purchase and deduction events
+- ✅ **External Links**: Outbound link clicks
+
+#### Setup
+1. **Enable Analytics** in your [Firebase Console](https://console.firebase.google.com)
+2. **Copy Measurement ID** from Analytics → Data Streams
+3. **Add to Environment**: `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX`
+4. **Deploy**: Analytics will automatically start tracking in production
+
+#### Usage Examples
+```typescript
+import { trackAuth, trackChat, trackCredits } from '@/lib/analytics';
+
+// Track user authentication
+trackAuth('login');
+
+// Track chat interactions
+trackChat('message_sent', messageLength);
+
+// Track credit events
+trackCredits('purchase', amount);
+```
+
+#### Privacy Compliance
+- **GDPR Compliant**: No personal data collection
+- **Development Safe**: No tracking in development environment
+- **Error Handling**: Graceful failures without breaking user experience
 
 ## 🛡️ Security Considerations
 

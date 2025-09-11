@@ -12,6 +12,7 @@ import {
 import { doc, onSnapshot, DocumentSnapshot } from 'firebase/firestore';
 import { getFirebaseServices } from '@/lib/utils/firebase-client';
 import { initializeNewUser, updateLastLogin } from '@/lib/actions/auth';
+import { trackAuth } from '@/lib/analytics';
 import { User } from '@/types/user';
 import { hasEnoughCredits } from '@/lib/utils/credits';
 
@@ -187,6 +188,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     try {
       await signOut(auth);
+      trackAuth('logout');
       setUser(null);
     } catch (error) {
       console.error('Error signing out:', error);

@@ -13,6 +13,10 @@ import { InsufficientCredits } from '@/components/credits/InsufficientCredits';
 import { DifyChatProps } from '@/types/dify';
 import { formatCredits } from '@/lib/utils/credits';
 import { 
+  MessageSkeleton
+} from '@/components/ui/skeletons';
+import { EmptyMessages } from '@/components/ui/empty-states';
+import { 
   Send, 
   Bot, 
   User, 
@@ -23,6 +27,7 @@ import {
 } from 'lucide-react';
 import { MessageFeedback } from './MessageFeedback';
 import { SuggestedQuestions } from './SuggestedQuestions';
+import { trackChat } from '@/lib/analytics';
 import { useDifyMessages, useDifyAppInfo, useDifyMutations } from '@/lib/hooks/useDify';
 
 interface ChatMessage {
@@ -165,6 +170,9 @@ export function DifyChat({
     setMessages(prev => [...prev, userMessage]);
     addMessage(userMessage);
     
+    // Track chat interaction
+    trackChat('message_sent', userMessage.content.length);
+    
     setInput('');
     setError(null);
 
@@ -187,6 +195,11 @@ export function DifyChat({
       // Add assistant message optimistically
       setMessages(prev => [...prev, assistantMessage]);
       addMessage(assistantMessage);
+      
+      // Track new conversation start
+      if (!conversationId && result.data!.conversation_id) {
+        trackChat('conversation_started');
+      }
       
       setConversationId(result.data!.conversation_id);
 
@@ -255,9 +268,10 @@ export function DifyChat({
           <div className="space-y-4">
             {/* Loading state for conversation messages */}
             {messagesLoading && conversationId && (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin mr-2" />
-                <span className="text-sm text-muted-foreground">Loading conversation...</span>
+              <div className="space-y-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <MessageSkeleton key={i} />
+                ))}
               </div>
             )}
             
@@ -270,6 +284,11 @@ export function DifyChat({
                   {messagesError instanceof Error ? messagesError.message : 'Unknown error'}
                 </p>
               </div>
+            )}
+            
+            {/* Empty state for messages */}
+            {!messagesLoading && !messagesError && messages.length === 0 && (
+              <EmptyMessages />
             )}
             
             {messages.map((message, index) => (
