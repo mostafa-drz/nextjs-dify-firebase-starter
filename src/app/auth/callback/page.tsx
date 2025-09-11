@@ -23,9 +23,9 @@ export default function AuthCallbackPage() {
           setStatus('success');
           setMessage(result.message);
           
-          // Redirect to dashboard after 2 seconds
+          // Redirect to chat after 2 seconds
           setTimeout(() => {
-            router.push('/');
+            router.push('/chat');
           }, 2000);
         } else {
           setStatus('error');
@@ -68,7 +68,7 @@ export default function AuthCallbackPage() {
                   {message}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Redirecting you to your dashboard...
+                  Redirecting you to your chat...
                 </p>
               </div>
             )}
