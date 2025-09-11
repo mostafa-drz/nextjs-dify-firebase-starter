@@ -231,35 +231,6 @@ export abstract class BaseDifyService {
       if (paramObj[field] === undefined || paramObj[field] === null || paramObj[field] === '') {
         throw new DifyApiError(`Missing required parameter: ${field}`, 400, 'INVALID_PARAM');
       }
-
-      // Additional security validation for string fields
-      if (typeof paramObj[field] === 'string') {
-        const value = paramObj[field] as string;
-
-        // Check for suspicious patterns
-        const suspiciousPatterns = [
-          /<script/i,
-          /javascript:/i,
-          /on\w+\s*=/i,
-          /eval\s*\(/i,
-          /function\s*\(/i,
-        ];
-
-        for (const pattern of suspiciousPatterns) {
-          if (pattern.test(value)) {
-            throw new DifyApiError(
-              `Parameter ${field} contains suspicious content`,
-              400,
-              'INVALID_PARAM'
-            );
-          }
-        }
-
-        // Length validation
-        if (value.length > 10000) {
-          throw new DifyApiError(`Parameter ${field} is too long`, 400, 'INVALID_PARAM');
-        }
-      }
     }
   }
 
