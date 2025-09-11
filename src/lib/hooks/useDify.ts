@@ -1,41 +1,27 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { 
-  getDifyConversations, 
-  getDifyAppInfo, 
+import { DifyMessage } from '@/types/dify';
+import {
+  getDifyConversations,
+  getDifyAppInfo,
   getDifyConversationMessages,
   sendDifyMessage,
   renameDifyConversation,
-  deleteDifyConversation
+  deleteDifyConversation,
 } from '@/lib/actions/dify';
+import { QUERY_CONFIGS, queryKeys, cacheInvalidation, optimisticUpdates } from '@/lib/query/config';
 
 /**
- * Unified React Query configuration for all Dify API calls
- * Provides consistent caching, error handling, and optimistic updates
+ * Unified React Query hooks for Dify API calls
+ * Uses centralized configuration and optimized patterns
  */
-
-// Shared query configurations
-const QUERY_CONFIGS = {
-  conversations: {
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000,   // 5 minutes
-  },
-  appInfo: {
-    staleTime: 10 * 60 * 1000, // 10 minutes (rarely changes)
-    gcTime: 30 * 60 * 1000,    // 30 minutes
-  },
-  messages: {
-    staleTime: 5 * 60 * 1000,  // 5 minutes
-    gcTime: 10 * 60 * 1000,    // 10 minutes
-  },
-} as const;
 
 /**
  * Generic Dify query hook with unified configuration
  */
 function useDifyQuery<T>(
-  queryKey: string[],
+  queryKey: readonly unknown[],
   queryFn: () => Promise<T>,
   config: keyof typeof QUERY_CONFIGS,
   enabled: boolean = true
@@ -44,7 +30,6 @@ function useDifyQuery<T>(
     queryKey,
     queryFn,
     enabled,
-    retry: 2,
     ...QUERY_CONFIGS[config],
   });
 }
@@ -54,19 +39,19 @@ function useDifyQuery<T>(
  */
 export function useDifyConversations(userId: string) {
   const queryClient = useQueryClient();
-  
+
   const query = useDifyQuery(
-    ['dify-conversations', userId],
+    queryKeys.dify.conversations(userId),
     async () => {
       const result = await getDifyConversations(userId);
       if (!result.success) throw new Error(result.error?.message || 'Failed to load conversations');
       return result.data;
     },
-    'conversations',
+    'medium',
     !!userId
   );
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['dify-conversations', userId] });
+  const invalidate = () => cacheInvalidation.invalidateConversations(queryClient, userId);
 
   return {
     ...query,
@@ -81,13 +66,13 @@ export function useDifyConversations(userId: string) {
  */
 export function useDifyAppInfo() {
   const query = useDifyQuery(
-    ['dify-app-info'],
+    queryKeys.dify.appInfo(),
     async () => {
       const result = await getDifyAppInfo();
       if (!result.success) throw new Error(result.error?.message || 'Failed to load app info');
       return result.data;
     },
-    'appInfo',
+    'persistent',
     true
   );
 
@@ -105,26 +90,22 @@ export function useDifyAppInfo() {
  */
 export function useDifyMessages(conversationId: string | undefined, userId: string) {
   const queryClient = useQueryClient();
-  
+
   const query = useDifyQuery(
-    ['dify-messages', conversationId || '', userId],
+    conversationId ? queryKeys.dify.messages(conversationId, userId) : [],
     async () => {
       if (!conversationId) return null;
       const result = await getDifyConversationMessages(userId, conversationId, 50);
       if (!result.success) throw new Error(result.error?.message || 'Failed to load messages');
       return result.data;
     },
-    'messages',
+    'medium',
     !!conversationId && !!userId
   );
 
-  const addMessage = (message: unknown) => {
+  const addMessage = (message: DifyMessage) => {
     if (!conversationId) return;
-    queryClient.setQueryData(['dify-messages', conversationId, userId], (old: unknown) => {
-      if (!old) return old;
-      const data = old as { data: unknown[]; has_more: boolean; first_id: string };
-      return { ...data, data: [...data.data, message] };
-    });
+    optimisticUpdates.addMessage(queryClient, conversationId, userId, message);
   };
 
   return {
@@ -142,35 +123,42 @@ export function useDifyMutations(userId: string) {
   const queryClient = useQueryClient();
 
   const sendMessage = useMutation({
-    mutationFn: async (params: { query: string; conversation_id?: string; response_mode?: 'blocking' | 'streaming' }) => {
+    mutationFn: async (params: {
+      query: string;
+      conversation_id?: string;
+      response_mode?: 'blocking' | 'streaming';
+    }) => {
       const result = await sendDifyMessage(userId, { ...params, user: userId });
       if (!result.success) throw new Error(result.error?.message || 'Failed to send message');
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['dify-conversations', userId] });
+      cacheInvalidation.invalidateConversations(queryClient, userId);
     },
   });
 
   const renameConversation = useMutation({
     mutationFn: async ({ conversationId, name }: { conversationId: string; name: string }) => {
       const result = await renameDifyConversation(userId, conversationId, name);
-      if (!result.success) throw new Error(result.error?.message || 'Failed to rename conversation');
+      if (!result.success)
+        throw new Error(result.error?.message || 'Failed to rename conversation');
       return result;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['dify-conversations', userId] });
+    onSuccess: (result, { conversationId, name }) => {
+      cacheInvalidation.invalidateConversations(queryClient, userId);
+      optimisticUpdates.updateConversation(queryClient, userId, conversationId, { name });
     },
   });
 
   const deleteConversation = useMutation({
     mutationFn: async (conversationId: string) => {
       const result = await deleteDifyConversation(userId, conversationId);
-      if (!result.success) throw new Error(result.error?.message || 'Failed to delete conversation');
+      if (!result.success)
+        throw new Error(result.error?.message || 'Failed to delete conversation');
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['dify-conversations', userId] });
+      cacheInvalidation.invalidateConversations(queryClient, userId);
     },
   });
 

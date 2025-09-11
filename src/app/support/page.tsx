@@ -9,16 +9,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { 
-  HelpCircle, 
-  MessageSquare, 
-  Mail, 
+import {
+  HelpCircle,
+  MessageSquare,
+  Mail,
   Clock,
   CheckCircle,
   CreditCard,
   Shield,
   Zap,
-  ExternalLink
+  ExternalLink,
 } from 'lucide-react';
 
 export default function SupportPage() {
@@ -27,7 +27,7 @@ export default function SupportPage() {
     name: '',
     email: '',
     subject: '',
-    message: ''
+    message: '',
   });
 
   const faqItems = [
@@ -37,13 +37,15 @@ export default function SupportPage() {
       questions: [
         {
           question: 'How do I get started with the AI assistant?',
-          answer: 'Simply sign up with your email, verify your account, and start chatting! You\'ll receive free credits to begin using the service.'
+          answer:
+            "Simply sign up with your email, verify your account, and start chatting! You'll receive free credits to begin using the service.",
         },
         {
           question: 'What is Dify AI and how does it work?',
-          answer: 'Dify is an AI platform that powers our chat assistant. It processes your messages and provides intelligent responses using advanced language models.'
-        }
-      ]
+          answer:
+            'Dify is an AI platform that powers our chat assistant. It processes your messages and provides intelligent responses using advanced language models.',
+        },
+      ],
     },
     {
       category: 'Credits & Billing',
@@ -51,17 +53,20 @@ export default function SupportPage() {
       questions: [
         {
           question: 'How does the credit system work?',
-          answer: 'Each credit equals 1000 tokens. Credits are consumed based on the length of your messages and AI responses. Longer conversations use more credits.'
+          answer:
+            'Each credit equals 1000 tokens. Credits are consumed based on the length of your messages and AI responses. Longer conversations use more credits.',
         },
         {
           question: 'How do I get more credits?',
-          answer: 'You can purchase additional credits through your account dashboard. We offer various packages to suit different usage needs.'
+          answer:
+            'You can purchase additional credits through your account dashboard. We offer various packages to suit different usage needs.',
         },
         {
           question: 'Do credits expire?',
-          answer: 'Credits don\'t expire for paid accounts. Free tier credits may have expiration dates as specified in your subscription plan.'
-        }
-      ]
+          answer:
+            "Credits don't expire for paid accounts. Free tier credits may have expiration dates as specified in your subscription plan.",
+        },
+      ],
     },
     {
       category: 'Security & Privacy',
@@ -69,38 +74,40 @@ export default function SupportPage() {
       questions: [
         {
           question: 'Is my data secure?',
-          answer: 'Yes, we use industry-standard encryption and security measures. Your conversations are processed securely and we don\'t share your data with third parties.'
+          answer:
+            "Yes, we use industry-standard encryption and security measures. Your conversations are processed securely and we don't share your data with third parties.",
         },
         {
           question: 'Can I delete my account and data?',
-          answer: 'Absolutely. You can delete your account and all associated data at any time through your profile settings. This action is irreversible.'
-        }
-      ]
-    }
+          answer:
+            'Absolutely. You can delete your account and all associated data at any time through your profile settings. This action is irreversible.',
+        },
+      ],
+    },
   ];
 
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real app, this would send the form data to your backend
-    alert('Thank you for your message! We\'ll get back to you within 24 hours.');
+    alert("Thank you for your message! We'll get back to you within 24 hours.");
     setContactForm({ name: '', email: '', subject: '', message: '' });
   };
 
   return (
     <PageLayout>
-      <div className="container mx-auto py-8 max-w-4xl">
+      <div className="container mx-auto max-w-4xl py-8">
         <div className="space-y-6">
           {/* Header */}
-          <div className="text-center space-y-4">
+          <div className="space-y-4 text-center">
             <div className="flex items-center justify-center gap-2">
-              <HelpCircle className="h-8 w-8 text-primary" />
+              <HelpCircle className="text-primary h-8 w-8" />
               <h1 className="text-3xl font-bold">Support Center</h1>
             </div>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Find answers to common questions or get in touch with our support team. 
-              We're here to help you get the most out of our AI platform.
+            <p className="text-muted-foreground mx-auto max-w-2xl">
+              Find answers to common questions or get in touch with our support team. We&apos;re
+              here to help you get the most out of our AI platform.
             </p>
-            <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
+            <div className="text-muted-foreground flex items-center justify-center gap-4 text-sm">
               <div className="flex items-center gap-1">
                 <Clock className="h-4 w-4" />
                 <span>24/7 Support</span>
@@ -139,7 +146,7 @@ export default function SupportPage() {
                       {category.questions.map((item, itemIndex) => (
                         <div key={itemIndex}>
                           <div className="space-y-2">
-                            <h4 className="font-semibold text-sm">{item.question}</h4>
+                            <h4 className="text-sm font-semibold">{item.question}</h4>
                             <p className="text-muted-foreground text-sm leading-relaxed">
                               {item.answer}
                             </p>
@@ -164,7 +171,7 @@ export default function SupportPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     {/* Contact Form */}
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold">Send us a message</h3>
@@ -174,7 +181,9 @@ export default function SupportPage() {
                           <Input
                             id="name"
                             value={contactForm.name}
-                            onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
+                            onChange={(e) =>
+                              setContactForm((prev) => ({ ...prev, name: e.target.value }))
+                            }
                             placeholder="Your name"
                             required
                           />
@@ -185,7 +194,9 @@ export default function SupportPage() {
                             id="email"
                             type="email"
                             value={contactForm.email}
-                            onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
+                            onChange={(e) =>
+                              setContactForm((prev) => ({ ...prev, email: e.target.value }))
+                            }
                             placeholder="your@email.com"
                             required
                           />
@@ -195,7 +206,9 @@ export default function SupportPage() {
                           <Input
                             id="subject"
                             value={contactForm.subject}
-                            onChange={(e) => setContactForm(prev => ({ ...prev, subject: e.target.value }))}
+                            onChange={(e) =>
+                              setContactForm((prev) => ({ ...prev, subject: e.target.value }))
+                            }
                             placeholder="What can we help you with?"
                             required
                           />
@@ -205,9 +218,11 @@ export default function SupportPage() {
                           <textarea
                             id="message"
                             value={contactForm.message}
-                            onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
+                            onChange={(e) =>
+                              setContactForm((prev) => ({ ...prev, message: e.target.value }))
+                            }
                             placeholder="Please describe your question or issue..."
-                            className="w-full min-h-[100px] px-3 py-2 border border-input bg-background rounded-md text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring min-h-[100px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                             required
                           />
                         </div>
@@ -222,17 +237,17 @@ export default function SupportPage() {
                       <h3 className="text-lg font-semibold">Other ways to reach us</h3>
                       <div className="space-y-4">
                         <div className="flex items-start gap-3">
-                          <Mail className="h-5 w-5 text-muted-foreground mt-0.5" />
+                          <Mail className="text-muted-foreground mt-0.5 h-5 w-5" />
                           <div>
                             <p className="font-medium">Email Support</p>
-                            <a 
+                            <a
                               href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@example.com'}`}
-                              className="text-primary hover:underline text-sm flex items-center gap-1"
+                              className="text-primary flex items-center gap-1 text-sm hover:underline"
                             >
                               {process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@example.com'}
                               <ExternalLink className="h-3 w-3" />
                             </a>
-                            <p className="text-xs text-muted-foreground mt-1">
+                            <p className="text-muted-foreground mt-1 text-xs">
                               We typically respond within 24 hours
                             </p>
                           </div>
@@ -242,18 +257,24 @@ export default function SupportPage() {
 
                         <div className="space-y-2">
                           <p className="font-medium">Response Times</p>
-                          <div className="space-y-1 text-sm text-muted-foreground">
+                          <div className="text-muted-foreground space-y-1 text-sm">
                             <div className="flex justify-between">
                               <span>General inquiries:</span>
-                              <Badge variant="outline" className="text-xs">24 hours</Badge>
+                              <Badge variant="outline" className="text-xs">
+                                24 hours
+                              </Badge>
                             </div>
                             <div className="flex justify-between">
                               <span>Technical issues:</span>
-                              <Badge variant="outline" className="text-xs">12 hours</Badge>
+                              <Badge variant="outline" className="text-xs">
+                                12 hours
+                              </Badge>
                             </div>
                             <div className="flex justify-between">
                               <span>Account problems:</span>
-                              <Badge variant="outline" className="text-xs">6 hours</Badge>
+                              <Badge variant="outline" className="text-xs">
+                                6 hours
+                              </Badge>
                             </div>
                           </div>
                         </div>
@@ -262,7 +283,7 @@ export default function SupportPage() {
 
                         <div className="space-y-2">
                           <p className="font-medium">Before contacting us</p>
-                          <ul className="text-sm text-muted-foreground space-y-1">
+                          <ul className="text-muted-foreground space-y-1 text-sm">
                             <li>• Check our FAQ above</li>
                             <li>• Try refreshing your browser</li>
                             <li>• Clear your browser cache</li>

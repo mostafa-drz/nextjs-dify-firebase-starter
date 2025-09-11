@@ -1,30 +1,25 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { 
-  Home, 
-  ArrowLeft, 
-  Search,
-  AlertTriangle
-} from 'lucide-react';
+import { Home, ArrowLeft, Search, AlertTriangle } from 'lucide-react';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="max-w-md w-full space-y-6">
+    <div className="bg-background flex min-h-screen items-center justify-center p-4">
+      <div className="w-full max-w-md space-y-6">
         {/* Error Icon */}
         <div className="text-center">
-          <div className="flex justify-center mb-4">
+          <div className="mb-4 flex justify-center">
             <div className="relative">
-              <AlertTriangle className="h-16 w-16 text-muted-foreground" />
-              <div className="absolute -top-1 -right-1 h-6 w-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-sm font-bold">
+              <AlertTriangle className="text-muted-foreground h-16 w-16" />
+              <div className="bg-destructive text-destructive-foreground absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full text-sm font-bold">
                 4
               </div>
             </div>
           </div>
-          <h1 className="text-4xl font-bold mb-2">Page Not Found</h1>
+          <h1 className="mb-2 text-4xl font-bold">Page Not Found</h1>
           <p className="text-muted-foreground">
-            The page you're looking for doesn't exist or has been moved.
+            The page you&apos;re looking for doesn&apos;t exist or has been moved.
           </p>
         </div>
 
@@ -32,29 +27,29 @@ export default function NotFound() {
         <Card>
           <CardContent className="pt-6">
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-center">What would you like to do?</h2>
-              
+              <h2 className="text-center text-lg font-semibold">What would you like to do?</h2>
+
               <div className="space-y-3">
                 <Button asChild className="w-full justify-start">
                   <Link href="/">
-                    <Home className="h-4 w-4 mr-2" />
+                    <Home className="mr-2 h-4 w-4" />
                     Go to Homepage
                   </Link>
                 </Button>
-                
+
                 <Button variant="outline" asChild className="w-full justify-start">
                   <Link href="/chat">
-                    <Search className="h-4 w-4 mr-2" />
+                    <Search className="mr-2 h-4 w-4" />
                     Start Chatting
                   </Link>
                 </Button>
-                
-                <Button 
-                  variant="ghost" 
+
+                <Button
+                  variant="ghost"
                   onClick={() => window.history.back()}
                   className="w-full justify-start"
                 >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  <ArrowLeft className="mr-2 h-4 w-4" />
                   Go Back
                 </Button>
               </div>
@@ -63,7 +58,7 @@ export default function NotFound() {
         </Card>
 
         {/* Help Text */}
-        <div className="text-center text-sm text-muted-foreground">
+        <div className="text-muted-foreground text-center text-sm">
           <p>
             If you believe this is an error, please{' '}
             <Link href="/support" className="text-primary hover:underline">
