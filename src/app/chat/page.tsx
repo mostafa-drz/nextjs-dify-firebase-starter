@@ -6,6 +6,7 @@ import { useUser } from '@/components/auth/UserProvider';
 import { DifyChat } from '@/components/dify/DifyChat';
 import { ConversationList } from '@/components/dify/ConversationList';
 import { CreditDisplay } from '@/components/credits/CreditDisplay';
+import { PageLayout } from '@/components/layout/PageLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -30,13 +31,14 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold mb-2">AI Chat Assistant</h1>
-        <p className="text-muted-foreground">
-          Secure server-side integration with Dify.ai using your API key
-        </p>
-      </div>
+    <PageLayout currentPage="chat">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold mb-2">AI Chat Assistant</h1>
+          <p className="text-muted-foreground">
+            Secure server-side integration with Dify.ai using your API key
+          </p>
+        </div>
 
       {/* Instructions */}
       <Alert className="mb-8">
@@ -145,5 +147,6 @@ export default function ChatPage() {
         </div>
       </div>
     </div>
+    </PageLayout>
   );
 }

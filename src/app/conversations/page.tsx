@@ -6,6 +6,7 @@ import { useUser } from '@/components/auth/UserProvider';
 import { ConversationList } from '@/components/dify/ConversationList';
 import { DifyChat } from '@/components/dify/DifyChat';
 import { CreditDisplay } from '@/components/credits/CreditDisplay';
+import { PageLayout } from '@/components/layout/PageLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Info, MessageSquare } from 'lucide-react';
@@ -29,13 +30,14 @@ export default function ConversationsPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold mb-2">Conversations</h1>
-        <p className="text-muted-foreground">
-          Manage your AI conversations and chat history
-        </p>
-      </div>
+    <PageLayout currentPage="conversations">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold mb-2">Conversations</h1>
+          <p className="text-muted-foreground">
+            Manage your AI conversations and chat history
+          </p>
+        </div>
 
       {/* Instructions */}
       <Alert className="mb-8">
@@ -94,5 +96,6 @@ export default function ConversationsPage() {
         </div>
       </div>
     </div>
+    </PageLayout>
   );
 }
