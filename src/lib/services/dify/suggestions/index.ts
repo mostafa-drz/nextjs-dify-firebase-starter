@@ -5,10 +5,7 @@
  */
 
 import { BaseDifyService } from '../base';
-import {
-  SuggestedQuestionsResponse,
-  DifyApiResponse
-} from '../types';
+import { SuggestedQuestionsResponse, DifyApiResponse } from '../types';
 
 /**
  * Service for handling suggested questions operations with Dify API
@@ -22,7 +19,7 @@ export class SuggestionsService extends BaseDifyService {
    * @example
    * ```typescript
    * const suggestions = await suggestionsService.getSuggestedQuestions("msg-123");
-   * 
+   *
    * if (suggestions.success && suggestions.data) {
    *   suggestions.data.data.forEach(question => {
    *     console.log(`Suggested: ${question}`);
@@ -30,12 +27,14 @@ export class SuggestionsService extends BaseDifyService {
    * }
    * ```
    */
-  async getSuggestedQuestions(messageId: string): Promise<DifyApiResponse<SuggestedQuestionsResponse>> {
+  async getSuggestedQuestions(
+    messageId: string
+  ): Promise<DifyApiResponse<SuggestedQuestionsResponse>> {
     try {
       this.validateRequired({ messageId }, ['messageId']);
 
       const params = new URLSearchParams({
-        user: this.userId
+        user: this.userId,
       });
 
       const response = await this.makeRequest(`/messages/${messageId}/suggested?${params}`, {
@@ -46,7 +45,7 @@ export class SuggestionsService extends BaseDifyService {
 
       return {
         success: true,
-        data
+        data,
       };
     } catch (error) {
       return this.handleError(error);
@@ -62,7 +61,7 @@ export class SuggestionsService extends BaseDifyService {
    * const results = await suggestionsService.getBatchSuggestedQuestions([
    *   "msg-1", "msg-2", "msg-3"
    * ]);
-   * 
+   *
    * results.forEach((result, index) => {
    *   if (result.success && result.data) {
    *     console.log(`Message ${index + 1} suggestions:`, result.data.data);
@@ -73,14 +72,12 @@ export class SuggestionsService extends BaseDifyService {
   async getBatchSuggestedQuestions(
     messageIds: string[]
   ): Promise<DifyApiResponse<SuggestedQuestionsResponse>[]> {
-    const promises = messageIds.map(messageId =>
-      this.getSuggestedQuestions(messageId)
-    );
+    const promises = messageIds.map((messageId) => this.getSuggestedQuestions(messageId));
 
     try {
       const results = await Promise.allSettled(promises);
-      
-      return results.map(result => {
+
+      return results.map((result) => {
         if (result.status === 'fulfilled') {
           return result.value;
         } else {
@@ -89,8 +86,8 @@ export class SuggestionsService extends BaseDifyService {
             error: {
               code: 'BATCH_SUGGESTIONS_ERROR',
               message: result.reason instanceof Error ? result.reason.message : 'Unknown error',
-              status: 500
-            }
+              status: 500,
+            },
           };
         }
       });
@@ -110,7 +107,7 @@ export class SuggestionsService extends BaseDifyService {
    *   "msg-123",
    *   ["What else can you help with?", "Tell me more about this topic"]
    * );
-   * 
+   *
    * console.log("Available questions:", questions);
    * ```
    */
@@ -120,11 +117,11 @@ export class SuggestionsService extends BaseDifyService {
   ): Promise<string[]> {
     try {
       const response = await this.getSuggestedQuestions(messageId);
-      
+
       if (response.success && response.data) {
         return response.data.data;
       }
-      
+
       console.warn('Failed to get suggested questions, using fallback');
       return fallbackQuestions;
     } catch (error) {
@@ -152,12 +149,15 @@ export class SuggestionsService extends BaseDifyService {
   ): Promise<string[]> {
     try {
       // First get the conversation history to find the latest message
-      const historyResponse = await this.makeRequest(`/messages?conversation_id=${conversationId}&user=${this.userId}&limit=1`, {
-        method: 'GET',
-      });
+      const historyResponse = await this.makeRequest(
+        `/messages?conversation_id=${conversationId}&user=${this.userId}&limit=1`,
+        {
+          method: 'GET',
+        }
+      );
 
       const historyData = await historyResponse.json();
-      
+
       if (!historyData.data || historyData.data.length === 0) {
         return fallbackQuestions;
       }
@@ -184,11 +184,11 @@ export class SuggestionsService extends BaseDifyService {
    * ```
    */
   formatQuestions(questions: string[], maxLength: number = 100): string[] {
-    return questions.map(question => {
+    return questions.map((question) => {
       if (question.length <= maxLength) {
         return question;
       }
-      
+
       // Truncate and add ellipsis
       return question.substring(0, maxLength - 3) + '...';
     });
@@ -216,28 +216,28 @@ export class SuggestionsService extends BaseDifyService {
       includeWords?: string[];
     } = {}
   ): string[] {
-    return questions.filter(question => {
+    return questions.filter((question) => {
       const length = question.length;
-      
+
       // Length filters
       if (filters.minLength && length < filters.minLength) return false;
       if (filters.maxLength && length > filters.maxLength) return false;
-      
+
       // Word filters
       if (filters.excludeWords) {
-        const hasExcludedWord = filters.excludeWords.some(word =>
+        const hasExcludedWord = filters.excludeWords.some((word) =>
           question.toLowerCase().includes(word.toLowerCase())
         );
         if (hasExcludedWord) return false;
       }
-      
+
       if (filters.includeWords) {
-        const hasIncludedWord = filters.includeWords.some(word =>
+        const hasIncludedWord = filters.includeWords.some((word) =>
           question.toLowerCase().includes(word.toLowerCase())
         );
         if (!hasIncludedWord) return false;
       }
-      
+
       return true;
     });
   }

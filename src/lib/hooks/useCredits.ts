@@ -3,7 +3,11 @@
 import { useState } from 'react';
 import { useUser } from '@/components/auth/UserProvider';
 import { deductCreditsForTokens, addCredits } from '@/lib/actions/credits';
-import { calculateCreditsFromTokens, hasEnoughCredits, shouldWarnLowCredits } from '@/lib/utils/credits';
+import {
+  calculateCreditsFromTokens,
+  hasEnoughCredits,
+  shouldWarnLowCredits,
+} from '@/lib/utils/credits';
 
 export function useCredits() {
   const { user, checkCredits, availableCredits } = useUser();
@@ -27,9 +31,9 @@ export function useCredits() {
       const result = await deductCreditsForTokens(user.uid, tokensUsed, operation, metadata);
       return result;
     } catch (error: unknown) {
-      return { 
-        success: false, 
-        message: error instanceof Error ? error.message : 'Failed to deduct credits' 
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to deduct credits',
       };
     } finally {
       setIsProcessing(false);
@@ -46,9 +50,9 @@ export function useCredits() {
       const result = await addCredits(user.uid, amount, reason);
       return result;
     } catch (error: unknown) {
-      return { 
-        success: false, 
-        message: error instanceof Error ? error.message : 'Failed to add credits' 
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to add credits',
       };
     } finally {
       setIsProcessing(false);
@@ -60,17 +64,17 @@ export function useCredits() {
     isProcessing,
     availableCredits,
     user,
-    
+
     // Helpers
     checkCredits,
     hasEnoughCredits: (required: number) => hasEnoughCredits(availableCredits, required),
     shouldWarnLowCredits: () => shouldWarnLowCredits(availableCredits),
     calculateCreditsFromTokens,
-    
+
     // Actions
     deductForTokens,
     addCreditsToUser,
-    
+
     // User data
     subscription: user?.admin?.subscription,
     creditHistory: user?.admin?.creditHistory || [],

@@ -142,13 +142,13 @@ export interface ChatCompletionResponse {
 /**
  * Streaming event types for real-time chat responses
  */
-export type StreamingEventType = 
-  | 'message'           // Partial message content
-  | 'message_end'       // End of message generation
-  | 'agent_thought'      // Agent reasoning (for agent mode)
-  | 'agent_message'     // Agent response (for agent mode)
-  | 'message_file'      // File attachment (for agent mode)
-  | 'error';            // Error occurred
+export type StreamingEventType =
+  | 'message' // Partial message content
+  | 'message_end' // End of message generation
+  | 'agent_thought' // Agent reasoning (for agent mode)
+  | 'agent_message' // Agent response (for agent mode)
+  | 'message_file' // File attachment (for agent mode)
+  | 'error'; // Error occurred
 
 /**
  * Base structure for streaming events
@@ -242,7 +242,7 @@ export interface ErrorStreamingEvent extends BaseStreamingEvent {
 /**
  * Union type for all streaming events
  */
-export type StreamingEvent = 
+export type StreamingEvent =
   | MessageStreamingEvent
   | MessageEndStreamingEvent
   | AgentThoughtStreamingEvent

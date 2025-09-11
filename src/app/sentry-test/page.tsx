@@ -50,84 +50,82 @@ export default function SentryTestPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white shadow rounded-lg p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Sentry Integration Test Page
-          </h1>
-          
-          <p className="text-gray-600 mb-6">
-            Use this page to test different Sentry logging scenarios. 
-            Check your Sentry dashboard to verify the events are being captured.
-          </p>
+      <div className="min-h-screen bg-gray-50 px-4 py-12">
+        <div className="mx-auto max-w-3xl">
+          <div className="rounded-lg bg-white p-6 shadow">
+            <h1 className="mb-4 text-2xl font-bold text-gray-900">Sentry Integration Test Page</h1>
 
-          <div className="space-y-4">
-            <div className="border rounded-lg p-4">
-              <h2 className="font-semibold text-lg mb-3">Client-Side Tests</h2>
-              <div className="space-x-2">
+            <p className="mb-6 text-gray-600">
+              Use this page to test different Sentry logging scenarios. Check your Sentry dashboard
+              to verify the events are being captured.
+            </p>
+
+            <div className="space-y-4">
+              <div className="rounded-lg border p-4">
+                <h2 className="mb-3 text-lg font-semibold">Client-Side Tests</h2>
+                <div className="space-x-2">
+                  <button
+                    onClick={testClientError}
+                    className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+                  >
+                    Test Handled Error
+                  </button>
+                  <button
+                    onClick={testUnhandledError}
+                    className="rounded bg-red-800 px-4 py-2 text-white hover:bg-red-900"
+                  >
+                    Test Unhandled Error
+                  </button>
+                </div>
+              </div>
+
+              <div className="rounded-lg border p-4">
+                <h2 className="mb-3 text-lg font-semibold">API Tests</h2>
                 <button
-                  onClick={testClientError}
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                  onClick={testApiError}
+                  className="rounded bg-orange-600 px-4 py-2 text-white hover:bg-orange-700"
                 >
-                  Test Handled Error
+                  Test API Error
                 </button>
-                <button
-                  onClick={testUnhandledError}
-                  className="px-4 py-2 bg-red-800 text-white rounded hover:bg-red-900"
-                >
-                  Test Unhandled Error
-                </button>
+              </div>
+
+              <div className="rounded-lg border p-4">
+                <h2 className="mb-3 text-lg font-semibold">Logging Tests</h2>
+                <div className="space-x-2">
+                  <button
+                    onClick={testLogMessage}
+                    className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                  >
+                    Log Info Message
+                  </button>
+                  <button
+                    onClick={testWarning}
+                    className="rounded bg-yellow-600 px-4 py-2 text-white hover:bg-yellow-700"
+                  >
+                    Log Warning
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div className="border rounded-lg p-4">
-              <h2 className="font-semibold text-lg mb-3">API Tests</h2>
-              <button
-                onClick={testApiError}
-                className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700"
-              >
-                Test API Error
-              </button>
-            </div>
-
-            <div className="border rounded-lg p-4">
-              <h2 className="font-semibold text-lg mb-3">Logging Tests</h2>
-              <div className="space-x-2">
-                <button
-                  onClick={testLogMessage}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                  Log Info Message
-                </button>
-                <button
-                  onClick={testWarning}
-                  className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
-                >
-                  Log Warning
-                </button>
+            {testStatus && (
+              <div className="mt-6 rounded border border-green-200 bg-green-50 p-4">
+                <p className="text-green-800">{testStatus}</p>
               </div>
-            </div>
-          </div>
+            )}
 
-          {testStatus && (
-            <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded">
-              <p className="text-green-800">{testStatus}</p>
+            <div className="mt-6 rounded border border-blue-200 bg-blue-50 p-4">
+              <h3 className="mb-2 font-semibold text-blue-900">Setup Instructions:</h3>
+              <ol className="list-inside list-decimal space-y-1 text-sm text-blue-800">
+                <li>Add your Sentry DSN to .env.local</li>
+                <li>Run: npm run dev</li>
+                <li>Visit this page and click the test buttons</li>
+                <li>Check your Sentry dashboard for the events</li>
+              </ol>
             </div>
-          )}
-
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded">
-            <h3 className="font-semibold text-blue-900 mb-2">Setup Instructions:</h3>
-            <ol className="list-decimal list-inside text-sm text-blue-800 space-y-1">
-              <li>Add your Sentry DSN to .env.local</li>
-              <li>Run: npm run dev</li>
-              <li>Visit this page and click the test buttons</li>
-              <li>Check your Sentry dashboard for the events</li>
-            </ol>
           </div>
         </div>
       </div>
-    </div>
     </ProtectedRoute>
   );
 }

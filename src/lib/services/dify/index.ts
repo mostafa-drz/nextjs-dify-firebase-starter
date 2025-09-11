@@ -13,10 +13,10 @@ import { AudioService } from './audio';
 
 /**
  * Main Dify service providing unified access to all Dify API functionality
- * 
+ *
  * This service acts as a facade, providing a single entry point to all Dify services
  * while maintaining separation of concerns through individual service classes.
- * 
+ *
  * @example
  * ```typescript
  * // Initialize the service
@@ -26,26 +26,26 @@ import { AudioService } from './audio';
  *   baseUrl: 'https://api.dify.ai/v1', // optional
  *   timeout: 30000 // optional
  * });
- * 
+ *
  * // Use chat functionality
  * const chatResponse = await difyService.chat.sendMessage({
  *   query: "Hello, how are you?",
  *   user: "user123",
  *   response_mode: "blocking"
  * });
- * 
+ *
  * // Use conversation management
  * const conversations = await difyService.conversation.getConversations();
- * 
+ *
  * // Use feedback system
  * await difyService.feedback.likeMessage("msg-123", "Great answer!");
- * 
+ *
  * // Use suggestions
  * const suggestions = await difyService.suggestions.getSuggestedQuestions("msg-123");
- * 
+ *
  * // Use audio features
  * const audioBlob = await difyService.audio.textToAudio("Hello world!");
- * 
+ *
  * ```
  */
 export class DifyService {
@@ -79,7 +79,6 @@ export class DifyService {
    */
   public readonly audio: AudioService;
 
-
   /**
    * Service configuration
    * @private
@@ -90,7 +89,7 @@ export class DifyService {
    * Creates a new DifyService instance
    * @param config - Service configuration
    * @throws {Error} If required configuration is missing
-   * 
+   *
    * @example
    * ```typescript
    * const difyService = new DifyService({
@@ -121,7 +120,7 @@ export class DifyService {
   /**
    * Gets the current user ID
    * @returns The user ID
-   * 
+   *
    * @example
    * ```typescript
    * const userId = difyService.getUserId();
@@ -135,7 +134,7 @@ export class DifyService {
   /**
    * Gets the API key (masked for security)
    * @returns Masked API key
-   * 
+   *
    * @example
    * ```typescript
    * const apiKey = difyService.getApiKey();
@@ -149,7 +148,7 @@ export class DifyService {
   /**
    * Gets the base URL for the Dify API
    * @returns The base URL
-   * 
+   *
    * @example
    * ```typescript
    * const baseUrl = difyService.getBaseUrl();
@@ -163,7 +162,7 @@ export class DifyService {
   /**
    * Gets the request timeout
    * @returns The timeout in milliseconds
-   * 
+   *
    * @example
    * ```typescript
    * const timeout = difyService.getTimeout();
@@ -177,7 +176,7 @@ export class DifyService {
   /**
    * Updates the user ID for all services
    * @param userId - New user ID
-   * 
+   *
    * @example
    * ```typescript
    * difyService.updateUserId('new-user-123');
@@ -185,7 +184,7 @@ export class DifyService {
    */
   public updateUserId(userId: string): void {
     this.config.userId = userId;
-    
+
     // Update user ID in all services (using type assertion to bypass readonly)
     (this.chat as unknown as { userId: string }).userId = userId;
     (this.conversation as unknown as { userId: string }).userId = userId;
@@ -197,7 +196,7 @@ export class DifyService {
   /**
    * Gets service health status
    * @returns Promise resolving to health status
-   * 
+   *
    * @example
    * ```typescript
    * const health = await difyService.getHealth();
@@ -227,7 +226,7 @@ export class DifyService {
       feedback: true,
       suggestions: true,
       audio: true,
-      files: true
+      files: true,
     };
 
     // Test each service with a simple operation
@@ -241,10 +240,16 @@ export class DifyService {
 
     try {
       // Test conversation service
-      await (this.conversation as unknown as { makeRequest: (url: string, options: unknown) => Promise<unknown> }).makeRequest('/conversations?user=' + this.config.userId + '&limit=1', { method: 'GET' });
+      await (
+        this.conversation as unknown as {
+          makeRequest: (url: string, options: unknown) => Promise<unknown>;
+        }
+      ).makeRequest('/conversations?user=' + this.config.userId + '&limit=1', { method: 'GET' });
     } catch (error) {
       services.conversation = false;
-      issues.push('Conversation service: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      issues.push(
+        'Conversation service: ' + (error instanceof Error ? error.message : 'Unknown error')
+      );
     }
 
     // Other services would be tested similarly...
@@ -252,7 +257,7 @@ export class DifyService {
     return {
       isHealthy: issues.length === 0,
       issues,
-      services
+      services,
     };
   }
 
@@ -260,7 +265,7 @@ export class DifyService {
    * Creates a new DifyService instance with different user ID
    * @param userId - New user ID
    * @returns New DifyService instance
-   * 
+   *
    * @example
    * ```typescript
    * const newService = difyService.forUser('different-user-123');
@@ -269,7 +274,7 @@ export class DifyService {
   public forUser(userId: string): DifyService {
     return new DifyService({
       ...this.config,
-      userId
+      userId,
     });
   }
 
@@ -277,7 +282,7 @@ export class DifyService {
    * Creates a new DifyService instance with different API key
    * @param apiKey - New API key
    * @returns New DifyService instance
-   * 
+   *
    * @example
    * ```typescript
    * const newService = difyService.withApiKey('app-different-key');
@@ -286,7 +291,7 @@ export class DifyService {
   public withApiKey(apiKey: string): DifyService {
     return new DifyService({
       ...this.config,
-      apiKey
+      apiKey,
     });
   }
 }

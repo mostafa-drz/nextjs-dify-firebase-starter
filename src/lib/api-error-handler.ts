@@ -10,11 +10,7 @@ export interface ApiError {
 /**
  * Create a standardized API error response
  */
-export function createApiError(
-  message: string,
-  status: number = 500,
-  code?: string
-): NextResponse {
+export function createApiError(message: string, status: number = 500, code?: string): NextResponse {
   const error = {
     error: {
       message,
@@ -44,21 +40,25 @@ export function withErrorHandler<T extends unknown[], R>(
       // Handle known Firebase errors
       if (error && typeof error === 'object' && 'code' in error) {
         const firebaseError = error as { code: string; message?: string };
-        
+
         switch (firebaseError.code) {
           case 'auth/invalid-credential':
           case 'auth/user-not-found':
             return createApiError('Invalid credentials', 401, firebaseError.code);
-          
+
           case 'auth/too-many-requests':
-            return createApiError('Too many requests. Please try again later.', 429, firebaseError.code);
-          
+            return createApiError(
+              'Too many requests. Please try again later.',
+              429,
+              firebaseError.code
+            );
+
           case 'permission-denied':
             return createApiError('Permission denied', 403, firebaseError.code);
-          
+
           case 'not-found':
             return createApiError('Resource not found', 404, firebaseError.code);
-          
+
           default:
             // Log unexpected Firebase errors
             logError(firebaseError, { code: firebaseError.code });
@@ -70,9 +70,7 @@ export function withErrorHandler<T extends unknown[], R>(
       if (error instanceof Error) {
         logError(error);
         return createApiError(
-          process.env.NODE_ENV === 'production' 
-            ? 'Internal server error' 
-            : error.message,
+          process.env.NODE_ENV === 'production' ? 'Internal server error' : error.message,
           500
         );
       }
@@ -93,11 +91,11 @@ export async function parseRequestBody<T>(
 ): Promise<T> {
   try {
     const body = await request.json();
-    
+
     if (validator && !validator(body)) {
       throw new Error('Invalid request body');
     }
-    
+
     return body as T;
   } catch (error) {
     if (error instanceof SyntaxError) {

@@ -11,16 +11,16 @@ interface EnvConfig {
   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: string;
   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: string;
   NEXT_PUBLIC_FIREBASE_APP_ID: string;
-  
+
   // Firebase Admin Configuration (Server-side only)
   FIREBASE_PROJECT_ID: string;
   FIREBASE_PRIVATE_KEY: string;
   FIREBASE_CLIENT_EMAIL: string;
-  
+
   // Dify Configuration (Server-side only)
   DIFY_API_KEY: string;
   DIFY_BASE_URL: string;
-  
+
   // Application Configuration
   NEXT_PUBLIC_SUPPORT_EMAIL: string;
 }
@@ -30,12 +30,12 @@ interface EnvConfig {
  */
 const CLIENT_ENV_VARS = [
   'NEXT_PUBLIC_FIREBASE_API_KEY',
-  'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN', 
+  'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
   'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
   'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
   'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
   'NEXT_PUBLIC_FIREBASE_APP_ID',
-  'NEXT_PUBLIC_SUPPORT_EMAIL'
+  'NEXT_PUBLIC_SUPPORT_EMAIL',
 ] as const;
 
 /**
@@ -46,14 +46,17 @@ const SERVER_ENV_VARS = [
   'FIREBASE_PRIVATE_KEY',
   'FIREBASE_CLIENT_EMAIL',
   'DIFY_API_KEY',
-  'DIFY_BASE_URL'
+  'DIFY_BASE_URL',
 ] as const;
 
 /**
  * Validation error class
  */
 export class EnvValidationError extends Error {
-  constructor(message: string, public missingVars: string[]) {
+  constructor(
+    message: string,
+    public missingVars: string[]
+  ) {
     super(message);
     this.name = 'EnvValidationError';
   }
@@ -65,13 +68,13 @@ export class EnvValidationError extends Error {
  */
 export function validateClientEnv(): void {
   const missing: string[] = [];
-  
+
   for (const varName of CLIENT_ENV_VARS) {
     if (!process.env[varName]) {
       missing.push(varName);
     }
   }
-  
+
   if (missing.length > 0) {
     throw new EnvValidationError(
       `Missing required client environment variables: ${missing.join(', ')}`,
@@ -86,13 +89,13 @@ export function validateClientEnv(): void {
  */
 export function validateServerEnv(): void {
   const missing: string[] = [];
-  
+
   for (const varName of SERVER_ENV_VARS) {
     if (!process.env[varName]) {
       missing.push(varName);
     }
   }
-  
+
   if (missing.length > 0) {
     throw new EnvValidationError(
       `Missing required server environment variables: ${missing.join(', ')}`,
@@ -145,7 +148,7 @@ export interface EnvStatus {
 export function checkEnvStatus(): EnvStatus {
   const missing: string[] = [];
   const errors: string[] = [];
-  
+
   // Check client vars
   for (const varName of CLIENT_ENV_VARS) {
     if (!process.env[varName]) {
@@ -153,7 +156,7 @@ export function checkEnvStatus(): EnvStatus {
       errors.push(`Client: ${varName} is missing`);
     }
   }
-  
+
   // Check server vars (only in server context)
   if (typeof window === 'undefined') {
     for (const varName of SERVER_ENV_VARS) {
@@ -163,10 +166,10 @@ export function checkEnvStatus(): EnvStatus {
       }
     }
   }
-  
+
   return {
     isValid: missing.length === 0,
     missingVars: missing,
-    errors
+    errors,
   };
 }

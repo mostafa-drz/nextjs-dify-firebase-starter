@@ -14,7 +14,7 @@ export class DifyApiError extends Error {
    * HTTP status code
    */
   public readonly status: number;
-  
+
   /**
    * Error code for programmatic handling
    */
@@ -81,12 +81,9 @@ export abstract class BaseDifyService {
    * @returns Promise resolving to the response
    * @protected
    */
-  protected async makeRequest(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<Response> {
+  protected async makeRequest(endpoint: string, options: RequestInit = {}): Promise<Response> {
     const url = `${this.baseUrl}${endpoint}`;
-    
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
@@ -94,7 +91,7 @@ export abstract class BaseDifyService {
       const response = await fetch(url, {
         ...options,
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
           ...options.headers,
         },
@@ -115,15 +112,15 @@ export abstract class BaseDifyService {
       return response;
     } catch (error) {
       clearTimeout(timeoutId);
-      
+
       if (error instanceof DifyApiError) {
         throw error;
       }
-      
+
       if (error instanceof Error && error.name === 'AbortError') {
         throw new DifyApiError('Request timeout', 408, 'TIMEOUT');
       }
-      
+
       throw new DifyApiError(
         error instanceof Error ? error.message : 'Unknown error occurred',
         500,
@@ -139,12 +136,9 @@ export abstract class BaseDifyService {
    * @returns Promise resolving to the response
    * @protected
    */
-  protected async makeMultipartRequest(
-    endpoint: string,
-    formData: FormData
-  ): Promise<Response> {
+  protected async makeMultipartRequest(endpoint: string, formData: FormData): Promise<Response> {
     const url = `${this.baseUrl}${endpoint}`;
-    
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
@@ -152,7 +146,7 @@ export abstract class BaseDifyService {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
           // Don't set Content-Type for FormData, let browser set it with boundary
         },
         body: formData,
@@ -173,15 +167,15 @@ export abstract class BaseDifyService {
       return response;
     } catch (error) {
       clearTimeout(timeoutId);
-      
+
       if (error instanceof DifyApiError) {
         throw error;
       }
-      
+
       if (error instanceof Error && error.name === 'AbortError') {
         throw new DifyApiError('Request timeout', 408, 'TIMEOUT');
       }
-      
+
       throw new DifyApiError(
         error instanceof Error ? error.message : 'Unknown error occurred',
         500,
@@ -198,15 +192,15 @@ export abstract class BaseDifyService {
    */
   protected handleError<T = unknown>(error: unknown): DifyApiResponse<T> {
     console.error('Dify API error:', error);
-    
+
     if (error instanceof DifyApiError) {
       return {
         success: false,
         error: {
           code: error.code || 'DIFY_API_ERROR',
           message: error.message,
-          status: error.status
-        }
+          status: error.status,
+        },
       };
     }
 
@@ -215,8 +209,8 @@ export abstract class BaseDifyService {
       error: {
         code: 'UNKNOWN_ERROR',
         message: error instanceof Error ? error.message : 'An unexpected error occurred',
-        status: 500
-      }
+        status: 500,
+      },
     };
   }
 
@@ -229,21 +223,13 @@ export abstract class BaseDifyService {
    */
   protected validateRequired(params: unknown, requiredFields: string[]): void {
     if (typeof params !== 'object' || params === null) {
-      throw new DifyApiError(
-        'Parameters must be an object',
-        400,
-        'INVALID_PARAM'
-      );
+      throw new DifyApiError('Parameters must be an object', 400, 'INVALID_PARAM');
     }
-    
+
     const paramObj = params as Record<string, unknown>;
     for (const field of requiredFields) {
       if (paramObj[field] === undefined || paramObj[field] === null || paramObj[field] === '') {
-        throw new DifyApiError(
-          `Missing required parameter: ${field}`,
-          400,
-          'INVALID_PARAM'
-        );
+        throw new DifyApiError(`Missing required parameter: ${field}`, 400, 'INVALID_PARAM');
       }
     }
   }

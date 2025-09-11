@@ -11,7 +11,7 @@ import {
   StreamingEvent,
   DifyApiResponse,
   StopGenerationRequest,
-  StopGenerationResponse
+  StopGenerationResponse,
 } from '../types';
 
 /**
@@ -30,7 +30,7 @@ export class ChatService extends BaseDifyService {
    *   user: "user123",
    *   response_mode: "blocking"
    * });
-   * 
+   *
    * if (response.success) {
    *   console.log("Assistant:", response.data?.answer);
    * }
@@ -44,7 +44,7 @@ export class ChatService extends BaseDifyService {
         method: 'POST',
         body: JSON.stringify({
           ...request,
-          response_mode: 'blocking' // Force blocking mode for this method
+          response_mode: 'blocking', // Force blocking mode for this method
         }),
       });
 
@@ -53,7 +53,7 @@ export class ChatService extends BaseDifyService {
       return {
         success: true,
         data,
-        usage: data.metadata?.usage
+        usage: data.metadata?.usage,
       };
     } catch (error) {
       return this.handleError(error);
@@ -71,12 +71,12 @@ export class ChatService extends BaseDifyService {
    *   user: "user123",
    *   response_mode: "streaming"
    * });
-   * 
+   *
    * const reader = stream.getReader();
    * while (true) {
    *   const { done, value } = await reader.read();
    *   if (done) break;
-   *   
+   *
    *   const event = JSON.parse(new TextDecoder().decode(value));
    *   console.log("Event:", event.event, "Content:", event.answer);
    * }
@@ -89,11 +89,11 @@ export class ChatService extends BaseDifyService {
       const response = await this.makeRequest('/chat-messages', {
         method: 'POST',
         headers: {
-          'Accept': 'text/event-stream',
+          Accept: 'text/event-stream',
         },
         body: JSON.stringify({
           ...request,
-          response_mode: 'streaming' // Force streaming mode for this method
+          response_mode: 'streaming', // Force streaming mode for this method
         }),
       });
 
@@ -110,7 +110,7 @@ export class ChatService extends BaseDifyService {
         start(controller) {
           controller.enqueue(new TextEncoder().encode(`data: ${errorText}\n\n`));
           controller.close();
-        }
+        },
       });
     }
   }
@@ -132,7 +132,7 @@ export class ChatService extends BaseDifyService {
       this.validateRequired({ taskId }, ['taskId']);
 
       const request: StopGenerationRequest = {
-        user: this.userId
+        user: this.userId,
       };
 
       const response = await this.makeRequest(`/chat-messages/${taskId}/stop`, {
@@ -144,7 +144,7 @@ export class ChatService extends BaseDifyService {
 
       return {
         success: true,
-        data
+        data,
       };
     } catch (error) {
       return this.handleError(error);
@@ -178,7 +178,7 @@ export class ChatService extends BaseDifyService {
     try {
       while (true) {
         const { done, value } = await reader.read();
-        
+
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
@@ -190,7 +190,7 @@ export class ChatService extends BaseDifyService {
             try {
               const eventData = line.slice(6); // Remove 'data: ' prefix
               if (eventData.trim() === '') continue;
-              
+
               const event: StreamingEvent = JSON.parse(eventData);
               yield event;
             } catch (parseError) {
@@ -231,7 +231,7 @@ export class ChatService extends BaseDifyService {
 
       for await (const event of this.parseStreamingEvents(stream)) {
         onEvent(event);
-        
+
         if (event.event === 'message_end' || event.event === 'error') {
           finalEvent = event;
         }

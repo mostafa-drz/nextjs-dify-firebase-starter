@@ -1,11 +1,5 @@
 import { Button } from './button';
-import { 
-  MessageSquare, 
-  MessageCircle, 
-  CreditCard,
-  FileText,
-  Users
-} from 'lucide-react';
+import { MessageSquare, MessageCircle, CreditCard, FileText, Users } from 'lucide-react';
 
 interface EmptyStateProps {
   icon?: React.ReactNode;
@@ -18,25 +12,17 @@ interface EmptyStateProps {
   className?: string;
 }
 
-export function EmptyState({ 
-  icon, 
-  title, 
-  description, 
-  action, 
-  className = '' 
-}: EmptyStateProps) {
+export function EmptyState({ icon, title, description, action, className = '' }: EmptyStateProps) {
   return (
-    <div className={`flex flex-col items-center justify-center py-12 px-4 text-center ${className}`}>
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
+    <div
+      className={`flex flex-col items-center justify-center px-4 py-12 text-center ${className}`}
+    >
+      <div className="bg-muted mb-4 flex h-16 w-16 items-center justify-center rounded-full">
         {icon}
       </div>
-      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+      <h3 className="mb-2 text-lg font-semibold">{title}</h3>
       <p className="text-muted-foreground mb-4 max-w-sm">{description}</p>
-      {action && (
-        <Button onClick={action.onClick}>
-          {action.label}
-        </Button>
-      )}
+      {action && <Button onClick={action.onClick}>{action.label}</Button>}
     </div>
   );
 }
@@ -47,12 +33,12 @@ export function EmptyState({
 export function EmptyConversations({ onCreateNew }: { onCreateNew: () => void }) {
   return (
     <EmptyState
-      icon={<MessageSquare className="h-8 w-8 text-muted-foreground" />}
+      icon={<MessageSquare className="text-muted-foreground h-8 w-8" />}
       title="No conversations yet"
       description="Start a new conversation with your AI assistant to get started."
       action={{
-        label: "Start New Chat",
-        onClick: onCreateNew
+        label: 'Start New Chat',
+        onClick: onCreateNew,
       }}
     />
   );
@@ -64,7 +50,7 @@ export function EmptyConversations({ onCreateNew }: { onCreateNew: () => void })
 export function EmptyMessages() {
   return (
     <EmptyState
-      icon={<MessageCircle className="h-8 w-8 text-muted-foreground" />}
+      icon={<MessageCircle className="text-muted-foreground h-8 w-8" />}
       title="No messages yet"
       description="Send a message to start the conversation."
       className="py-8"
@@ -78,7 +64,7 @@ export function EmptyMessages() {
 export function EmptyCreditHistory() {
   return (
     <EmptyState
-      icon={<CreditCard className="h-8 w-8 text-muted-foreground" />}
+      icon={<CreditCard className="text-muted-foreground h-8 w-8" />}
       title="No credit history"
       description="Your credit usage history will appear here once you start using the AI assistant."
     />
@@ -91,7 +77,7 @@ export function EmptyCreditHistory() {
 export function EmptySearchResults({ query }: { query: string }) {
   return (
     <EmptyState
-      icon={<FileText className="h-8 w-8 text-muted-foreground" />}
+      icon={<FileText className="text-muted-foreground h-8 w-8" />}
       title="No results found"
       description={`No conversations found matching "${query}". Try a different search term.`}
     />
@@ -104,7 +90,7 @@ export function EmptySearchResults({ query }: { query: string }) {
 export function EmptyUserProfile() {
   return (
     <EmptyState
-      icon={<Users className="h-8 w-8 text-muted-foreground" />}
+      icon={<Users className="text-muted-foreground h-8 w-8" />}
       title="Profile not found"
       description="Unable to load your profile information. Please try refreshing the page."
     />
@@ -116,9 +102,9 @@ export function EmptyUserProfile() {
  */
 export function EmptySuggestedQuestions() {
   return (
-    <div className="text-center py-8">
-      <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-      <p className="text-sm text-muted-foreground">
+    <div className="py-8 text-center">
+      <MessageSquare className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
+      <p className="text-muted-foreground text-sm">
         No suggested questions available at the moment.
       </p>
     </div>

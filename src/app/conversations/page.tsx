@@ -33,69 +33,67 @@ export default function ConversationsPage() {
   return (
     <ProtectedRoute>
       <PageLayout currentPage="conversations">
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold mb-2">Conversations</h1>
-          <p className="text-muted-foreground">
-            Manage your AI conversations and chat history
-          </p>
-        </div>
+        <div className="container mx-auto max-w-7xl px-4 py-8">
+          <div className="mb-8 text-center">
+            <h1 className="mb-2 text-3xl font-bold">Conversations</h1>
+            <p className="text-muted-foreground">Manage your AI conversations and chat history</p>
+          </div>
 
-      {/* Instructions */}
-      <Alert className="mb-8">
-        <Info className="h-4 w-4" />
-        <AlertDescription>
-          <strong>Conversation Management:</strong> Browse your chat history, rename conversations, 
-          and continue previous discussions. All conversations are securely stored and synced.
-        </AlertDescription>
-      </Alert>
+          {/* Instructions */}
+          <Alert className="mb-8">
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              <strong>Conversation Management:</strong> Browse your chat history, rename
+              conversations, and continue previous discussions. All conversations are securely
+              stored and synced.
+            </AlertDescription>
+          </Alert>
 
-      <div className="grid lg:grid-cols-4 gap-8">
-        {/* Conversation List Sidebar */}
-        <div className="lg:col-span-1">
-          <ConversationList
-            userId={user.uid}
-            currentConversationId={currentConversationId}
-            onConversationSelect={handleConversationSelect}
-            onCreateNew={handleCreateNew}
-          />
-        </div>
-
-        {/* Main Chat Area */}
-        <div className="lg:col-span-3">
-          <div className="space-y-6">
-            {/* Credit Display */}
-            <div className="flex justify-end">
-              <CreditDisplay variant="compact" />
+          <div className="grid gap-8 lg:grid-cols-4">
+            {/* Conversation List Sidebar */}
+            <div className="lg:col-span-1">
+              <ConversationList
+                userId={user.uid}
+                currentConversationId={currentConversationId}
+                onConversationSelect={handleConversationSelect}
+                onCreateNew={handleCreateNew}
+              />
             </div>
 
-            {/* Chat Interface */}
-            <Card className="min-h-[600px]">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5" />
-                  {currentConversationId ? 'Continue Conversation' : 'New Conversation'}
-                </CardTitle>
-                <CardDescription>
-                  {currentConversationId 
-                    ? 'Continue your previous conversation'
-                    : 'Start a new conversation with your AI assistant'
-                  }
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-0">
-                <DifyChat
-                  name="AI Assistant"
-                  placeholder="Type your message..."
-                  className="border-0"
-                  conversationId={currentConversationId}
-                />
-              </CardContent>
-            </Card>
+            {/* Main Chat Area */}
+            <div className="lg:col-span-3">
+              <div className="space-y-6">
+                {/* Credit Display */}
+                <div className="flex justify-end">
+                  <CreditDisplay variant="compact" />
+                </div>
+
+                {/* Chat Interface */}
+                <Card className="min-h-[600px]">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <MessageSquare className="h-5 w-5" />
+                      {currentConversationId ? 'Continue Conversation' : 'New Conversation'}
+                    </CardTitle>
+                    <CardDescription>
+                      {currentConversationId
+                        ? 'Continue your previous conversation'
+                        : 'Start a new conversation with your AI assistant'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <DifyChat
+                      name="AI Assistant"
+                      placeholder="Type your message..."
+                      className="border-0"
+                      conversationId={currentConversationId}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
       </PageLayout>
     </ProtectedRoute>
   );

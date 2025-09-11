@@ -10,24 +10,24 @@ interface MessageFeedbackProps {
   onFeedback?: (type: 'like' | 'dislike') => void;
 }
 
-export function MessageFeedback({ 
-  messageId: _messageId, // eslint-disable-line @typescript-eslint/no-unused-vars
-  userId: _userId, // eslint-disable-line @typescript-eslint/no-unused-vars
-  onFeedback 
+export function MessageFeedback({
+  messageId: _messageId,
+  userId: _userId,
+  onFeedback,
 }: MessageFeedbackProps) {
   const [feedback, setFeedback] = useState<'like' | 'dislike' | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleFeedback = async (type: 'like' | 'dislike') => {
     if (feedback === type) return; // Already gave this feedback
-    
+
     try {
       setLoading(true);
-      
+
       // For now, we'll simulate the API call since we need to implement the feedback action
       // TODO: Implement actual feedback API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       setFeedback(type);
       onFeedback?.(type);
     } catch (error) {
@@ -38,7 +38,7 @@ export function MessageFeedback({
   };
 
   return (
-    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+    <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
       <Button
         variant="ghost"
         size="sm"
@@ -53,7 +53,7 @@ export function MessageFeedback({
           <ThumbsUp className={`h-3 w-3 ${feedback === 'like' ? 'text-green-600' : ''}`} />
         )}
       </Button>
-      
+
       <Button
         variant="ghost"
         size="sm"

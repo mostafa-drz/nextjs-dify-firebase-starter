@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@/components/auth/UserProvider';
+import { useAuth } from '@/components/auth/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -11,18 +11,18 @@ import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 export default function AuthCallbackPage() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
-  const { handleSignInWithEmailLink } = useUser();
+  const { handleSignInWithEmailLink } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     const handleAuth = async () => {
       try {
         const result = await handleSignInWithEmailLink();
-        
+
         if (result.success) {
           setStatus('success');
           setMessage(result.message);
-          
+
           // Redirect to chat after 2 seconds
           setTimeout(() => {
             router.push('/chat');
@@ -46,13 +46,13 @@ export default function AuthCallbackPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
       <div className="w-full max-w-md">
         <Card className="text-center">
           <CardContent className="py-8">
             {status === 'loading' && (
               <div className="space-y-4">
-                <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto" />
+                <Loader2 className="mx-auto h-12 w-12 animate-spin text-blue-600" />
                 <h2 className="text-xl font-semibold">Signing you in...</h2>
                 <p className="text-muted-foreground">
                   Please wait while we verify your magic link.
@@ -62,22 +62,18 @@ export default function AuthCallbackPage() {
 
             {status === 'success' && (
               <div className="space-y-4">
-                <CheckCircle className="h-12 w-12 text-green-600 mx-auto" />
+                <CheckCircle className="mx-auto h-12 w-12 text-green-600" />
                 <h2 className="text-xl font-semibold text-green-800">Welcome back!</h2>
-                <p className="text-muted-foreground">
-                  {message}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Redirecting you to your chat...
-                </p>
+                <p className="text-muted-foreground">{message}</p>
+                <p className="text-muted-foreground text-sm">Redirecting you to your chat...</p>
               </div>
             )}
 
             {status === 'error' && (
               <div className="space-y-4">
-                <XCircle className="h-12 w-12 text-red-600 mx-auto" />
+                <XCircle className="mx-auto h-12 w-12 text-red-600" />
                 <h2 className="text-xl font-semibold text-red-800">Sign-in Failed</h2>
-                
+
                 <Alert variant="destructive">
                   <AlertDescription>{message}</AlertDescription>
                 </Alert>
@@ -86,9 +82,9 @@ export default function AuthCallbackPage() {
                   <Button onClick={handleRetry} className="w-full">
                     Try Again
                   </Button>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     Need help? Contact{' '}
-                    <a 
+                    <a
                       href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL}`}
                       className="text-blue-600 hover:underline"
                     >

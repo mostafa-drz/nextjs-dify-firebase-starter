@@ -16,11 +16,11 @@ export function ProtectedRoute({ children, fallback }: ProtectedRouteProps) {
   // Show loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-full max-w-md mx-auto">
+      <div className="flex min-h-screen items-center justify-center">
+        <Card className="mx-auto w-full max-w-md">
           <CardContent className="flex flex-col items-center justify-center py-8">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            <p className="mt-4 text-sm text-muted-foreground">Loading...</p>
+            <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+            <p className="text-muted-foreground mt-4 text-sm">Loading...</p>
           </CardContent>
         </Card>
       </div>
@@ -30,7 +30,7 @@ export function ProtectedRoute({ children, fallback }: ProtectedRouteProps) {
   // Show login form if not authenticated
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="flex min-h-screen items-center justify-center p-4">
         {fallback || <LoginForm />}
       </div>
     );

@@ -4,12 +4,12 @@ import { logError } from '@/lib/sentry';
 export const GET = withErrorHandler(async () => {
   // Intentionally throw an error for testing
   const error = new Error('Test API error from Sentry test endpoint');
-  
+
   // Log the error
-  logError(error, { 
+  logError(error, {
     endpoint: '/api/sentry-test-error',
     test: true,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 
   // Return error response

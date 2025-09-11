@@ -5,11 +5,7 @@
  */
 
 import { BaseDifyService } from '../base';
-import {
-  MessageFeedbackRequest,
-  MessageFeedbackResponse,
-  DifyApiResponse
-} from '../types';
+import { MessageFeedbackRequest, MessageFeedbackResponse, DifyApiResponse } from '../types';
 
 /**
  * Service for handling message feedback operations with Dify API
@@ -30,7 +26,7 @@ export class FeedbackService extends BaseDifyService {
    *   "like",
    *   "This was very helpful!"
    * );
-   * 
+   *
    * if (result.success) {
    *   console.log("Feedback sent successfully");
    * }
@@ -47,7 +43,7 @@ export class FeedbackService extends BaseDifyService {
       const request: MessageFeedbackRequest = {
         rating,
         user: this.userId,
-        ...(content && { content })
+        ...(content && { content }),
       };
 
       const response = await this.makeRequest(`/messages/${messageId}/feedbacks`, {
@@ -59,7 +55,7 @@ export class FeedbackService extends BaseDifyService {
 
       return {
         success: true,
-        data
+        data,
       };
     } catch (error) {
       return this.handleError(error);
@@ -168,7 +164,7 @@ export class FeedbackService extends BaseDifyService {
    *   { messageId: "msg-1", rating: "like", content: "Good!" },
    *   { messageId: "msg-2", rating: "dislike", content: "Not helpful" }
    * ]);
-   * 
+   *
    * results.forEach((result, index) => {
    *   if (result.success) {
    *     console.log(`Feedback ${index + 1} sent successfully`);
@@ -183,14 +179,14 @@ export class FeedbackService extends BaseDifyService {
       content?: string;
     }>
   ): Promise<DifyApiResponse<MessageFeedbackResponse>[]> {
-    const promises = feedbacks.map(feedback =>
+    const promises = feedbacks.map((feedback) =>
       this.sendFeedback(feedback.messageId, feedback.rating, feedback.content)
     );
 
     try {
       const results = await Promise.allSettled(promises);
-      
-      return results.map(result => {
+
+      return results.map((result) => {
         if (result.status === 'fulfilled') {
           return result.value;
         } else {
@@ -199,8 +195,8 @@ export class FeedbackService extends BaseDifyService {
             error: {
               code: 'BATCH_FEEDBACK_ERROR',
               message: result.reason instanceof Error ? result.reason.message : 'Unknown error',
-              status: 500
-            }
+              status: 500,
+            },
           };
         }
       });

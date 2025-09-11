@@ -14,10 +14,10 @@ interface CreditDisplayProps {
   className?: string;
 }
 
-export function CreditDisplay({ 
-  variant = 'card', 
+export function CreditDisplay({
+  variant = 'card',
   showHistory = false,
-  className = '' 
+  className = '',
 }: CreditDisplayProps) {
   const { user, availableCredits, subscription } = useUser();
 
@@ -32,7 +32,7 @@ export function CreditDisplay({
   if (variant === 'compact') {
     return (
       <div className={`flex items-center space-x-2 ${className}`}>
-        <CreditCard className="h-4 w-4 text-muted-foreground" />
+        <CreditCard className="text-muted-foreground h-4 w-4" />
         <span className={`text-sm font-medium ${showWarning ? 'text-red-600' : 'text-foreground'}`}>
           {formatCredits(availableCredits)} credits
         </span>
@@ -46,29 +46,27 @@ export function CreditDisplay({
     return (
       <div className={`space-y-2 ${className}`}>
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Available Credits:</span>
+          <span className="text-muted-foreground text-sm">Available Credits:</span>
           <span className={`font-medium ${showWarning ? 'text-red-600' : 'text-foreground'}`}>
             {formatCredits(availableCredits)}
           </span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">≈ Tokens:</span>
-          <span className="text-sm text-muted-foreground">
-            {formatCredits(tokensAvailable)}
-          </span>
+          <span className="text-muted-foreground text-sm">≈ Tokens:</span>
+          <span className="text-muted-foreground text-sm">{formatCredits(tokensAvailable)}</span>
         </div>
         {showWarning && (
           <Alert variant="destructive" className="py-2">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription className="text-xs">
               Credits running low! Contact{' '}
-              <a 
+              <a
                 href={`mailto:${APP_CONFIG.SUPPORT_EMAIL}`}
                 className="underline hover:no-underline"
               >
                 support
-              </a>
-              {' '}to add more.
+              </a>{' '}
+              to add more.
             </AlertDescription>
           </Alert>
         )}
@@ -82,14 +80,14 @@ export function CreditDisplay({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Available Credits</CardTitle>
-          <CreditCard className="h-4 w-4 text-muted-foreground" />
+          <CreditCard className="text-muted-foreground h-4 w-4" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{formatCredits(availableCredits)}</div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             ≈ {formatCredits(tokensAvailable)} tokens available
           </p>
-          <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
+          <div className="text-muted-foreground mt-2 flex items-center justify-between text-xs">
             <span>Used: {formatCredits(user.admin.usedCredits)}</span>
             <span>Plan: {subscription?.plan || 'Free'}</span>
           </div>
@@ -100,10 +98,10 @@ export function CreditDisplay({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">How Credits Work</CardTitle>
-          <Info className="h-4 w-4 text-muted-foreground" />
+          <Info className="text-muted-foreground h-4 w-4" />
         </CardHeader>
         <CardContent className="space-y-2">
-          <div className="text-sm text-muted-foreground">
+          <div className="text-muted-foreground text-sm">
             <div className="flex justify-between">
               <span>1 Credit =</span>
               <span>{CREDIT_CONFIG.TOKENS_PER_CREDIT.toLocaleString()} tokens</span>
@@ -126,16 +124,10 @@ export function CreditDisplay({
             You have {formatCredits(availableCredits)} credits remaining.
             <br />
             Contact{' '}
-            <Button 
-              variant="link" 
-              className="h-auto p-0 text-red-600 underline"
-              asChild
-            >
-              <a href={`mailto:${APP_CONFIG.SUPPORT_EMAIL}`}>
-                support
-              </a>
-            </Button>
-            {' '}to add more credits.
+            <Button variant="link" className="h-auto p-0 text-red-600 underline" asChild>
+              <a href={`mailto:${APP_CONFIG.SUPPORT_EMAIL}`}>support</a>
+            </Button>{' '}
+            to add more credits.
           </AlertDescription>
         </Alert>
       )}
@@ -160,12 +152,13 @@ export function CreditDisplay({
                     )}
                   </div>
                   <span className={transaction.amount > 0 ? 'text-green-600' : 'text-red-600'}>
-                    {transaction.amount > 0 ? '+' : ''}{transaction.amount}
+                    {transaction.amount > 0 ? '+' : ''}
+                    {transaction.amount}
                   </span>
                 </div>
               ))}
               {user.admin.creditHistory.length > 5 && (
-                <div className="text-xs text-muted-foreground text-center pt-2">
+                <div className="text-muted-foreground pt-2 text-center text-xs">
                   +{user.admin.creditHistory.length - 5} more transactions
                 </div>
               )}

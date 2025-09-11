@@ -9,10 +9,7 @@ import { getFirebaseAnalytics } from './utils/firebase-client';
  */
 
 // Core analytics function
-export const trackEvent = (
-  eventName: string, 
-  parameters?: Record<string, unknown>
-) => {
+export const trackEvent = (eventName: string, parameters?: Record<string, unknown>) => {
   // Only track in production
   if (process.env.NODE_ENV !== 'production') {
     console.log('📊 Analytics (dev):', eventName, parameters);
@@ -53,10 +50,7 @@ export const trackAuth = (action: 'login' | 'logout' | 'signup') => {
 /**
  * Track credit usage - essential for business metrics
  */
-export const trackCredits = (
-  action: 'purchase' | 'deduct' | 'low_balance',
-  amount?: number
-) => {
+export const trackCredits = (action: 'purchase' | 'deduct' | 'low_balance', amount?: number) => {
   trackEvent('credits', {
     action,
     amount,

@@ -18,7 +18,7 @@ export function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email) {
       setMessage({ type: 'error', text: 'Please enter your email address' });
       return;
@@ -36,19 +36,19 @@ export function LoginForm() {
 
     try {
       const result = await sendSignInEmail(email);
-      setMessage({ 
-        type: result.success ? 'success' : 'error', 
-        text: result.message 
+      setMessage({
+        type: result.success ? 'success' : 'error',
+        text: result.message,
       });
-      
+
       if (result.success) {
         trackAuth('login');
         setEmail(''); // Clear email on success
       }
     } catch {
-      setMessage({ 
-        type: 'error', 
-        text: 'An unexpected error occurred. Please try again.' 
+      setMessage({
+        type: 'error',
+        text: 'An unexpected error occurred. Please try again.',
       });
     } finally {
       setLoading(false);
@@ -56,9 +56,9 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="mx-auto w-full max-w-md">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
+        <CardTitle className="text-center text-2xl font-bold">Sign In</CardTitle>
         <CardDescription className="text-center">
           Enter your email to receive a magic link
         </CardDescription>
@@ -84,11 +84,7 @@ export function LoginForm() {
             </Alert>
           )}
 
-          <Button 
-            type="submit" 
-            className="w-full" 
-            disabled={loading}
-          >
+          <Button type="submit" className="w-full" disabled={loading}>
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -103,7 +99,7 @@ export function LoginForm() {
           </Button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-muted-foreground">
+        <div className="text-muted-foreground mt-6 text-center text-sm">
           <p>
             We&apos;ll send you a secure link to sign in instantly.
             <br />

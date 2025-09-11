@@ -39,7 +39,7 @@ Sentry.init({
     // Filter out non-critical errors in production
     if (process.env.NODE_ENV === 'production') {
       const error = hint.originalException;
-      
+
       // Ignore network errors that are often transient
       if (error && error instanceof Error) {
         if (
@@ -52,15 +52,16 @@ Sentry.init({
       }
 
       // Ignore errors from browser extensions
-      if (event.exception?.values?.[0]?.stacktrace?.frames?.some(
-        frame => frame.filename?.includes('extension://')
-      )) {
+      if (
+        event.exception?.values?.[0]?.stacktrace?.frames?.some((frame) =>
+          frame.filename?.includes('extension://')
+        )
+      ) {
         return null;
       }
 
       // Ignore ResizeObserver errors (common browser quirk)
-      if (error && error instanceof Error && 
-          error.message?.includes('ResizeObserver')) {
+      if (error && error instanceof Error && error.message?.includes('ResizeObserver')) {
         return null;
       }
     }
@@ -85,7 +86,8 @@ Sentry.init({
   ],
 
   // Only send errors from your domain
-  allowUrls: process.env.NODE_ENV === 'production' 
-    ? [/^https:\/\/.*\.vercel\.app/, /^https:\/\/yourdomain\.com/]
-    : [],
+  allowUrls:
+    process.env.NODE_ENV === 'production'
+      ? [/^https:\/\/.*\.vercel\.app/, /^https:\/\/yourdomain\.com/]
+      : [],
 });

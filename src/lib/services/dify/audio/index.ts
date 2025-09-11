@@ -9,7 +9,7 @@ import {
   SpeechToTextResponse,
   TextToAudioRequest,
   TextToAudioResponse,
-  DifyApiResponse
+  DifyApiResponse,
 } from '../types';
 
 /**
@@ -25,7 +25,7 @@ export class AudioService extends BaseDifyService {
    * ```typescript
    * const audioFile = new File([audioData], 'recording.wav', { type: 'audio/wav' });
    * const result = await audioService.speechToText(audioFile);
-   * 
+   *
    * if (result.success) {
    *   console.log("Transcribed text:", result.data?.text);
    * }
@@ -34,7 +34,7 @@ export class AudioService extends BaseDifyService {
   async speechToText(audioFile: File): Promise<DifyApiResponse<SpeechToTextResponse>> {
     try {
       this.validateRequired({ audioFile }, ['audioFile']);
-      
+
       // Validate file size (15MB limit)
       const maxSize = 15 * 1024 * 1024; // 15MB in bytes
       if (audioFile.size > maxSize) {
@@ -42,9 +42,19 @@ export class AudioService extends BaseDifyService {
       }
 
       // Validate file type
-      const allowedTypes = ['audio/mp3', 'audio/mp4', 'audio/mpeg', 'audio/mpga', 'audio/m4a', 'audio/wav', 'audio/webm'];
+      const allowedTypes = [
+        'audio/mp3',
+        'audio/mp4',
+        'audio/mpeg',
+        'audio/mpga',
+        'audio/m4a',
+        'audio/wav',
+        'audio/webm',
+      ];
       if (!allowedTypes.includes(audioFile.type)) {
-        throw new Error(`Unsupported file type: ${audioFile.type}. Supported types: ${allowedTypes.join(', ')}`);
+        throw new Error(
+          `Unsupported file type: ${audioFile.type}. Supported types: ${allowedTypes.join(', ')}`
+        );
       }
 
       const formData = new FormData();
@@ -56,7 +66,7 @@ export class AudioService extends BaseDifyService {
 
       return {
         success: true,
-        data
+        data,
       };
     } catch (error) {
       return this.handleError(error);
@@ -72,7 +82,7 @@ export class AudioService extends BaseDifyService {
    * ```typescript
    * // Convert text to audio
    * const result = await audioService.textToAudio("Hello, how are you today?");
-   * 
+   *
    * if (result.success && result.data) {
    *   const audioUrl = URL.createObjectURL(result.data);
    *   const audio = new Audio(audioUrl);
@@ -93,13 +103,13 @@ export class AudioService extends BaseDifyService {
       const request: TextToAudioRequest = {
         user: this.userId,
         ...(text && { text }),
-        ...(messageId && { message_id: messageId })
+        ...(messageId && { message_id: messageId }),
       };
 
       const response = await this.makeRequest('/text-to-audio', {
         method: 'POST',
         headers: {
-          'Accept': 'audio/wav',
+          Accept: 'audio/wav',
         },
         body: JSON.stringify(request),
       });
@@ -108,7 +118,7 @@ export class AudioService extends BaseDifyService {
 
       return {
         success: true,
-        data: audioBlob
+        data: audioBlob,
       };
     } catch (error) {
       return this.handleError(error);
@@ -122,7 +132,7 @@ export class AudioService extends BaseDifyService {
    * @example
    * ```typescript
    * const result = await audioService.messageToAudio("msg-123");
-   * 
+   *
    * if (result.success && result.data) {
    *   // Play the audio
    *   const audioUrl = URL.createObjectURL(result.data);
@@ -147,7 +157,7 @@ export class AudioService extends BaseDifyService {
    * @example
    * ```typescript
    * const audioUrl = await audioService.textToAudioUrl("Hello world!");
-   * 
+   *
    * if (audioUrl) {
    *   const audio = new Audio(audioUrl);
    *   audio.play();
@@ -157,11 +167,11 @@ export class AudioService extends BaseDifyService {
   async textToAudioUrl(text: string): Promise<string | null> {
     try {
       const result = await this.textToAudio(text);
-      
+
       if (result.success && result.data) {
         return URL.createObjectURL(result.data);
       }
-      
+
       return null;
     } catch (error) {
       console.error('Error converting text to audio URL:', error);
@@ -176,7 +186,7 @@ export class AudioService extends BaseDifyService {
    * @example
    * ```typescript
    * const audioUrl = await audioService.messageToAudioUrl("msg-123");
-   * 
+   *
    * if (audioUrl) {
    *   const audio = new Audio(audioUrl);
    *   audio.play();
@@ -186,11 +196,11 @@ export class AudioService extends BaseDifyService {
   async messageToAudioUrl(messageId: string): Promise<string | null> {
     try {
       const result = await this.messageToAudio(messageId);
-      
+
       if (result.success && result.data) {
         return URL.createObjectURL(result.data);
       }
-      
+
       return null;
     } catch (error) {
       console.error('Error converting message to audio URL:', error);
@@ -205,7 +215,7 @@ export class AudioService extends BaseDifyService {
    * @example
    * ```typescript
    * const validation = audioService.validateAudioFile(audioFile);
-   * 
+   *
    * if (!validation.isValid) {
    *   console.error("File validation failed:", validation.error);
    * }
@@ -217,16 +227,24 @@ export class AudioService extends BaseDifyService {
     if (file.size > maxSize) {
       return {
         isValid: false,
-        error: `File size exceeds 15MB limit. Current size: ${file.size} bytes`
+        error: `File size exceeds 15MB limit. Current size: ${file.size} bytes`,
       };
     }
 
     // Check file type
-    const allowedTypes = ['audio/mp3', 'audio/mp4', 'audio/mpeg', 'audio/mpga', 'audio/m4a', 'audio/wav', 'audio/webm'];
+    const allowedTypes = [
+      'audio/mp3',
+      'audio/mp4',
+      'audio/mpeg',
+      'audio/mpga',
+      'audio/m4a',
+      'audio/wav',
+      'audio/webm',
+    ];
     if (!allowedTypes.includes(file.type)) {
       return {
         isValid: false,
-        error: `Unsupported file type: ${file.type}. Supported types: ${allowedTypes.join(', ')}`
+        error: `Unsupported file type: ${file.type}. Supported types: ${allowedTypes.join(', ')}`,
       };
     }
 
@@ -243,7 +261,15 @@ export class AudioService extends BaseDifyService {
    * ```
    */
   getSupportedFormats(): string[] {
-    return ['audio/mp3', 'audio/mp4', 'audio/mpeg', 'audio/mpga', 'audio/m4a', 'audio/wav', 'audio/webm'];
+    return [
+      'audio/mp3',
+      'audio/mp4',
+      'audio/mpeg',
+      'audio/mpga',
+      'audio/m4a',
+      'audio/wav',
+      'audio/webm',
+    ];
   }
 
   /**

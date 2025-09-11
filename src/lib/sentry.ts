@@ -41,7 +41,7 @@ export function logError(
         scope.setContext('additional', context);
       }
       scope.setLevel(level);
-      
+
       if (error instanceof Error) {
         Sentry.captureException(error);
       } else {
@@ -57,11 +57,13 @@ export function logError(
  * Set user context for better error tracking
  * Call this after user authentication
  */
-export function setUserContext(user: {
-  id?: string;
-  email?: string;
-  username?: string;
-} | null) {
+export function setUserContext(
+  user: {
+    id?: string;
+    email?: string;
+    username?: string;
+  } | null
+) {
   if (user) {
     Sentry.setUser({
       id: user.id,
@@ -77,11 +79,7 @@ export function setUserContext(user: {
  * Add breadcrumb for better error context
  * Use this to track user actions leading to errors
  */
-export function addBreadcrumb(
-  message: string,
-  category: string,
-  data?: Record<string, unknown>
-) {
+export function addBreadcrumb(message: string, category: string, data?: Record<string, unknown>) {
   Sentry.addBreadcrumb({
     message,
     category,
@@ -120,7 +118,7 @@ export function logApiError(
         scope.setTag('api.status_code', statusCode);
       }
       scope.setContext('api', context);
-      
+
       if (error instanceof Error) {
         Sentry.captureException(error);
       } else {
@@ -176,12 +174,12 @@ export function measurePerformance<T>(
 
   try {
     const result = operation();
-    
+
     if (result instanceof Promise) {
       return result
         .then((res) => {
           const duration = Date.now() - startTime;
-          
+
           // Log slow operations
           if (duration > 3000) {
             logMessage(
@@ -189,7 +187,7 @@ export function measurePerformance<T>(
               LogLevel.WARNING
             );
           }
-          
+
           return res;
         })
         .catch((error) => {
@@ -199,14 +197,14 @@ export function measurePerformance<T>(
         });
     } else {
       const duration = Date.now() - startTime;
-      
+
       if (duration > 1000) {
         logMessage(
           `Slow synchronous operation: ${operationName} took ${duration}ms`,
           LogLevel.WARNING
         );
       }
-      
+
       return result;
     }
   } catch (error) {

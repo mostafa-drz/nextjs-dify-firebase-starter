@@ -49,7 +49,7 @@ export interface User {
   email: string;
   displayName?: string;
   photoURL?: string;
-  
+
   // User-editable profile data
   preferences?: {
     theme: 'light' | 'dark';
@@ -58,7 +58,7 @@ export interface User {
   };
   lastLoginAt: Timestamp;
   createdAt: Timestamp;
-  
+
   // Admin-protected data (user cannot modify)
   admin: UserAdmin;
 }

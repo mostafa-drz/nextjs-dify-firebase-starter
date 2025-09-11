@@ -18,6 +18,7 @@ A secure Next.js 15 boilerplate for integrating [Dify.ai](https://dify.ai) with 
 
 ### Security Features
 
+- 🔒 **HTTP-only cookie authentication** - Secure Firebase ID token handling
 - 🔒 **API keys never exposed** to client-side code
 - 🔒 **Server-side validation** for all Dify API calls
 - 🔒 **Credit pre-flight checks** to prevent unauthorized usage
@@ -721,13 +722,41 @@ trackCredits('purchase', amount);
 - **Development Safe**: No tracking in development environment
 - **Error Handling**: Graceful failures without breaking user experience
 
+## 🔐 Authentication System
+
+This project uses **HTTP-only cookie authentication** for secure Firebase integration. No manual token handling required!
+
+### How It Works
+
+1. **User signs in** → Firebase client gets ID token
+2. **Token sent to server** → `/api/auth/set-token` sets HTTP-only cookie
+3. **Automatic authentication** → Cookie sent with every request
+4. **User signs out** → Cookie cleared via `/api/auth/clear-token`
+
+### Security Features
+
+- ✅ **HTTP-only cookies** - XSS protection
+- ✅ **HTTPS only** - Secure in production
+- ✅ **SameSite=strict** - CSRF protection
+- ✅ **Proper JWT verification** - Firebase Admin SDK
+- ✅ **7-day expiry** - Reasonable session length
+
+### Files
+
+- `src/lib/config/auth-config.ts` - Simple constants
+- `src/app/api/auth/set-token/route.ts` - Set cookie
+- `src/app/api/auth/clear-token/route.ts` - Clear cookie
+- `src/lib/utils/auth-cookie.ts` - Cookie helpers
+- `src/lib/auth/middleware-auth.ts` - JWT verification
+
 ## 🛡️ Security Considerations
 
-1. **API Keys**: Never expose Dify API keys to client-side code
-2. **Credit Limits**: Implement proper credit limits to prevent abuse
-3. **Rate Limiting**: Consider adding rate limiting for API calls
-4. **User Validation**: Always validate user authentication server-side
-5. **Firestore Rules**: Keep security rules restrictive and test thoroughly
+1. **Authentication**: HTTP-only cookies with proper JWT verification
+2. **API Keys**: Never expose Dify API keys to client-side code
+3. **Credit Limits**: Implement proper credit limits to prevent abuse
+4. **Rate Limiting**: Consider adding rate limiting for API calls
+5. **User Validation**: Always validate user authentication server-side
+6. **Firestore Rules**: Keep security rules restrictive and test thoroughly
 
 ## 🤝 Contributing
 

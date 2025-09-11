@@ -26,7 +26,7 @@ export function EnvValidation({ showOnError = true, className = '' }: EnvValidat
       setEnvStatus({
         isValid: false,
         missingVars: [],
-        errors: ['Failed to validate environment variables']
+        errors: ['Failed to validate environment variables'],
       });
     } finally {
       setIsChecking(false);
@@ -76,33 +76,35 @@ export function EnvValidation({ showOnError = true, className = '' }: EnvValidat
                 Missing required environment variables. The application may not function correctly.
               </AlertDescription>
             </Alert>
-            
+
             <div className="space-y-2">
-              <h4 className="font-medium text-sm text-red-800">Missing Variables:</h4>
-              <ul className="list-disc list-inside space-y-1 text-sm text-red-700">
+              <h4 className="text-sm font-medium text-red-800">Missing Variables:</h4>
+              <ul className="list-inside list-disc space-y-1 text-sm text-red-700">
                 {envStatus.missingVars.map((varName) => (
-                  <li key={varName} className="font-mono">{varName}</li>
+                  <li key={varName} className="font-mono">
+                    {varName}
+                  </li>
                 ))}
               </ul>
             </div>
-            
+
             <div className="space-y-2">
-              <h4 className="font-medium text-sm text-red-800">Errors:</h4>
-              <ul className="list-disc list-inside space-y-1 text-sm text-red-700">
+              <h4 className="text-sm font-medium text-red-800">Errors:</h4>
+              <ul className="list-inside list-disc space-y-1 text-sm text-red-700">
                 {envStatus.errors.map((error, index) => (
                   <li key={index}>{error}</li>
                 ))}
               </ul>
             </div>
-            
+
             <div className="pt-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={checkEnvironment}
-                className="text-red-700 border-red-300 hover:bg-red-50"
+                className="border-red-300 text-red-700 hover:bg-red-50"
               >
-                <RefreshCw className="h-4 w-4 mr-2" />
+                <RefreshCw className="mr-2 h-4 w-4" />
                 Recheck Environment
               </Button>
             </div>
@@ -130,7 +132,7 @@ export function useEnvValidation() {
       setEnvStatus({
         isValid: false,
         missingVars: [],
-        errors: ['Failed to validate environment variables']
+        errors: ['Failed to validate environment variables'],
       });
     } finally {
       setIsChecking(false);
@@ -145,6 +147,6 @@ export function useEnvValidation() {
     envStatus,
     isChecking,
     checkEnvironment,
-    isValid: envStatus?.isValid ?? false
+    isValid: envStatus?.isValid ?? false,
   };
 }

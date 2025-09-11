@@ -1,34 +1,20 @@
-'use client';
-
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useUser } from '@/components/auth/UserProvider';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 
+/**
+ * Home Page - Server Component
+ * Middleware handles authentication redirects, so this component
+ * only renders a loading state as users are redirected appropriately
+ */
 export default function Home() {
-  const { user, loading } = useUser();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!loading) {
-      if (user) {
-        // User is authenticated, redirect to chat
-        router.push('/chat');
-      } else {
-        // User is not authenticated, redirect to login
-        router.push('/login');
-      }
-    }
-  }, [user, loading, router]);
-
-  // Show loading state while checking authentication
+  // This component should rarely be seen as middleware handles redirects
+  // But we keep it as a fallback loading state
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <Card className="w-full max-w-md mx-auto">
+    <div className="flex min-h-screen items-center justify-center">
+      <Card className="mx-auto w-full max-w-md">
         <CardContent className="flex flex-col items-center justify-center py-8">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          <p className="mt-4 text-sm text-muted-foreground">Loading...</p>
+          <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+          <p className="text-muted-foreground mt-4 text-sm">Redirecting...</p>
         </CardContent>
       </Card>
     </div>

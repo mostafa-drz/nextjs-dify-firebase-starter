@@ -22,20 +22,16 @@ Sentry.init({
     // Filter out non-critical errors in production
     if (process.env.NODE_ENV === 'production') {
       const error = hint.originalException;
-      
+
       // Ignore authentication redirects (expected behavior)
       if (error && error instanceof Error) {
-        if (
-          error.message?.includes('redirect') ||
-          error.message?.includes('unauthorized')
-        ) {
+        if (error.message?.includes('redirect') || error.message?.includes('unauthorized')) {
           return null;
         }
       }
 
       // Filter out middleware health checks
-      if (event.request?.url?.includes('/api/health') ||
-          event.request?.url?.includes('/_next/')) {
+      if (event.request?.url?.includes('/api/health') || event.request?.url?.includes('/_next/')) {
         return null;
       }
     }

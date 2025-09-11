@@ -18,7 +18,7 @@ export async function DELETE(request: NextRequest) {
 
     // Get the authorization header
     const authHeader = request.headers.get('authorization');
-    
+
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json(
         { message: 'Missing or invalid authorization header' },
@@ -27,7 +27,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const idToken = authHeader.split('Bearer ')[1];
-    
+
     // Verify the Firebase ID token
     const decodedToken = await adminAuth.verifyIdToken(idToken);
     const userId = decodedToken.uid;
@@ -69,20 +69,14 @@ export async function DELETE(request: NextRequest) {
 
       // Delete the Firebase Auth user
       await adminAuth.deleteUser(userId);
-      
+
       return NextResponse.json(
-        { 
+        {
           message: 'Account and all associated data deleted successfully',
-          deletedCollections: [
-            'conversations',
-            'creditHistory', 
-            'users',
-            'userPreferences'
-          ]
+          deletedCollections: ['conversations', 'creditHistory', 'users', 'userPreferences'],
         },
         { status: 200 }
       );
-
     } catch (firestoreError) {
       console.error('Firestore deletion error:', firestoreError);
       return NextResponse.json(
@@ -90,12 +84,8 @@ export async function DELETE(request: NextRequest) {
         { status: 500 }
       );
     }
-
   } catch (error) {
     console.error('Delete account error:', error);
-    return NextResponse.json(
-      { message: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }

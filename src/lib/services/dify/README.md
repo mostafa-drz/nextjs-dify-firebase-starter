@@ -24,18 +24,18 @@ import { DifyService } from '@/lib/services/dify';
 // Initialize the service
 const difyService = new DifyService({
   apiKey: process.env.DIFY_API_KEY!,
-  userId: 'user123'
+  userId: 'user123',
 });
 
 // Send a message
 const response = await difyService.chat.sendMessage({
-  query: "Hello, how are you?",
-  user: "user123",
-  response_mode: "blocking"
+  query: 'Hello, how are you?',
+  user: 'user123',
+  response_mode: 'blocking',
 });
 
 if (response.success) {
-  console.log("Assistant:", response.data?.answer);
+  console.log('Assistant:', response.data?.answer);
 }
 ```
 
@@ -48,22 +48,22 @@ Handles all chat-related operations including blocking and streaming messages.
 ```typescript
 // Blocking message
 const response = await difyService.chat.sendMessage({
-  query: "Tell me about AI",
-  user: "user123",
-  response_mode: "blocking"
+  query: 'Tell me about AI',
+  user: 'user123',
+  response_mode: 'blocking',
 });
 
 // Streaming message
 const stream = await difyService.chat.sendMessageStreaming({
-  query: "Write a story",
-  user: "user123",
-  response_mode: "streaming"
+  query: 'Write a story',
+  user: 'user123',
+  response_mode: 'streaming',
 });
 
 // Parse streaming events
 for await (const event of difyService.chat.parseStreamingEvents(stream)) {
   if (event.event === 'message') {
-    console.log("Partial:", event.answer);
+    console.log('Partial:', event.answer);
   }
 }
 
@@ -79,21 +79,16 @@ Manages conversations and message history.
 // Get conversations
 const conversations = await difyService.conversation.getConversations({
   limit: 20,
-  sort_by: '-updated_at'
+  sort_by: '-updated_at',
 });
 
 // Get conversation history
-const history = await difyService.conversation.getConversationHistory(
-  conversationId,
-  { limit: 50 }
-);
+const history = await difyService.conversation.getConversationHistory(conversationId, {
+  limit: 50,
+});
 
 // Rename conversation
-await difyService.conversation.renameConversation(
-  conversationId,
-  "New Name",
-  false
-);
+await difyService.conversation.renameConversation(conversationId, 'New Name', false);
 
 // Delete conversation
 await difyService.conversation.deleteConversation(conversationId);
@@ -105,18 +100,18 @@ Handles message feedback (likes/dislikes).
 
 ```typescript
 // Like a message
-await difyService.feedback.likeMessage("msg-123", "Great answer!");
+await difyService.feedback.likeMessage('msg-123', 'Great answer!');
 
 // Dislike a message
-await difyService.feedback.dislikeMessage("msg-456", "Not helpful");
+await difyService.feedback.dislikeMessage('msg-456', 'Not helpful');
 
 // Toggle feedback
-await difyService.feedback.toggleFeedback("msg-789", "like");
+await difyService.feedback.toggleFeedback('msg-789', 'like');
 
 // Batch feedback
 await difyService.feedback.sendBatchFeedback([
-  { messageId: "msg-1", rating: "like" },
-  { messageId: "msg-2", rating: "dislike" }
+  { messageId: 'msg-1', rating: 'like' },
+  { messageId: 'msg-2', rating: 'dislike' },
 ]);
 ```
 
@@ -126,18 +121,17 @@ Provides dynamic question suggestions.
 
 ```typescript
 // Get suggested questions
-const suggestions = await difyService.suggestions.getSuggestedQuestions("msg-123");
+const suggestions = await difyService.suggestions.getSuggestedQuestions('msg-123');
 
 // With fallback
-const questions = await difyService.suggestions.getSuggestedQuestionsWithFallback(
-  "msg-123",
-  ["What else can you help with?"]
-);
+const questions = await difyService.suggestions.getSuggestedQuestionsWithFallback('msg-123', [
+  'What else can you help with?',
+]);
 
 // Filter and format questions
 const filtered = difyService.suggestions.filterQuestions(questions, {
   minLength: 10,
-  maxLength: 100
+  maxLength: 100,
 });
 ```
 
@@ -149,11 +143,11 @@ Handles speech-to-text and text-to-audio conversion.
 // Speech to text
 const result = await difyService.audio.speechToText(audioFile);
 if (result.success) {
-  console.log("Transcribed:", result.data?.text);
+  console.log('Transcribed:', result.data?.text);
 }
 
 // Text to audio
-const audioResult = await difyService.audio.textToAudio("Hello world!");
+const audioResult = await difyService.audio.textToAudio('Hello world!');
 if (audioResult.success) {
   const audioUrl = URL.createObjectURL(audioResult.data);
   const audio = new Audio(audioUrl);
@@ -161,7 +155,7 @@ if (audioResult.success) {
 }
 
 // Message to audio
-const messageAudio = await difyService.audio.messageToAudio("msg-123");
+const messageAudio = await difyService.audio.messageToAudio('msg-123');
 ```
 
 ### FileUploadService
@@ -172,7 +166,7 @@ Manages file uploads for images and documents.
 // Upload file
 const result = await difyService.files.uploadFile(file);
 if (result.success) {
-  console.log("File uploaded:", result.data?.url);
+  console.log('File uploaded:', result.data?.url);
 }
 
 // Upload image
@@ -186,7 +180,7 @@ await difyService.files.uploadWithProgress(file, (progress) => {
 // Validate file
 const validation = difyService.files.validateFile(file);
 if (!validation.isValid) {
-  console.error("Invalid file:", validation.error);
+  console.error('Invalid file:', validation.error);
 }
 ```
 
@@ -194,10 +188,10 @@ if (!validation.isValid) {
 
 ```typescript
 const difyService = new DifyService({
-  apiKey: 'app-your-api-key',           // Required
-  userId: 'user123',                    // Required
-  baseUrl: 'https://api.dify.ai/v1',    // Optional
-  timeout: 30000                        // Optional
+  apiKey: 'app-your-api-key', // Required
+  userId: 'user123', // Required
+  baseUrl: 'https://api.dify.ai/v1', // Optional
+  timeout: 30000, // Optional
 });
 ```
 
@@ -219,9 +213,9 @@ const user2Response = await user2Service.chat.sendMessage({...});
 ```typescript
 const health = await difyService.getHealth();
 if (health.isHealthy) {
-  console.log("All services healthy");
+  console.log('All services healthy');
 } else {
-  console.log("Issues:", health.issues);
+  console.log('Issues:', health.issues);
 }
 ```
 
@@ -233,13 +227,13 @@ const response = await difyService.chat.sendMessage(request);
 if (!response.success) {
   switch (response.error?.code) {
     case 'INSUFFICIENT_CREDITS':
-      console.log("Need more credits");
+      console.log('Need more credits');
       break;
     case 'INVALID_PARAM':
-      console.log("Invalid parameters");
+      console.log('Invalid parameters');
       break;
     default:
-      console.log("Unknown error:", response.error?.message);
+      console.log('Unknown error:', response.error?.message);
   }
 }
 ```
@@ -255,7 +249,7 @@ import {
   ChatCompletionResponse,
   StreamingEvent,
   ConversationListItem,
-  MessageFeedbackRequest
+  MessageFeedbackRequest,
 } from '@/lib/services/dify';
 ```
 

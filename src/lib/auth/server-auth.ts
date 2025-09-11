@@ -4,9 +4,26 @@ import { getFirestoreAdmin, FieldValue } from '@/lib/utils/firebase-admin';
 import { CREDIT_CONFIG } from '@/lib/config/constants';
 
 /**
- * Initialize a new user with default settings and free credits
+ * Server-side Authentication Actions
+ * Handles user initialization and authentication logic on the server
  */
-export async function initializeNewUser(userId: string, email: string, displayName?: string) {
+
+export interface ServerAuthResult {
+  success: boolean;
+  message: string;
+  userId?: string;
+  credits?: number;
+}
+
+/**
+ * Initialize a new user with default settings and free credits
+ * This is called from the client-side UserProvider when a new user signs in
+ */
+export async function initializeNewUser(
+  userId: string,
+  email: string,
+  displayName?: string
+): Promise<ServerAuthResult> {
   try {
     const db = getFirestoreAdmin();
     const userRef = db.doc(`users/${userId}`);
@@ -14,7 +31,12 @@ export async function initializeNewUser(userId: string, email: string, displayNa
     // Check if user already exists
     const existingUser = await userRef.get();
     if (existingUser.exists) {
-      return { success: true, message: 'User already exists' };
+      return {
+        success: true,
+        message: 'User already exists',
+        userId,
+        credits: existingUser.data()?.admin?.availableCredits || 0,
+      };
     }
 
     // Create new user document with admin-protected credits
@@ -56,6 +78,7 @@ export async function initializeNewUser(userId: string, email: string, displayNa
     return {
       success: true,
       message: 'User initialized successfully',
+      userId,
       credits: CREDIT_CONFIG.FREE_TIER_CREDITS,
     };
   } catch (error) {
@@ -70,7 +93,7 @@ export async function initializeNewUser(userId: string, email: string, displayNa
 /**
  * Update user's last login timestamp
  */
-export async function updateLastLogin(userId: string) {
+export async function updateLastLogin(userId: string): Promise<ServerAuthResult> {
   try {
     const db = getFirestoreAdmin();
     const userRef = db.doc(`users/${userId}`);
@@ -79,9 +102,29 @@ export async function updateLastLogin(userId: string) {
       lastLoginAt: FieldValue.serverTimestamp(),
     });
 
-    return { success: true };
+    return { success: true, message: 'Last login updated' };
   } catch (error) {
     console.error('Error updating last login:', error);
-    return { success: false };
+    return { success: false, message: 'Failed to update last login' };
+  }
+}
+
+/**
+ * Get user data from server (for server components)
+ */
+export async function getUserData(userId: string) {
+  try {
+    const db = getFirestoreAdmin();
+    const userRef = db.doc(`users/${userId}`);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return null;
+    }
+
+    return userDoc.data();
+  } catch (error) {
+    console.error('Error getting user data:', error);
+    return null;
   }
 }

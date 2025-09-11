@@ -1,61 +1,58 @@
 'use client';
 
-import { initializeApp, getApp, getApps } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getAnalytics, Analytics } from 'firebase/analytics';
+import {
+  initializeFirebaseWithDefaults,
+  getFirebaseServices as getSingletonServices,
+  isFirebaseInitialized,
+  getFirebaseConfig as getSingletonConfig,
+} from '@/lib/firebase/singleton';
 
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
-};
+/**
+ * Legacy Firebase Client Utilities
+ * Now uses the singleton pattern for better initialization management
+ */
 
-// Global analytics instance
-let analytics: Analytics | null = null;
+// Initialize Firebase with default configuration
+let firebaseInitialized = false;
 
-// Initialize Firebase (client-side)
 export function initializeFirebase() {
   if (typeof window === 'undefined') return null;
-  
-  // Check if Firebase App already exists
-  const apps = getApps();
-  const app = apps.length > 0 ? getApp() : initializeApp(firebaseConfig);
-  
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  
-  // Initialize Analytics only in production and on client-side
-  // This respects privacy by not tracking in development
-  if (!analytics && process.env.NODE_ENV === 'production') {
+
+  if (!firebaseInitialized) {
     try {
-      analytics = getAnalytics(app);
+      initializeFirebaseWithDefaults();
+      firebaseInitialized = true;
     } catch (error) {
-      console.warn('Failed to initialize Firebase Analytics:', error);
+      console.error('Failed to initialize Firebase:', error);
+      return null;
     }
   }
-  
-  return { app, auth, db, analytics };
+
+  return getSingletonServices();
 }
 
 // Export services for use in components
 export function getFirebaseServices() {
-  return initializeFirebase();
+  if (!isFirebaseInitialized()) {
+    return initializeFirebase();
+  }
+  return getSingletonServices();
 }
 
 // Export analytics instance for use in analytics utilities
-export function getFirebaseAnalytics(): Analytics | null {
+export function getFirebaseAnalytics() {
   if (typeof window === 'undefined') return null;
-  
-  // Ensure Firebase is initialized first
-  if (!analytics && process.env.NODE_ENV === 'production') {
-    const services = initializeFirebase();
+
+  try {
+    const services = getFirebaseServices();
     return services?.analytics || null;
+  } catch (error) {
+    console.warn('Firebase not initialized:', error);
+    return null;
   }
-  
-  return analytics;
+}
+
+// Export configuration for debugging
+export function getFirebaseConfig() {
+  return getSingletonConfig();
 }

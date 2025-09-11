@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,14 +8,14 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ConversationListSkeleton } from '@/components/ui/skeletons';
 import { EmptyConversations } from '@/components/ui/empty-states';
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { 
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -26,14 +26,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { useDifyConversations, useDifyMutations } from '@/lib/hooks/useDify';
 import { DifyConversation } from '@/types/dify';
-import { 
-  MessageSquare, 
-  MoreHorizontal, 
-  Edit3, 
-  Trash2, 
+import {
+  MessageSquare,
+  MoreHorizontal,
+  Edit3,
+  Trash2,
   Calendar,
   Plus,
-  Loader2
+  Loader2,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -44,24 +44,17 @@ interface ConversationListProps {
   onCreateNew: () => void;
 }
 
-export function ConversationList({ 
-  userId, 
+export function ConversationList({
+  userId,
   currentConversationId,
   onConversationSelect,
-  onCreateNew 
+  onCreateNew,
 }: ConversationListProps) {
   // React Query hooks
-  const { 
-    conversations, 
-    isLoading: loading, 
-    error: queryError
-  } = useDifyConversations(userId);
-  
-  const { 
-    renameConversation, 
-    deleteConversation 
-  } = useDifyMutations(userId);
-  
+  const { conversations, isLoading: loading, error: queryError } = useDifyConversations(userId);
+
+  const { renameConversation, deleteConversation } = useDifyMutations(userId);
+
   // Dialog states
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -76,9 +69,9 @@ export function ConversationList({
     try {
       await renameConversation.mutateAsync({
         conversationId: selectedConversation.id,
-        name: newName.trim()
+        name: newName.trim(),
       });
-      
+
       setRenameDialogOpen(false);
       setNewName('');
     } catch (err) {
@@ -92,7 +85,7 @@ export function ConversationList({
     try {
       await deleteConversation.mutateAsync(selectedConversation.id);
       setDeleteDialogOpen(false);
-      
+
       // If we deleted the current conversation, redirect to new chat
       if (currentConversationId === selectedConversation.id) {
         onCreateNew();
@@ -102,16 +95,49 @@ export function ConversationList({
     }
   };
 
-  const openRenameDialog = (conversation: DifyConversation) => {
+  const openRenameDialog = useCallback((conversation: DifyConversation) => {
     setSelectedConversation(conversation);
     setNewName(conversation.name || '');
     setRenameDialogOpen(true);
-  };
+  }, []);
 
-  const openDeleteDialog = (conversation: DifyConversation) => {
+  const openDeleteDialog = useCallback((conversation: DifyConversation) => {
     setSelectedConversation(conversation);
     setDeleteDialogOpen(true);
-  };
+  }, []);
+
+  const handleConversationClick = useCallback(
+    (conversationId: string) => {
+      onConversationSelect(conversationId);
+    },
+    [onConversationSelect]
+  );
+
+  const handleStopPropagation = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+  }, []);
+
+  const handleRenameClick = useCallback(
+    (conversation: DifyConversation) => {
+      openRenameDialog(conversation);
+    },
+    [openRenameDialog]
+  );
+
+  const handleDeleteClick = useCallback(
+    (conversation: DifyConversation) => {
+      openDeleteDialog(conversation);
+    },
+    [openDeleteDialog]
+  );
+
+  const handleRenameDialogClose = useCallback(() => {
+    setRenameDialogOpen(false);
+  }, []);
+
+  const handleDeleteDialogClose = useCallback(() => {
+    setDeleteDialogOpen(false);
+  }, []);
 
   if (loading) {
     return (
@@ -138,74 +164,68 @@ export function ConversationList({
               <MessageSquare className="h-5 w-5" />
               Conversations
             </CardTitle>
-            <Button 
-              size="sm" 
-              onClick={onCreateNew}
-              className="h-8 w-8 p-0"
-            >
+            <Button size="sm" onClick={onCreateNew} className="h-8 w-8 p-0">
               <Plus className="h-4 w-4" />
             </Button>
           </div>
         </CardHeader>
-        
+
         <CardContent className="p-0">
-          {error && (
-            <div className="p-4 text-sm text-red-600 bg-red-50 border-b">
-              {error}
-            </div>
-          )}
-          
+          {error && <div className="border-b bg-red-50 p-4 text-sm text-red-600">{error}</div>}
+
           <ScrollArea className="h-[calc(100vh-200px)]">
-            <div className="p-2 space-y-1">
+            <div className="space-y-1 p-2">
               {conversations.length === 0 ? (
                 <EmptyConversations onCreateNew={onCreateNew} />
               ) : (
                 conversations.map((conversation) => (
                   <div
                     key={conversation.id}
-                    className={`group relative p-3 rounded-lg cursor-pointer transition-colors hover:bg-muted/50 ${
+                    className={`group hover:bg-muted/50 relative cursor-pointer rounded-lg p-3 transition-colors ${
                       currentConversationId === conversation.id ? 'bg-muted' : ''
                     }`}
-                    onClick={() => onConversationSelect(conversation.id)}
+                    onClick={() => handleConversationClick(conversation.id)}
                   >
                     <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-medium truncate">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="truncate text-sm font-medium">
                           {conversation.name || 'Untitled Conversation'}
                         </h3>
-                        <div className="flex items-center gap-2 mt-1">
+                        <div className="mt-1 flex items-center gap-2">
                           <Badge variant="secondary" className="text-xs">
                             Active
                           </Badge>
-                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <span className="text-muted-foreground flex items-center gap-1 text-xs">
                             <Calendar className="h-3 w-3" />
-                            {formatDistanceToNow(new Date(conversation.created_at), { addSuffix: true })}
+                            {formatDistanceToNow(new Date(conversation.created_at), {
+                              addSuffix: true,
+                            })}
                           </span>
                         </div>
                       </div>
-                      
+
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={(e) => e.stopPropagation()}
+                            className="h-6 w-6 p-0 opacity-0 transition-opacity group-hover:opacity-100"
+                            onClick={handleStopPropagation}
                           >
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => openRenameDialog(conversation)}>
-                            <Edit3 className="h-4 w-4 mr-2" />
+                          <DropdownMenuItem onClick={() => handleRenameClick(conversation)}>
+                            <Edit3 className="mr-2 h-4 w-4" />
                             Rename
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem 
-                            onClick={() => openDeleteDialog(conversation)}
+                          <DropdownMenuItem
+                            onClick={() => handleDeleteClick(conversation)}
                             className="text-red-600 focus:text-red-600"
                           >
-                            <Trash2 className="h-4 w-4 mr-2" />
+                            <Trash2 className="mr-2 h-4 w-4" />
                             Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -224,9 +244,7 @@ export function ConversationList({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Rename Conversation</DialogTitle>
-            <DialogDescription>
-              Enter a new name for this conversation.
-            </DialogDescription>
+            <DialogDescription>Enter a new name for this conversation.</DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <Input
@@ -237,18 +255,18 @@ export function ConversationList({
             />
           </div>
           <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setRenameDialogOpen(false)}
+            <Button
+              variant="outline"
+              onClick={handleRenameDialogClose}
               disabled={renameConversation.isLoading}
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleRename}
               disabled={renameConversation.isLoading || !newName.trim()}
             >
-              {renameConversation.isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {renameConversation.isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Rename
             </Button>
           </DialogFooter>
@@ -261,24 +279,25 @@ export function ConversationList({
           <DialogHeader>
             <DialogTitle>Delete Conversation</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete &quot;{selectedConversation?.name || 'this conversation'}&quot;? 
-              This action cannot be undone.
+              Are you sure you want to delete &quot;
+              {selectedConversation?.name || 'this conversation'}&quot;? This action cannot be
+              undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setDeleteDialogOpen(false)}
+            <Button
+              variant="outline"
+              onClick={handleDeleteDialogClose}
               disabled={deleteConversation.isLoading}
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               variant="destructive"
               onClick={handleDelete}
               disabled={deleteConversation.isLoading}
             >
-              {deleteConversation.isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {deleteConversation.isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Delete
             </Button>
           </DialogFooter>

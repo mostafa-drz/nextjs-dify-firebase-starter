@@ -21,7 +21,7 @@ Sentry.init({
     // Filter out non-critical errors in production
     if (process.env.NODE_ENV === 'production') {
       const error = hint.originalException;
-      
+
       // Ignore expected Firebase Admin errors
       if (error && error instanceof Error) {
         // Ignore token verification errors (handled by app logic)
@@ -34,8 +34,7 @@ Sentry.init({
         }
 
         // Ignore rate limiting errors (expected behavior)
-        if (error.message?.includes('429') || 
-            error.message?.includes('rate limit')) {
+        if (error.message?.includes('429') || error.message?.includes('rate limit')) {
           // Log to console but don't send to Sentry
           console.warn('Rate limit encountered:', error.message);
           return null;
