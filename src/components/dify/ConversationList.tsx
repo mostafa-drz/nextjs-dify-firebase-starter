@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -21,7 +21,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { getDifyConversations, renameDifyConversation, deleteDifyConversation } from '@/lib/actions/dify';
+import { useDifyConversations, useDifyMutations } from '@/lib/hooks/useDify';
 import { DifyConversation } from '@/types/dify';
 import { 
   MessageSquare, 
@@ -49,72 +49,39 @@ export function ConversationList({
   onConversationSelect,
   onCreateNew 
 }: ConversationListProps) {
-  const [conversations, setConversations] = useState<DifyConversation[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // React Query hooks
+  const { 
+    conversations, 
+    isLoading: loading, 
+    error: queryError
+  } = useDifyConversations(userId, apiKey);
+  
+  const { 
+    renameConversation, 
+    deleteConversation 
+  } = useDifyMutations(userId, apiKey);
   
   // Dialog states
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedConversation, setSelectedConversation] = useState<DifyConversation | null>(null);
   const [newName, setNewName] = useState('');
-  const [actionLoading, setActionLoading] = useState(false);
 
-  // Load conversations
-  useEffect(() => {
-    const loadConversations = async () => {
-      try {
-        setLoading(true);
-        const result = await getDifyConversations(userId, apiKey, 50);
-        
-        if (result.success && result.data) {
-          setConversations(result.data.data || []);
-        } else {
-          setError(result.error?.message || 'Failed to load conversations');
-        }
-      } catch (err) {
-        setError('An unexpected error occurred');
-        console.error('Error loading conversations:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (userId && apiKey) {
-      loadConversations();
-    }
-  }, [userId, apiKey]);
+  const error = queryError?.message || null;
 
   const handleRename = async () => {
     if (!selectedConversation || !newName.trim()) return;
 
     try {
-      setActionLoading(true);
-      const result = await renameDifyConversation(
-        userId, 
-        apiKey, 
-        selectedConversation.id, 
-        newName.trim()
-      );
-
-      if (result.success) {
-        setConversations(prev => 
-          prev.map(conv => 
-            conv.id === selectedConversation.id 
-              ? { ...conv, name: newName.trim() }
-              : conv
-          )
-        );
-        setRenameDialogOpen(false);
-        setNewName('');
-      } else {
-        setError(result.error?.message || 'Failed to rename conversation');
-      }
+      await renameConversation.mutateAsync({
+        conversationId: selectedConversation.id,
+        name: newName.trim()
+      });
+      
+      setRenameDialogOpen(false);
+      setNewName('');
     } catch (err) {
-      setError('An unexpected error occurred');
       console.error('Error renaming conversation:', err);
-    } finally {
-      setActionLoading(false);
     }
   };
 
@@ -122,31 +89,15 @@ export function ConversationList({
     if (!selectedConversation) return;
 
     try {
-      setActionLoading(true);
-      const result = await deleteDifyConversation(
-        userId, 
-        apiKey, 
-        selectedConversation.id
-      );
-
-      if (result.success) {
-        setConversations(prev => 
-          prev.filter(conv => conv.id !== selectedConversation.id)
-        );
-        setDeleteDialogOpen(false);
-        
-        // If we deleted the current conversation, redirect to new chat
-        if (currentConversationId === selectedConversation.id) {
-          onCreateNew();
-        }
-      } else {
-        setError(result.error?.message || 'Failed to delete conversation');
+      await deleteConversation.mutateAsync(selectedConversation.id);
+      setDeleteDialogOpen(false);
+      
+      // If we deleted the current conversation, redirect to new chat
+      if (currentConversationId === selectedConversation.id) {
+        onCreateNew();
       }
     } catch (err) {
-      setError('An unexpected error occurred');
       console.error('Error deleting conversation:', err);
-    } finally {
-      setActionLoading(false);
     }
   };
 
@@ -294,15 +245,15 @@ export function ConversationList({
             <Button 
               variant="outline" 
               onClick={() => setRenameDialogOpen(false)}
-              disabled={actionLoading}
+              disabled={renameConversation.isLoading}
             >
               Cancel
             </Button>
             <Button 
               onClick={handleRename}
-              disabled={actionLoading || !newName.trim()}
+              disabled={renameConversation.isLoading || !newName.trim()}
             >
-              {actionLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {renameConversation.isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Rename
             </Button>
           </DialogFooter>
@@ -323,16 +274,16 @@ export function ConversationList({
             <Button 
               variant="outline" 
               onClick={() => setDeleteDialogOpen(false)}
-              disabled={actionLoading}
+              disabled={deleteConversation.isLoading}
             >
               Cancel
             </Button>
             <Button 
               variant="destructive"
               onClick={handleDelete}
-              disabled={actionLoading}
+              disabled={deleteConversation.isLoading}
             >
-              {actionLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {deleteConversation.isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Delete
             </Button>
           </DialogFooter>

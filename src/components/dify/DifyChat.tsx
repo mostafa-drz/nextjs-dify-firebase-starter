@@ -9,7 +9,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { InsufficientCredits } from '@/components/credits/InsufficientCredits';
-import { sendDifyMessage, getDifyAppInfo } from '@/lib/actions/dify';
 import { DifyChatProps } from '@/types/dify';
 import { formatCredits } from '@/lib/utils/credits';
 import { 
@@ -23,7 +22,7 @@ import {
 } from 'lucide-react';
 import { MessageFeedback } from './MessageFeedback';
 import { SuggestedQuestions } from './SuggestedQuestions';
-import { useConversationMessages } from '@/lib/hooks/useConversationMessages';
+import { useDifyMessages, useDifyAppInfo, useDifyMutations } from '@/lib/hooks/useDify';
 
 interface ChatMessage {
   id: string;
@@ -45,15 +44,8 @@ export function DifyChat({
   const { user, availableCredits, checkCredits } = useUser();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | undefined>(initialConversationId);
   const [error, setError] = useState<string | null>(null);
-  const [appInfo, setAppInfo] = useState<{
-    opening_statement?: string;
-    suggested_questions?: string[];
-    speech_to_text?: { enabled: boolean };
-    retriever_resource?: { enabled: boolean };
-  } | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // Load conversation messages if conversationId is provided
@@ -61,43 +53,33 @@ export function DifyChat({
     data: conversationData,
     isLoading: messagesLoading,
     error: messagesError,
-    addMessageOptimistically,
-    updateMessage: _updateMessage,
-  } = useConversationMessages(
+    addMessage,
+  } = useDifyMessages(
     conversationId,
     user?.uid || '',
-    apiKey,
-    !!user && !!conversationId
+    apiKey
   );
 
-  // Load app info on mount
-  useEffect(() => {
-    const loadAppInfo = async () => {
-      try {
-        const result = await getDifyAppInfo(apiKey);
-        if (result.success && result.data) {
-          setAppInfo(result.data);
-          
-          // Add welcome message if available and no messages yet
-          if (result.data?.opening_statement && messages.length === 0) {
-            const welcomeMsg: ChatMessage = {
-              id: 'welcome',
-              role: 'assistant',
-              content: result.data.opening_statement,
-              timestamp: new Date()
-            };
-            setMessages([welcomeMsg]);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to load app info:', error);
-      }
-    };
+  // React Query hooks for app info and mutations
+  const { 
+    suggestedQuestions, 
+    openingStatement
+  } = useDifyAppInfo(apiKey);
 
-    if (apiKey) {
-      loadAppInfo();
+  const { sendMessage } = useDifyMutations(user?.uid || '', apiKey);
+
+  // Add welcome message when app info loads
+  useEffect(() => {
+    if (openingStatement && messages.length === 0) {
+      const welcomeMsg: ChatMessage = {
+        id: 'welcome',
+        role: 'assistant',
+        content: openingStatement,
+        timestamp: new Date()
+      };
+      setMessages([welcomeMsg]);
     }
-  }, [apiKey, messages.length]);
+  }, [openingStatement, messages.length]);
 
   // Custom welcome message override
   useEffect(() => {
@@ -171,7 +153,7 @@ export function DifyChat({
   const canAffordMessage = checkCredits(estimatedCredits);
 
   const handleSendMessage = async () => {
-    if (!input.trim() || isLoading || !canAffordMessage) return;
+    if (!input.trim() || sendMessage.isLoading || !canAffordMessage) return;
 
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
@@ -182,27 +164,17 @@ export function DifyChat({
 
     // Add user message optimistically
     setMessages(prev => [...prev, userMessage]);
-    addMessageOptimistically(userMessage);
+    addMessage(userMessage);
     
     setInput('');
-    setIsLoading(true);
     setError(null);
 
     try {
-      const result = await sendDifyMessage(user.uid, apiKey, {
+      const result = await sendMessage.mutateAsync({
         query: userMessage.content,
         conversation_id: conversationId,
-        user: user.uid,
         response_mode: 'blocking'
       });
-
-      if (!result.success) {
-        if (result.error?.code === 'INSUFFICIENT_CREDITS') {
-          setError('Insufficient credits for this message');
-          return;
-        }
-        throw new Error(result.error?.message || 'Failed to send message');
-      }
 
       const assistantMessage: ChatMessage = {
         id: result.data!.message_id,
@@ -215,7 +187,7 @@ export function DifyChat({
 
       // Add assistant message optimistically
       setMessages(prev => [...prev, assistantMessage]);
-      addMessageOptimistically(assistantMessage);
+      addMessage(assistantMessage);
       
       setConversationId(result.data!.conversation_id);
 
@@ -225,8 +197,6 @@ export function DifyChat({
       
       // Remove the user message since the request failed
       setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -350,7 +320,7 @@ export function DifyChat({
             ))}
 
             {/* Loading indicator */}
-            {isLoading && (
+            {sendMessage.isLoading && (
               <div className="flex items-start space-x-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
                   <Bot className="h-4 w-4" />
@@ -373,15 +343,15 @@ export function DifyChat({
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder={placeholder}
-            disabled={isLoading}
+            disabled={sendMessage.isLoading}
             className="flex-1"
           />
           <Button 
             onClick={handleSendMessage} 
-            disabled={!input.trim() || isLoading || !canAffordMessage}
+            disabled={!input.trim() || sendMessage.isLoading || !canAffordMessage}
             size="icon"
           >
-            {isLoading ? (
+            {sendMessage.isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Send className="h-4 w-4" />
@@ -400,14 +370,14 @@ export function DifyChat({
         )}
 
         {/* Suggested questions */}
-        {messages.length <= 1 && appInfo?.suggested_questions && appInfo.suggested_questions.length > 0 && (
+        {messages.length <= 1 && suggestedQuestions && suggestedQuestions.length > 0 && (
           <SuggestedQuestions
-            questions={appInfo.suggested_questions}
+            questions={suggestedQuestions}
             onQuestionSelect={(question) => {
               setInput(question);
               handleSendMessage();
             }}
-            loading={isLoading}
+            loading={sendMessage.isLoading}
           />
         )}
       </CardContent>
