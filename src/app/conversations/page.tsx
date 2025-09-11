@@ -54,7 +54,6 @@ export default function ConversationsPage() {
         {/* Conversation List Sidebar */}
         <div className="lg:col-span-1">
           <ConversationList
-            apiKey="app-demo-key"
             userId={user.uid}
             currentConversationId={currentConversationId}
             onConversationSelect={handleConversationSelect}
@@ -86,7 +85,6 @@ export default function ConversationsPage() {
               </CardHeader>
               <CardContent className="p-0">
                 <DifyChat
-                  apiKey="app-demo-key"
                   name="AI Assistant"
                   placeholder="Type your message..."
                   className="border-0"

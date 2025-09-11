@@ -52,18 +52,18 @@ function useDifyQuery<T>(
 /**
  * Conversations hook - simplified
  */
-export function useDifyConversations(userId: string, apiKey: string) {
+export function useDifyConversations(userId: string) {
   const queryClient = useQueryClient();
   
   const query = useDifyQuery(
     ['dify-conversations', userId],
     async () => {
-      const result = await getDifyConversations(userId, apiKey);
+      const result = await getDifyConversations(userId);
       if (!result.success) throw new Error(result.error?.message || 'Failed to load conversations');
       return result.data;
     },
     'conversations',
-    !!userId && !!apiKey
+    !!userId
   );
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ['dify-conversations', userId] });
@@ -79,16 +79,16 @@ export function useDifyConversations(userId: string, apiKey: string) {
 /**
  * App info hook - simplified
  */
-export function useDifyAppInfo(apiKey: string) {
+export function useDifyAppInfo() {
   const query = useDifyQuery(
-    ['dify-app-info', apiKey],
+    ['dify-app-info'],
     async () => {
-      const result = await getDifyAppInfo(apiKey);
+      const result = await getDifyAppInfo();
       if (!result.success) throw new Error(result.error?.message || 'Failed to load app info');
       return result.data;
     },
     'appInfo',
-    !!apiKey
+    true
   );
 
   return {
@@ -103,19 +103,19 @@ export function useDifyAppInfo(apiKey: string) {
 /**
  * Conversation messages hook - simplified
  */
-export function useDifyMessages(conversationId: string | undefined, userId: string, apiKey: string) {
+export function useDifyMessages(conversationId: string | undefined, userId: string) {
   const queryClient = useQueryClient();
   
   const query = useDifyQuery(
     ['dify-messages', conversationId || '', userId],
     async () => {
       if (!conversationId) return null;
-      const result = await getDifyConversationMessages(userId, apiKey, conversationId, 50);
+      const result = await getDifyConversationMessages(userId, conversationId, 50);
       if (!result.success) throw new Error(result.error?.message || 'Failed to load messages');
       return result.data;
     },
     'messages',
-    !!conversationId && !!userId && !!apiKey
+    !!conversationId && !!userId
   );
 
   const addMessage = (message: unknown) => {
@@ -138,12 +138,12 @@ export function useDifyMessages(conversationId: string | undefined, userId: stri
 /**
  * Unified mutations hook - simplified
  */
-export function useDifyMutations(userId: string, apiKey: string) {
+export function useDifyMutations(userId: string) {
   const queryClient = useQueryClient();
 
   const sendMessage = useMutation({
     mutationFn: async (params: { query: string; conversation_id?: string; response_mode?: 'blocking' | 'streaming' }) => {
-      const result = await sendDifyMessage(userId, apiKey, { ...params, user: userId });
+      const result = await sendDifyMessage(userId, { ...params, user: userId });
       if (!result.success) throw new Error(result.error?.message || 'Failed to send message');
       return result;
     },
@@ -154,7 +154,7 @@ export function useDifyMutations(userId: string, apiKey: string) {
 
   const renameConversation = useMutation({
     mutationFn: async ({ conversationId, name }: { conversationId: string; name: string }) => {
-      const result = await renameDifyConversation(userId, apiKey, conversationId, name);
+      const result = await renameDifyConversation(userId, conversationId, name);
       if (!result.success) throw new Error(result.error?.message || 'Failed to rename conversation');
       return result;
     },
@@ -165,7 +165,7 @@ export function useDifyMutations(userId: string, apiKey: string) {
 
   const deleteConversation = useMutation({
     mutationFn: async (conversationId: string) => {
-      const result = await deleteDifyConversation(userId, apiKey, conversationId);
+      const result = await deleteDifyConversation(userId, conversationId);
       if (!result.success) throw new Error(result.error?.message || 'Failed to delete conversation');
       return result;
     },

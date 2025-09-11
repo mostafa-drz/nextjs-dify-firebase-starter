@@ -59,7 +59,6 @@ export default function ChatPage() {
 
           {/* Conversation List */}
           <ConversationList
-            apiKey="app-demo-key"
             userId={user.uid}
             currentConversationId={currentConversationId}
             onConversationSelect={handleConversationSelect}
@@ -119,7 +118,6 @@ export default function ChatPage() {
             
             <TabsContent value="chat" className="mt-6">
               <DifyChat
-                apiKey="app-demo-key"
                 name="Demo Assistant"
                 placeholder="Ask me anything..."
                 welcomeMessage="Hello! I'm your AI assistant powered by Dify. I use a secure server-side integration that protects your API keys and tracks token usage for credit deduction. How can I help you today?"

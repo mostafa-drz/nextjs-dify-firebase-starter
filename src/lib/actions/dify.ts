@@ -9,6 +9,7 @@ import {
 import { deductCreditsForTokens, checkUserCredits } from '@/lib/actions/credits';
 
 const DIFY_BASE_URL = process.env.DIFY_BASE_URL || 'https://api.dify.ai/v1';
+const DIFY_API_KEY = process.env.DIFY_API_KEY;  
 
 class DifyApiError extends Error {
   constructor(
@@ -51,13 +52,9 @@ async function makeDifyRequest(
 
 export async function sendDifyMessage(
   userId: string,
-  apiKey: string,
   request: DifyChatRequest
 ): Promise<DifyApiResponse<DifyConversationResponse>> {
-  // Use environment variable if demo key is provided
-  const actualApiKey = apiKey === 'app-demo-key' 
-    ? process.env.DIFY_API_KEY || apiKey 
-    : apiKey;
+
   try {
     // First check if user has sufficient credits (estimate 50 tokens minimum)
     const requiredCredits = Math.ceil(50 / 1000); // Minimum estimate
@@ -80,7 +77,7 @@ export async function sendDifyMessage(
         ...request,
         response_mode: 'blocking' // Always use blocking for credit tracking
       }),
-    }, actualApiKey);
+    }, DIFY_API_KEY || '');
 
     const data: DifyConversationResponse = await response.json();
 
@@ -91,7 +88,7 @@ export async function sendDifyMessage(
         data.metadata.usage.total_tokens,
         'dify_chat',
         {
-          difyAppToken: apiKey.substring(0, 8) + '...',
+          difyAppToken: DIFY_API_KEY?.substring(0, 8) + '...',
           conversationId: data.conversation_id,
           sessionId: request.conversation_id
         }
@@ -135,7 +132,6 @@ export async function sendDifyMessage(
 
 export async function getDifyConversations(
   userId: string,
-  apiKey: string,
   limit: number = 20,
   firstId?: string
 ): Promise<DifyApiResponse<{ data: DifyConversation[]; has_more: boolean; first_id: string }>> {
@@ -148,7 +144,7 @@ export async function getDifyConversations(
 
     const response = await makeDifyRequest(`/conversations?${params}`, {
       method: 'GET',
-    }, apiKey);
+    }, DIFY_API_KEY || '');
 
     const data = await response.json();
 
@@ -184,7 +180,6 @@ export async function getDifyConversations(
 
 export async function getDifyConversationMessages(
   userId: string,
-  apiKey: string,
   conversationId: string,
   limit: number = 20,
   firstId?: string
@@ -199,7 +194,7 @@ export async function getDifyConversationMessages(
     const response = await makeDifyRequest(
       `/conversations/${conversationId}/messages?${params}`, 
       { method: 'GET' }, 
-      apiKey
+      DIFY_API_KEY || ''
     );
 
     const data = await response.json();
@@ -236,7 +231,6 @@ export async function getDifyConversationMessages(
 
 export async function renameDifyConversation(
   userId: string,
-  apiKey: string,
   conversationId: string,
   name: string
 ): Promise<DifyApiResponse<{ result: string }>> {
@@ -247,7 +241,7 @@ export async function renameDifyConversation(
         name,
         user: userId
       }),
-    }, apiKey);
+    }, DIFY_API_KEY || '');
 
     const data = await response.json();
 
@@ -283,7 +277,6 @@ export async function renameDifyConversation(
 
 export async function deleteDifyConversation(
   userId: string,
-  apiKey: string,
   conversationId: string
 ): Promise<DifyApiResponse<{ result: string }>> {
   try {
@@ -292,7 +285,7 @@ export async function deleteDifyConversation(
       body: JSON.stringify({
         user: userId
       }),
-    }, apiKey);
+    }, DIFY_API_KEY || '');
 
     const data = await response.json();
 
@@ -326,9 +319,7 @@ export async function deleteDifyConversation(
   }
 }
 
-export async function getDifyAppInfo(
-  apiKey: string
-): Promise<DifyApiResponse<{
+export async function getDifyAppInfo(): Promise<DifyApiResponse<{
   opening_statement: string;
   suggested_questions: string[];
   speech_to_text: {
@@ -338,15 +329,11 @@ export async function getDifyAppInfo(
     enabled: boolean;
   };
 }>> {
-  // Use environment variable if demo key is provided
-  const actualApiKey = apiKey === 'app-demo-key' 
-    ? process.env.DIFY_API_KEY || apiKey 
-    : apiKey;
 
   try {
     const response = await makeDifyRequest('/parameters', {
       method: 'GET',
-    }, actualApiKey);
+      }, DIFY_API_KEY || '');
 
     const data = await response.json();
 

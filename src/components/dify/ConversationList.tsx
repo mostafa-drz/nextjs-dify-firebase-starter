@@ -36,7 +36,6 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 
 interface ConversationListProps {
-  apiKey: string;
   userId: string;
   currentConversationId?: string;
   onConversationSelect: (conversationId: string) => void;
@@ -44,7 +43,6 @@ interface ConversationListProps {
 }
 
 export function ConversationList({ 
-  apiKey, 
   userId, 
   currentConversationId,
   onConversationSelect,
@@ -55,12 +53,12 @@ export function ConversationList({
     conversations, 
     isLoading: loading, 
     error: queryError
-  } = useDifyConversations(userId, apiKey);
+  } = useDifyConversations(userId);
   
   const { 
     renameConversation, 
     deleteConversation 
-  } = useDifyMutations(userId, apiKey);
+  } = useDifyMutations(userId);
   
   // Dialog states
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);

@@ -35,7 +35,6 @@ interface ChatMessage {
 }
 
 export function DifyChat({ 
-  apiKey, 
   name = 'Dify Assistant',
   className = '',
   placeholder = 'Type your message...',
@@ -57,17 +56,16 @@ export function DifyChat({
     addMessage,
   } = useDifyMessages(
     conversationId,
-    user?.uid || '',
-    apiKey
+    user?.uid || ''
   );
 
   // React Query hooks for app info and mutations
   const { 
     suggestedQuestions, 
     openingStatement
-  } = useDifyAppInfo(apiKey);
+  } = useDifyAppInfo();
 
-  const { sendMessage } = useDifyMutations(user?.uid || '', apiKey);
+  const { sendMessage } = useDifyMutations(user?.uid || '');
 
   // Add welcome message when app info loads
   useEffect(() => {
@@ -303,7 +301,6 @@ export function DifyChat({
                           <MessageFeedback
                             messageId={message.id}
                             userId={user.uid}
-                            apiKey={apiKey}
                           />
                         )}
                       </div>

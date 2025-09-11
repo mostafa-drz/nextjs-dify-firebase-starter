@@ -73,13 +73,16 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 
 # Firebase Admin (Server-side)
-FIREBASE_ADMIN_PROJECT_ID=your_project_id
-FIREBASE_ADMIN_CLIENT_EMAIL=your_service_account_email
-FIREBASE_ADMIN_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+FIREBASE_PROJECT_ID=your_project_id
+FIREBASE_CLIENT_EMAIL=your_service_account_email
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 
-# Dify Integration
+# Dify AI Configuration
+DIFY_API_KEY=your_dify_api_key
 DIFY_BASE_URL=https://api.dify.ai/v1
-DIFY_API_KEY=app-your_dify_api_key
+
+# Application Configuration
+NEXT_PUBLIC_SUPPORT_EMAIL=support@yourdomain.com
 
 # Sentry Configuration (Optional)
 NEXT_PUBLIC_SENTRY_DSN=https://your_public_key@o0.ingest.sentry.io/0

@@ -71,7 +71,6 @@ export interface DifyChatRequest {
 }
 
 export interface DifyChatProps {
-  apiKey: string;
   name?: string;
   className?: string;
   placeholder?: string;

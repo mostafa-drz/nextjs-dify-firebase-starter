@@ -21,7 +21,7 @@ export const APP_CONFIG = {
   SUPPORT_EMAIL: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@yourdomain.com',
 } as const;
 
-// Dify API configuration
+// Dify API configuration (server-side only)
 export const DIFY_CONFIG = {
   API_BASE_URL: 'https://api.dify.ai',
   EMBED_BASE_URL: 'https://udify.app',
