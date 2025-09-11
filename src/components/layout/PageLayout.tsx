@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import { Header } from './Header';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface PageLayoutProps {
   children: ReactNode;
@@ -13,7 +14,9 @@ export function PageLayout({ children, currentPage }: PageLayoutProps) {
     <>
       <Header currentPage={currentPage} />
       <main className="min-h-screen bg-background">
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </main>
     </>
   );

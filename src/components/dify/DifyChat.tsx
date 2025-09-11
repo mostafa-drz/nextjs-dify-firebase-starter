@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useUser } from '@/components/auth/UserProvider';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -221,7 +222,8 @@ export function DifyChat({
   }
 
   return (
-    <Card className={className}>
+    <ErrorBoundary>
+      <Card className={className}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <div className="flex items-center space-x-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary">
@@ -382,5 +384,6 @@ export function DifyChat({
         )}
       </CardContent>
     </Card>
+    </ErrorBoundary>
   );
 }

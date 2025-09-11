@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -131,7 +132,7 @@ export function ConversationList({
   }
 
   return (
-    <>
+    <ErrorBoundary>
       <Card className="h-full">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
@@ -289,6 +290,6 @@ export function ConversationList({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
+    </ErrorBoundary>
   );
 }
