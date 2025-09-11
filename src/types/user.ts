@@ -10,6 +10,9 @@ export interface CreditTransaction {
     sessionId?: string;
     tokensUsed?: number;
     cost?: number;
+    reservationId?: string;
+    conversationId?: string;
+    estimatedTokens?: number;
   };
 }
 

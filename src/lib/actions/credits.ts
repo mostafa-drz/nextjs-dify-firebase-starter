@@ -169,6 +169,239 @@ export async function deductCreditsForTokens(
 }
 
 /**
+ * Reserve credits for an operation (prevents double-spending)
+ */
+export async function reserveCredits(
+  userId: string,
+  creditsToReserve: number,
+  operation: string,
+  reservationId: string,
+  metadata?: Record<string, unknown>
+): Promise<{ success: boolean; message: string; remainingCredits?: number }> {
+  try {
+    const db = getFirestoreAdmin();
+    const userRef = db.doc(`users/${userId}`);
+
+    const result = await db.runTransaction(async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+
+      if (!userDoc.exists) {
+        throw new Error('User not found');
+      }
+
+      const userData = userDoc.data();
+      const currentCredits = userData?.admin?.availableCredits || 0;
+      const reservedCredits = userData?.admin?.reservedCredits || 0;
+
+      if (currentCredits < creditsToReserve) {
+        return {
+          success: false,
+          message: `Insufficient credits. Required: ${creditsToReserve}, Available: ${currentCredits}`,
+          remainingCredits: currentCredits,
+        };
+      }
+
+      const newAvailableCredits = currentCredits - creditsToReserve;
+      const newReservedCredits = reservedCredits + creditsToReserve;
+
+      // Create reservation record
+      const reservationRecord = {
+        reservationId,
+        amount: creditsToReserve,
+        operation,
+        timestamp: FieldValue.serverTimestamp(),
+        metadata,
+      };
+
+      // Update user admin data
+      transaction.update(userRef, {
+        'admin.availableCredits': newAvailableCredits,
+        'admin.reservedCredits': newReservedCredits,
+        'admin.creditReservations': FieldValue.arrayUnion(reservationRecord),
+        'admin.updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      return {
+        success: true,
+        message: 'Credits reserved successfully',
+        remainingCredits: newAvailableCredits,
+      };
+    });
+
+    return result;
+  } catch (error: unknown) {
+    console.error('Error reserving credits:', error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Failed to reserve credits',
+    };
+  }
+}
+
+/**
+ * Confirm reserved credits (convert reservation to actual deduction)
+ */
+export async function confirmReservedCredits(
+  userId: string,
+  reservationId: string,
+  actualTokensUsed: number,
+  operation: string,
+  metadata?: Record<string, unknown>
+): Promise<{
+  success: boolean;
+  message: string;
+  remainingCredits?: number;
+  creditsDeducted?: number;
+}> {
+  try {
+    const db = getFirestoreAdmin();
+    const userRef = db.doc(`users/${userId}`);
+
+    const result = await db.runTransaction(async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+
+      if (!userDoc.exists) {
+        throw new Error('User not found');
+      }
+
+      const userData = userDoc.data();
+      const reservations = userData?.admin?.creditReservations || [];
+      const reservedCredits = userData?.admin?.reservedCredits || 0;
+
+      // Find the reservation
+      const reservation = reservations.find((r: any) => r.reservationId === reservationId);
+      if (!reservation) {
+        return {
+          success: false,
+          message: 'Reservation not found',
+        };
+      }
+
+      const reservedAmount = reservation.amount;
+      const actualCreditsNeeded = calculateCreditsFromTokens(actualTokensUsed);
+      const creditsToRefund = Math.max(0, reservedAmount - actualCreditsNeeded);
+
+      const newReservedCredits = reservedCredits - reservedAmount;
+      const newUsedCredits = (userData?.admin?.usedCredits || 0) + actualCreditsNeeded;
+
+      // Create transaction record
+      const transactionRecord: Omit<CreditTransaction, 'id' | 'timestamp'> & {
+        timestamp: FieldValue;
+      } = {
+        amount: -actualCreditsNeeded,
+        operation,
+        timestamp: FieldValue.serverTimestamp(),
+        metadata: {
+          ...metadata,
+          reservationId,
+          tokensUsed: actualTokensUsed,
+          cost: actualCreditsNeeded,
+        },
+      };
+
+      // Remove reservation and update credits
+      const updatedReservations = reservations.filter(
+        (r: any) => r.reservationId !== reservationId
+      );
+
+      const updates: any = {
+        'admin.reservedCredits': newReservedCredits,
+        'admin.usedCredits': newUsedCredits,
+        'admin.creditHistory': FieldValue.arrayUnion(transactionRecord),
+        'admin.creditReservations': updatedReservations,
+        'admin.updatedAt': FieldValue.serverTimestamp(),
+      };
+
+      // Refund excess credits if any
+      if (creditsToRefund > 0) {
+        updates['admin.availableCredits'] = FieldValue.increment(creditsToRefund);
+      }
+
+      transaction.update(userRef, updates);
+
+      return {
+        success: true,
+        message: 'Reserved credits confirmed successfully',
+        remainingCredits: (userData?.admin?.availableCredits || 0) + creditsToRefund,
+        creditsDeducted: actualCreditsNeeded,
+      };
+    });
+
+    return result;
+  } catch (error: unknown) {
+    console.error('Error confirming reserved credits:', error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Failed to confirm reserved credits',
+    };
+  }
+}
+
+/**
+ * Release reserved credits (for failed operations)
+ */
+export async function releaseReservedCredits(
+  userId: string,
+  reservationId: string,
+  _reason: string
+): Promise<{ success: boolean; message: string; remainingCredits?: number }> {
+  try {
+    const db = getFirestoreAdmin();
+    const userRef = db.doc(`users/${userId}`);
+
+    const result = await db.runTransaction(async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+
+      if (!userDoc.exists) {
+        throw new Error('User not found');
+      }
+
+      const userData = userDoc.data();
+      const reservations = userData?.admin?.creditReservations || [];
+      const reservedCredits = userData?.admin?.reservedCredits || 0;
+
+      // Find the reservation
+      const reservation = reservations.find((r: any) => r.reservationId === reservationId);
+      if (!reservation) {
+        return {
+          success: false,
+          message: 'Reservation not found',
+        };
+      }
+
+      const reservedAmount = reservation.amount;
+      const newReservedCredits = reservedCredits - reservedAmount;
+
+      // Remove reservation and restore credits
+      const updatedReservations = reservations.filter(
+        (r: any) => r.reservationId !== reservationId
+      );
+
+      transaction.update(userRef, {
+        'admin.availableCredits': FieldValue.increment(reservedAmount),
+        'admin.reservedCredits': newReservedCredits,
+        'admin.creditReservations': updatedReservations,
+        'admin.updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      return {
+        success: true,
+        message: 'Reserved credits released successfully',
+        remainingCredits: (userData?.admin?.availableCredits || 0) + reservedAmount,
+      };
+    });
+
+    return result;
+  } catch (error: unknown) {
+    console.error('Error releasing reserved credits:', error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Failed to release reserved credits',
+    };
+  }
+}
+
+/**
  * Check if user has enough credits for an operation
  */
 export async function checkUserCredits(
