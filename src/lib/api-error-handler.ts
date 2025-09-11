@@ -34,7 +34,7 @@ export function createApiError(
 /**
  * Wrap API route handlers with error handling
  */
-export function withErrorHandler<T extends any[], R>(
+export function withErrorHandler<T extends unknown[], R>(
   handler: (...args: T) => Promise<NextResponse | R>
 ) {
   return async (...args: T): Promise<NextResponse | R> => {
@@ -43,7 +43,7 @@ export function withErrorHandler<T extends any[], R>(
     } catch (error) {
       // Handle known Firebase errors
       if (error && typeof error === 'object' && 'code' in error) {
-        const firebaseError = error as any;
+        const firebaseError = error as { code: string; message?: string };
         
         switch (firebaseError.code) {
           case 'auth/invalid-credential':
@@ -89,7 +89,7 @@ export function withErrorHandler<T extends any[], R>(
  */
 export async function parseRequestBody<T>(
   request: NextRequest,
-  validator?: (data: any) => data is T
+  validator?: (data: unknown) => data is T
 ): Promise<T> {
   try {
     const body = await request.json();
@@ -139,10 +139,10 @@ export function checkRateLimit(
 /**
  * Middleware for API authentication check
  */
-export async function requireAuth(
+export async function requireAuth<T>(
   request: NextRequest,
-  checkAuth: (request: NextRequest) => Promise<any>
-): Promise<any> {
+  checkAuth: (request: NextRequest) => Promise<T>
+): Promise<T> {
   try {
     const user = await checkAuth(request);
     if (!user) {

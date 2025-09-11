@@ -32,7 +32,7 @@ export function logMessage(message: string, level: LogLevel = LogLevel.INFO) {
  */
 export function logError(
   error: Error | unknown,
-  context?: Record<string, any>,
+  context?: Record<string, unknown>,
   level: LogLevel = LogLevel.ERROR
 ) {
   if (process.env.NODE_ENV === 'production') {
@@ -80,7 +80,7 @@ export function setUserContext(user: {
 export function addBreadcrumb(
   message: string,
   category: string,
-  data?: Record<string, any>
+  data?: Record<string, unknown>
 ) {
   Sentry.addBreadcrumb({
     message,
@@ -98,7 +98,7 @@ export function addBreadcrumb(
 export function logApiError(
   endpoint: string,
   error: Error | unknown,
-  requestData?: any,
+  requestData?: unknown,
   statusCode?: number
 ) {
   const context = {
@@ -138,12 +138,13 @@ export function logApiError(
  */
 export function logFirebaseError(
   operation: string,
-  error: any,
-  additionalContext?: Record<string, any>
+  error: unknown,
+  additionalContext?: Record<string, unknown>
 ) {
+  const firebaseError = error as { code?: string; message?: string };
   const context = {
     operation,
-    code: error?.code,
+    code: firebaseError?.code,
     ...additionalContext,
   };
 
@@ -155,8 +156,8 @@ export function logFirebaseError(
     'auth/too-many-requests',
   ];
 
-  if (error?.code && ignoredCodes.includes(error.code)) {
-    console.warn('Firebase operation failed (expected):', operation, error.code);
+  if (firebaseError?.code && ignoredCodes.includes(firebaseError.code)) {
+    console.warn('Firebase operation failed (expected):', operation, firebaseError.code);
     return;
   }
 
@@ -167,17 +168,10 @@ export function logFirebaseError(
  * Performance monitoring helper
  * Use this to track slow operations
  */
-export function measurePerformance(
+export function measurePerformance<T>(
   operationName: string,
-  operation: () => Promise<any> | any
-): Promise<any> | any {
-  const transaction = Sentry.startTransaction({
-    op: 'function',
-    name: operationName,
-  });
-
-  Sentry.getCurrentHub().configureScope((scope) => scope.setSpan(transaction));
-
+  operation: () => Promise<T> | T
+): Promise<T> | T {
   const startTime = Date.now();
 
   try {
@@ -187,8 +181,6 @@ export function measurePerformance(
       return result
         .then((res) => {
           const duration = Date.now() - startTime;
-          transaction.setStatus('ok');
-          transaction.finish();
           
           // Log slow operations
           if (duration > 3000) {
@@ -201,14 +193,12 @@ export function measurePerformance(
           return res;
         })
         .catch((error) => {
-          transaction.setStatus('internal_error');
-          transaction.finish();
+          const duration = Date.now() - startTime;
+          logError(error, { operation: operationName, duration });
           throw error;
         });
     } else {
       const duration = Date.now() - startTime;
-      transaction.setStatus('ok');
-      transaction.finish();
       
       if (duration > 1000) {
         logMessage(
@@ -220,8 +210,8 @@ export function measurePerformance(
       return result;
     }
   } catch (error) {
-    transaction.setStatus('internal_error');
-    transaction.finish();
+    const duration = Date.now() - startTime;
+    logError(error, { operation: operationName, duration });
     throw error;
   }
 }

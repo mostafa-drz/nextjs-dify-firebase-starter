@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import * as Sentry from '@sentry/nextjs';
+import Link from 'next/link';
 import { logError } from '@/lib/sentry';
 
 export default function Error({
@@ -43,7 +43,7 @@ export default function Error({
             Something went wrong!
           </h1>
           <p className="text-base text-gray-600">
-            We've encountered an unexpected error. Our team has been notified and is working on a fix.
+            We&apos;ve encountered an unexpected error. Our team has been notified and is working on a fix.
           </p>
         </div>
 
@@ -54,12 +54,12 @@ export default function Error({
           >
             Try again
           </button>
-          <a
+          <Link
             href="/"
             className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             Go to homepage
-          </a>
+          </Link>
         </div>
 
         {process.env.NODE_ENV === 'development' && error.digest && (

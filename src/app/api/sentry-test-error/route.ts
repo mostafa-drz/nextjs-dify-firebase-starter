@@ -1,8 +1,7 @@
-import { NextRequest } from 'next/server';
 import { withErrorHandler, createApiError } from '@/lib/api-error-handler';
 import { logError } from '@/lib/sentry';
 
-export const GET = withErrorHandler(async (request: NextRequest) => {
+export const GET = withErrorHandler(async () => {
   // Intentionally throw an error for testing
   const error = new Error('Test API error from Sentry test endpoint');
   

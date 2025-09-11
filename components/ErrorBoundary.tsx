@@ -1,7 +1,6 @@
 'use client';
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import * as Sentry from '@sentry/nextjs';
 import { logError } from '@/lib/sentry';
 
 interface Props {
@@ -65,7 +64,7 @@ export class ErrorBoundary extends Component<Props, State> {
             Something went wrong
           </h2>
           <p className="mb-4 text-center text-sm text-red-700">
-            We've encountered an unexpected error. The issue has been logged and will be investigated.
+            We&apos;ve encountered an unexpected error. The issue has been logged and will be investigated.
           </p>
           {this.props.showError && this.state.error && process.env.NODE_ENV !== 'production' && (
             <details className="mt-4 w-full max-w-xl">
