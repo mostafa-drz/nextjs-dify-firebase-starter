@@ -10,7 +10,7 @@ import {
   User as FirebaseUser
 } from 'firebase/auth';
 import { doc, onSnapshot, DocumentSnapshot } from 'firebase/firestore';
-import { getFirebaseServices } from '@/lib/utils/firebase';
+import { getFirebaseServices } from '@/lib/utils/firebase-client';
 import { initializeNewUser, updateLastLogin } from '@/lib/actions/auth';
 import { User } from '@/types/user';
 import { hasEnoughCredits } from '@/lib/utils/credits';

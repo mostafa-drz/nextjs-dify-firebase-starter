@@ -1,39 +1,94 @@
-import { Timestamp } from 'firebase/firestore';
-
-export interface DifySession {
+export interface DifyApp {
   id: string;
-  userId: string;
-  difyAppToken: string;
-  conversationId?: string;
-  status: 'active' | 'expired' | 'blocked';
-  startedAt: Timestamp;
-  lastActivityAt: Timestamp;
-  totalInteractions: number;
-  totalCreditsUsed: number;
+  name: string;
+  mode: 'chat' | 'completion' | 'agent' | 'workflow';
+  icon?: string;
+  description?: string;
+  apiKey: string;
+  baseUrl?: string;
 }
 
-export interface DifyChatProps {
-  token: string;           // Dify app token
-  creditCost?: number;     // Base credits per session (default: 1)
-  name?: string;          // Display name
-  height?: string;        // Embed height
-  className?: string;     // Styling
+export interface DifyMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  created_at: string;
 }
 
-export interface DifyApiResponse {
-  conversation_id?: string;
-  message_id?: string;
+export interface DifyConversationResponse {
+  conversation_id: string;
+  message_id: string;
+  mode: string;
+  answer: string;
+  created_at: string;
+  metadata: {
+    usage: {
+      prompt_tokens: number;
+      completion_tokens: number;
+      total_tokens: number;
+    };
+    retriever_resources?: Record<string, unknown>[];
+  };
+}
+
+export interface DifyStreamResponse {
+  event: 'message' | 'message_end' | 'error' | 'agent_thought';
+  conversation_id: string;
+  message_id: string;
   answer?: string;
+  created_at: string;
   metadata?: {
     usage?: {
-      prompt_tokens?: number;
-      completion_tokens?: number;
-      total_tokens?: number;
+      prompt_tokens: number;
+      completion_tokens: number;
+      total_tokens: number;
     };
   };
 }
 
-export interface DifyStreamChunk {
-  event: string;
-  data: string;
+export interface DifyConversation {
+  id: string;
+  name: string;
+  inputs: Record<string, unknown>;
+  status: string;
+  introduction: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DifyChatRequest {
+  query: string;
+  conversation_id?: string;
+  user: string;
+  inputs?: Record<string, unknown>;
+  response_mode?: 'streaming' | 'blocking';
+  files?: Array<{
+    type: 'image' | 'document';
+    transfer_method: 'remote_url' | 'local_file';
+    url?: string;
+    upload_file_id?: string;
+  }>;
+}
+
+export interface DifyChatProps {
+  apiKey: string;
+  name?: string;
+  className?: string;
+  placeholder?: string;
+  welcomeMessage?: string;
+}
+
+export interface DifyApiResponse<T = unknown> {
+  success: boolean;
+  data?: T;
+  error?: {
+    code: string;
+    message: string;
+    status: number;
+  };
+  usage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+  };
 }
