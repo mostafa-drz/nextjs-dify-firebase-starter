@@ -5,6 +5,7 @@ A secure Next.js 15 boilerplate for integrating [Dify.ai](https://dify.ai) with 
 ## 🚀 Features
 
 ### Core Features
+
 - ✅ **Next.js 15** with App Router and Server Actions
 - ✅ **Firebase Authentication** with magic link (passwordless) login
 - ✅ **Firestore Database** with security rules and real-time updates
@@ -16,6 +17,7 @@ A secure Next.js 15 boilerplate for integrating [Dify.ai](https://dify.ai) with 
 - ✅ **Google Analytics** with Firebase Analytics integration
 
 ### Security Features
+
 - 🔒 **API keys never exposed** to client-side code
 - 🔒 **Server-side validation** for all Dify API calls
 - 🔒 **Credit pre-flight checks** to prevent unauthorized usage
@@ -24,6 +26,7 @@ A secure Next.js 15 boilerplate for integrating [Dify.ai](https://dify.ai) with 
 - 🔒 **Sentry error tracking** with privacy-first configuration
 
 ### User Experience
+
 - 📱 **Responsive design** for all screen sizes
 - ⚡ **Real-time credit updates** via Firestore listeners
 - 💬 **Custom chat interface** with token usage tracking
@@ -64,6 +67,7 @@ cp .env.example .env.local
 ```
 
 Required environment variables:
+
 ```env
 # Firebase Client Configuration
 NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
@@ -124,6 +128,147 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to see the application.
 
+## 🔨 Development Experience
+
+This project includes a comprehensive development setup with automated code formatting, linting, and quality checks to ensure consistent code style and prevent common errors.
+
+### Development Tools Setup
+
+The project is configured with modern development tools for the best developer experience:
+
+#### Code Quality Tools
+
+- **Prettier**: Automatic code formatting with Tailwind CSS class sorting
+- **ESLint**: Code linting with Next.js, TypeScript, and Prettier integration
+- **TypeScript**: Full type checking with strict mode enabled
+- **Husky**: Git hooks for automated quality checks
+
+#### IDE Configuration
+
+Pre-configured VSCode/Cursor settings for optimal development:
+
+- Format on save enabled
+- Auto-fix ESLint issues on save
+- Tailwind CSS IntelliSense support
+- TypeScript IntelliSense and error highlighting
+- Recommended extensions list
+
+#### Git Hooks
+
+Automated quality checks run on every commit and push:
+
+- **Pre-commit**: Runs linting and formatting on staged files
+- **Pre-push**: Runs TypeScript checking and build verification
+
+### Available Scripts
+
+```bash
+# Development
+npm run dev          # Start development server with hot reload
+npm run build        # Build for production
+npm run start        # Start production server
+
+# Code Quality
+npm run lint         # Check code with ESLint
+npm run lint:fix     # Fix ESLint issues automatically
+npm run format       # Format code with Prettier
+npm run format:check # Check if code is properly formatted
+npm run typecheck    # Type check with TypeScript compiler
+
+# Git Hooks (handled automatically)
+npm run prepare      # Initialize Husky (runs on npm install)
+```
+
+### IDE Setup (VSCode/Cursor)
+
+The project includes `.vscode/` configuration with:
+
+#### Recommended Extensions
+
+- **Prettier**: Code formatting
+- **ESLint**: Code linting
+- **Tailwind CSS IntelliSense**: CSS class completion
+- **Code Spell Checker**: Spelling validation
+- **Error Lens**: Inline error display
+- **Auto Rename Tag**: Automatic HTML/JSX tag renaming
+
+#### Editor Settings
+
+- **Auto-format on save** for consistent code style
+- **Auto-fix ESLint issues** to prevent common errors
+- **Tailwind class sorting** for better organization
+- **TypeScript hints** for better development experience
+
+### First-Time Setup for New Developers
+
+1. **Clone and install dependencies**:
+
+   ```bash
+   git clone <repository-url>
+   cd dify-firebase-boilerplate
+   npm install
+   ```
+
+2. **Open in VSCode/Cursor**:
+
+   ```bash
+   code .  # or cursor .
+   ```
+
+3. **Install recommended extensions** when prompted
+
+4. **Configure environment** (see Environment Configuration section)
+
+5. **Verify setup**:
+   ```bash
+   npm run typecheck  # Should pass without errors
+   npm run lint       # Should pass without errors
+   npm run build      # Should build successfully
+   ```
+
+### Code Formatting Rules
+
+The project follows these formatting conventions:
+
+- **Print width**: 100 characters
+- **Quotes**: Single quotes for JavaScript/TypeScript
+- **Semi-colons**: Required
+- **Trailing commas**: ES5 compatible
+- **Tailwind classes**: Automatically sorted by functionality
+
+### Quality Checks
+
+Before every commit, the following checks run automatically:
+
+1. **ESLint**: Checks for code quality issues
+2. **Prettier**: Ensures consistent formatting
+3. **TypeScript**: Validates type safety
+
+Before every push:
+
+1. **TypeScript compilation**: Ensures no type errors
+2. **Production build**: Ensures the app builds successfully
+
+### Troubleshooting
+
+**Husky hooks not working?**
+
+```bash
+npx husky install
+```
+
+**ESLint/Prettier conflicts?**
+The project uses `eslint-config-prettier` to disable conflicting rules automatically.
+
+**TypeScript errors on build?**
+
+```bash
+npm run typecheck  # Check specific TypeScript issues
+```
+
+**Extensions not working in Cursor?**
+Cursor is compatible with VSCode extensions. Install the recommended extensions manually if auto-prompt doesn't appear.
+
 ## 🎯 Usage
 
 ### Basic Integration
@@ -153,11 +298,7 @@ Access credit information using the `useCredits` hook:
 import { useCredits } from '@/lib/hooks/useCredits';
 
 export function MyComponent() {
-  const { 
-    availableCredits, 
-    hasEnoughCredits, 
-    deductForTokens 
-  } = useCredits();
+  const { availableCredits, hasEnoughCredits, deductForTokens } = useCredits();
 
   return (
     <div>
@@ -177,9 +318,9 @@ import { sendDifyMessage } from '@/lib/actions/dify';
 
 // In a server action or API route
 const result = await sendDifyMessage(userId, apiKey, {
-  query: "Hello",
+  query: 'Hello',
   user: userId,
-  response_mode: 'blocking'
+  response_mode: 'blocking',
 });
 
 if (result.success) {
@@ -195,6 +336,7 @@ This boilerplate implements a **client-side conversation management system** usi
 ### Architecture Overview
 
 **Why React Query?**
+
 - **Automatic caching** with intelligent invalidation
 - **Optimistic updates** for instant UI feedback
 - **Background refetching** to keep data fresh
@@ -202,6 +344,7 @@ This boilerplate implements a **client-side conversation management system** usi
 - **DevTools** for debugging (development only)
 
 **Why Not Firebase/Firestore?**
+
 - **Simplicity**: Avoids additional database complexity
 - **Performance**: Client-side caching is faster than database queries
 - **Flexibility**: Developers can choose their own persistence layer
@@ -223,21 +366,13 @@ User Action → Optimistic Update → API Call → Cache Update → UI Update
 import { useConversationMessages } from '@/lib/hooks/useConversationMessages';
 
 export function ChatComponent() {
-  const { 
-    messages, 
-    isLoading, 
-    addMessageOptimistically,
-    invalidate 
-  } = useConversationMessages(
-    conversationId,
-    userId,
-    apiKey
-  );
+  const { messages, isLoading, addMessageOptimistically, invalidate } =
+    useConversationMessages(conversationId, userId, apiKey);
 
   const handleSendMessage = async (content: string) => {
     const tempMessage = { id: 'temp', content, role: 'user' };
     addMessageOptimistically(tempMessage); // Instant UI update
-    
+
     const result = await sendDifyMessage(userId, apiKey, { query: content });
     // Cache automatically updated with real data
   };
@@ -262,7 +397,7 @@ export function ChatPage() {
   const [currentConversationId, setCurrentConversationId] = useState<string>();
 
   return (
-    <div className="grid lg:grid-cols-4 gap-8">
+    <div className="grid gap-8 lg:grid-cols-4">
       <div className="lg:col-span-1">
         <ConversationList
           apiKey="app-demo-key"
@@ -298,11 +433,14 @@ export function ChatPage() {
 
 ```tsx
 // Add to your Firebase functions
-export const syncConversationToFirestore = async (conversationId: string, messages: unknown[]) => {
+export const syncConversationToFirestore = async (
+  conversationId: string,
+  messages: unknown[]
+) => {
   await db.collection('conversations').doc(conversationId).set({
     messages,
     lastUpdated: new Date(),
-    userId: auth.currentUser?.uid
+    userId: auth.currentUser?.uid,
   });
 };
 
@@ -317,7 +455,10 @@ await syncConversationToFirestore(result.data.conversation_id, messages);
 // Add to useConversationMessages hook
 useEffect(() => {
   if (data) {
-    localStorage.setItem(`conversation-${conversationId}`, JSON.stringify(data));
+    localStorage.setItem(
+      `conversation-${conversationId}`,
+      JSON.stringify(data)
+    );
   }
 }, [data, conversationId]);
 ```
@@ -329,7 +470,7 @@ useEffect(() => {
 const useRealtimeMessages = (conversationId: string) => {
   useEffect(() => {
     const ws = new WebSocket(`/ws/conversations/${conversationId}`);
-    ws.onmessage = (event) => {
+    ws.onmessage = event => {
       const newMessage = JSON.parse(event.data);
       addMessageOptimistically(newMessage);
     };
@@ -350,6 +491,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 ### Best Practices
 
 **Do's:**
+
 - ✅ Use optimistic updates for better UX
 - ✅ Implement proper error boundaries
 - ✅ Add loading states for all async operations
@@ -357,6 +499,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 - ✅ Test with React Query DevTools
 
 **Don'ts:**
+
 - ❌ Don't bypass the cache for real-time updates
 - ❌ Don't store sensitive data in client-side cache
 - ❌ Don't forget to handle offline scenarios
@@ -372,7 +515,7 @@ src/
 │   ├── dashboard/         # User dashboard
 │   ├── login/            # Authentication page
 │   └── test-credits/     # Credit testing utilities
-├── components/            
+├── components/
 │   ├── auth/             # Authentication components
 │   ├── credits/          # Credit management UI
 │   ├── dify/            # Dify integration components
@@ -403,10 +546,10 @@ Configure credit costs and limits in `src/lib/config/constants.ts`:
 
 ```typescript
 export const CREDIT_CONFIG = {
-  TOKENS_PER_CREDIT: 1000,        // 1 credit = 1000 tokens
-  FREE_TIER_CREDITS: 100,         // Free credits per month
-  MIN_CREDITS_WARNING: 10,        // Show warning below this
-  CREDIT_PURCHASE_AMOUNTS: [10, 50, 100, 500]
+  TOKENS_PER_CREDIT: 1000, // 1 credit = 1000 tokens
+  FREE_TIER_CREDITS: 100, // Free credits per month
+  MIN_CREDITS_WARNING: 10, // Show warning below this
+  CREDIT_PURCHASE_AMOUNTS: [10, 50, 100, 500],
 } as const;
 ```
 
@@ -421,29 +564,34 @@ const DIFY_APPS = {
     apiKey: process.env.DIFY_CHAT_API_KEY!,
   },
   summarizer: {
-    name: 'Document Summarizer', 
+    name: 'Document Summarizer',
     apiKey: process.env.DIFY_SUMMARIZER_API_KEY!,
-  }
+  },
 };
 ```
 
 ## 🧪 Testing
 
 ### Run Tests
+
 ```bash
 npm test
 ```
 
 ### Test Credit System
+
 Visit `/test-credits` to test credit deduction and management.
 
 ### Test Dify Integration
+
 Visit `/chat` to test the Dify chat interface.
 
 ### Test Sentry Integration
+
 Visit `/sentry-test` to test error tracking and logging.
 
 ### Enable Google Analytics
+
 1. Enable Analytics in your Firebase project console
 2. Copy the Measurement ID from Analytics settings
 3. Add `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX` to `.env.local`
@@ -460,6 +608,7 @@ Visit `/sentry-test` to test error tracking and logging.
 ### Other Platforms
 
 This Next.js app can be deployed to any platform supporting Node.js:
+
 - Railway
 - Render
 - Heroku
@@ -469,6 +618,7 @@ This Next.js app can be deployed to any platform supporting Node.js:
 ## 📊 Monitoring
 
 ### Firebase Console
+
 - Monitor authentication metrics
 - View Firestore usage and costs
 - Check security rule violations
@@ -478,12 +628,14 @@ This Next.js app can be deployed to any platform supporting Node.js:
 This project includes production-ready **Sentry integration** with minimal but essential logging:
 
 #### Features
+
 - **Smart Error Filtering**: Automatically filters non-critical errors (network timeouts, browser quirks)
 - **Privacy-First**: Masks sensitive data, excludes cookies and IP addresses
 - **Performance Monitoring**: Tracks slow operations and API performance
 - **Production Optimized**: Lower sampling rates to reduce noise (10% traces, 1% sessions)
 
 #### Setup
+
 1. Create a free [Sentry account](https://sentry.io) and project
 2. Copy your DSN and add to `.env.local`:
    ```bash
@@ -493,6 +645,7 @@ This project includes production-ready **Sentry integration** with minimal but e
 3. Test with `/sentry-test` page
 
 #### Usage Examples
+
 ```typescript
 import { logError, logMessage, LogLevel } from '@/lib/sentry';
 
@@ -508,8 +661,9 @@ logMessage('User upgraded to premium', LogLevel.INFO);
 ```
 
 #### What Gets Logged
+
 - ✅ API errors (5xx responses)
-- ✅ Authentication failures  
+- ✅ Authentication failures
 - ✅ Payment processing errors
 - ✅ Slow operations (>3s)
 - ✅ Unhandled exceptions
@@ -518,6 +672,7 @@ logMessage('User upgraded to premium', LogLevel.INFO);
 - ❌ Expected auth errors (filtered)
 
 ### Application Monitoring
+
 - Credit usage patterns in Firestore
 - Real-time error alerts and performance monitoring
 - User activity via Firebase Analytics
@@ -527,25 +682,29 @@ logMessage('User upgraded to premium', LogLevel.INFO);
 This project includes **privacy-first Google Analytics** using Firebase Analytics with minimal data collection:
 
 #### Features
+
 - **Production Only**: Analytics only tracks in production environment
 - **Essential Events**: Tracks only business-critical events (auth, chat, credits)
 - **Privacy Focused**: No personal data collection or tracking
 - **Client-Side Only**: Simple Firebase Analytics integration
 
 #### Tracked Events
+
 - ✅ **Page Views**: User navigation patterns
-- ✅ **Authentication**: Login/logout events  
+- ✅ **Authentication**: Login/logout events
 - ✅ **Chat Usage**: Message sending and conversation starts
 - ✅ **Credit Usage**: Purchase and deduction events
 - ✅ **External Links**: Outbound link clicks
 
 #### Setup
+
 1. **Enable Analytics** in your [Firebase Console](https://console.firebase.google.com)
 2. **Copy Measurement ID** from Analytics → Data Streams
 3. **Add to Environment**: `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX`
 4. **Deploy**: Analytics will automatically start tracking in production
 
 #### Usage Examples
+
 ```typescript
 import { trackAuth, trackChat, trackCredits } from '@/lib/analytics';
 
@@ -560,6 +719,7 @@ trackCredits('purchase', amount);
 ```
 
 #### Privacy Compliance
+
 - **GDPR Compliant**: No personal data collection
 - **Development Safe**: No tracking in development environment
 - **Error Handling**: Graceful failures without breaking user experience
@@ -587,6 +747,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🆘 Support
 
 For support and questions:
+
 - Create an issue in this repository
 - Email: support@yourdomain.com
 - Check the [Dify Documentation](https://docs.dify.ai/)
@@ -595,6 +756,7 @@ For support and questions:
 ## 🚧 Roadmap
 
 ### ✅ Completed Features
+
 - [x] **Conversation Management**: Full conversation history with React Query caching
 - [x] **Optimistic Updates**: Instant UI feedback for better user experience
 - [x] **Message Feedback**: Like/dislike system for assistant messages
@@ -602,6 +764,7 @@ For support and questions:
 - [x] **Modular Architecture**: Clean service separation for maintainability
 
 ### 🔄 Planned Features
+
 - [ ] Stripe integration for credit purchases
 - [ ] Multiple Dify app management
 - [ ] Usage analytics dashboard
