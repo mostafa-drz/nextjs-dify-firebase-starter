@@ -636,10 +636,43 @@ const DIFY_APPS = {
 
 ## 🧪 Testing
 
+### Testing Philosophy
+
+This project follows focused, self-descriptive testing principles that prioritize quality over quantity. Our tests focus on essential business logic and real-world scenarios rather than exhaustive coverage.
+
+**Core Principles:**
+
+- **Self-Descriptive**: Test names clearly describe what's being tested and expected outcomes
+- **Essential Focus**: Test business-critical logic first (credit system, authentication, payment flows)
+- **Not Exhaustive**: Skip trivial functions, third-party libraries, and implementation details
+- **Real-World Scenarios**: Test user journeys and integration points where things can break
+- **Maintainable**: Simple, focused tests that are easy to understand and modify
+
+**What We Test:**
+
+- ✅ Business logic (credit calculations, user authentication flows)
+- ✅ Error handling and failure scenarios
+- ✅ Integration points between different parts of the system
+- ✅ User journeys and complete workflows
+- ✅ Edge cases and boundary conditions
+
+**What We Don't Test:**
+
+- ❌ Third-party libraries (Firebase SDK, Dify API)
+- ❌ Simple utilities and data transformations
+- ❌ Configuration and environment variables
+- ❌ Styling and visual appearance
+- ❌ Trivial getters/setters without business logic
+
+For detailed testing principles, see [Testing Principles Documentation](./docs/testing-principles.md).
+
 ### Run Tests
 
 ```bash
-npm test
+npm test              # Run all tests
+npm test:watch        # Run tests in watch mode
+npm test:coverage     # Run tests with coverage report
+npm test:ui           # Run tests with UI interface
 ```
 
 ### Test Credit System
@@ -963,6 +996,12 @@ git push origin main
 ```
 
 This will create your first automated release!
+
+## 📚 Additional Documentation
+
+- **[Feedback Service](./docs/feedback-service.md)** - Elegant user feedback collection with Sentry and Slack integration
+- **[Dify API Documentation](./difyDocs/)** - Complete API reference and integration guides
+- **[Demo Applications](./demos/)** - Creative demo apps showcasing Dify capabilities
 
 ## 🚧 Roadmap
 

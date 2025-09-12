@@ -17,6 +17,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { FeedbackButton } from '@/components/feedback';
 import {
   ChefHat,
   Camera,
@@ -247,6 +248,17 @@ export function RecipeAnalyzerDemo() {
           </div>
         </div>
       </DemoCard>
+
+      {/* Feedback Button */}
+      <FeedbackButton
+        config={{
+          enabled: true,
+          position: 'bottom-right',
+          buttonText: 'Feedback',
+          categories: ['bug', 'feature', 'general', 'improvement'],
+          placeholder: 'Share your thoughts about the Recipe Analyzer...',
+        }}
+      />
     </div>
   );
 }

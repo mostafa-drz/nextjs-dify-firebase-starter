@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ChefHat, Camera, MessageSquare, FileImage, Mic, Volume2 } from 'lucide-react';
+import { FeedbackButton } from '@/components/feedback';
 
 /**
  * Demo application data
@@ -185,6 +186,17 @@ export default function DemosPage() {
           problems. Use them as starting points for your own AI-powered applications.
         </p>
       </div>
+
+      {/* Feedback Button */}
+      <FeedbackButton
+        config={{
+          enabled: true,
+          position: 'bottom-right',
+          buttonText: 'Feedback',
+          categories: ['bug', 'feature', 'general', 'improvement'],
+          placeholder: 'Share your thoughts about our demos...',
+        }}
+      />
     </div>
   );
 }
