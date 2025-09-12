@@ -60,8 +60,7 @@ export interface DifyChatRequest {
   query: string;
   conversation_id?: string;
   user: string;
-  inputs?: Record<string, unknown>;
-  context?: Record<string, unknown>; // Simple context object for AI awareness
+  inputs?: Record<string, unknown>; // Official Dify inputs parameter - flexible for any use case
   response_mode?: 'streaming' | 'blocking';
   files?: Array<{
     type: 'image' | 'document';

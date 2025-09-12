@@ -21,11 +21,8 @@ export interface UserProfile {
   displayName?: string;
   photoURL?: string;
   preferences?: {
-    theme: 'light' | 'dark';
-    notifications: boolean;
     language: string;
   };
-  lastLoginAt: Timestamp;
   createdAt: Timestamp;
 }
 
@@ -55,11 +52,8 @@ export interface User {
 
   // User-editable profile data
   preferences?: {
-    theme: 'light' | 'dark';
-    notifications: boolean;
     language: string;
   };
-  lastLoginAt: Timestamp;
   createdAt: Timestamp;
 
   // Admin-protected data (user cannot modify)

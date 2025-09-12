@@ -77,7 +77,7 @@ export interface BaseChatRequest {
  * Extended chat request with additional parameters
  */
 export interface ChatRequest extends BaseChatRequest {
-  /** Variable values defined by the app */
+  /** Variable values defined by the app - flexible inputs for any use case */
   inputs?: Record<string, unknown>;
   /** File attachments for vision-capable models */
   files?: Array<{

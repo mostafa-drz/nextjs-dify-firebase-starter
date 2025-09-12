@@ -19,7 +19,7 @@ import { MessageFeedback } from './MessageFeedback';
 import { SuggestedQuestions } from './SuggestedQuestions';
 import { trackChat } from '@/lib/analytics';
 import { useChatMessages } from '@/lib/hooks/useChatMessages';
-import { buildMessageContext } from '@/lib/utils/context-builder';
+import { buildCommonInputs } from '@/lib/utils/input-builder';
 import { useLocale } from 'next-intl';
 
 export function DifyChat({
@@ -70,14 +70,22 @@ export function DifyChat({
     setError(null);
 
     try {
-      // Build context with user language and other info
-      const context = await buildMessageContext(locale);
+      // Build inputs using flexible input builder
+      // Developers can customize this based on their specific needs
+      const inputs = buildCommonInputs(
+        user ? { ...user } : {}, // User object (handle null case)
+        locale, // User's locale
+        {
+          // Add any additional inputs for your specific use case
+          // Example: session_id, feature_flags, etc.
+        }
+      );
 
       const result = await sendMessage.mutateAsync({
         query: userMessage.content,
         conversation_id: conversationId,
         response_mode: 'blocking',
-        context,
+        inputs,
       });
 
       if (result.data?.message_id && result.data?.answer) {
@@ -115,6 +123,7 @@ export function DifyChat({
     removeMessage,
     conversationId,
     locale,
+    user,
   ]);
 
   const handleKeyPress = useCallback(

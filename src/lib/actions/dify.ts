@@ -128,7 +128,7 @@ export async function sendDifyMessage(
     let data: DifyConversationResponse;
 
     try {
-      // Make API call
+      // Make API call - only pass official Dify parameters
       apiResponse = await makeDifyRequest(
         '/chat-messages',
         {
