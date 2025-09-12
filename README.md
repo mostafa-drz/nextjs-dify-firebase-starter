@@ -43,7 +43,23 @@ A secure Next.js 15 boilerplate for integrating [Dify.ai](https://dify.ai) with 
 
 ## 🛠️ Setup Instructions
 
-### 1. Clone and Install
+### 1. Quick Setup (Recommended)
+
+```bash
+git clone <repository-url>
+cd dify-firebase-boilerplate
+npm run setup
+```
+
+This automated setup will:
+- ✅ Install all dependencies
+- ✅ Create `.env.local` from template
+- ✅ Check Node.js version (18+ required)
+- ✅ Install Git hooks
+- ✅ Guide you through Firebase CLI setup
+- ✅ Verify everything is ready
+
+### 1b. Manual Install (Alternative)
 
 ```bash
 git clone <repository-url>
@@ -164,7 +180,9 @@ Automated quality checks run on every commit and push:
 ### Available Scripts
 
 ```bash
-# Development
+# Setup & Development
+npm run setup        # Automated environment setup (run once)
+npm run setup:check  # Verify setup completeness
 npm run dev          # Start development server with hot reload
 npm run build        # Build for production
 npm run start        # Start production server
@@ -367,11 +385,8 @@ User Action → Optimistic Update → API Call → Cache Update → UI Update
 import { useConversationMessages } from '@/lib/hooks/useConversationMessages';
 
 export function ChatComponent() {
-  const { messages, isLoading, addMessageOptimistically, invalidate } = useConversationMessages(
-    conversationId,
-    userId,
-    apiKey
-  );
+  const { messages, isLoading, addMessageOptimistically, invalidate } =
+    useConversationMessages(conversationId, userId, apiKey);
 
   const handleSendMessage = async (content: string) => {
     const tempMessage = { id: 'temp', content, role: 'user' };
@@ -384,7 +399,7 @@ export function ChatComponent() {
   return (
     <div>
       {isLoading && <div>Loading conversation...</div>}
-      {messages.map((message) => (
+      {messages.map(message => (
         <div key={message.id}>{message.content}</div>
       ))}
     </div>
@@ -437,7 +452,10 @@ export function ChatPage() {
 
 ```tsx
 // Add to your Firebase functions
-export const syncConversationToFirestore = async (conversationId: string, messages: unknown[]) => {
+export const syncConversationToFirestore = async (
+  conversationId: string,
+  messages: unknown[]
+) => {
   await db.collection('conversations').doc(conversationId).set({
     messages,
     lastUpdated: new Date(),
@@ -456,7 +474,10 @@ await syncConversationToFirestore(result.data.conversation_id, messages);
 // Add to useConversationMessages hook
 useEffect(() => {
   if (data) {
-    localStorage.setItem(`conversation-${conversationId}`, JSON.stringify(data));
+    localStorage.setItem(
+      `conversation-${conversationId}`,
+      JSON.stringify(data)
+    );
   }
 }, [data, conversationId]);
 ```
@@ -468,7 +489,7 @@ useEffect(() => {
 const useRealtimeMessages = (conversationId: string) => {
   useEffect(() => {
     const ws = new WebSocket(`/ws/conversations/${conversationId}`);
-    ws.onmessage = (event) => {
+    ws.onmessage = event => {
       const newMessage = JSON.parse(event.data);
       addMessageOptimistically(newMessage);
     };
@@ -593,6 +614,61 @@ Visit `/sentry-test` to test error tracking and logging.
 1. Enable Analytics in your Firebase project console
 2. Copy the Measurement ID from Analytics settings
 3. Add `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX` to `.env.local`
+
+## 🌍 Adding More Languages
+
+This boilerplate supports internationalization using next-intl. Currently configured for English only, but you can easily add more languages:
+
+### Adding a New Language (e.g., Spanish)
+
+1. **Add locale to config:**
+
+   ```typescript
+   // src/i18n/config.ts
+   export const locales = ['en', 'es'] as const;
+   ```
+
+2. **Create translation file:**
+
+   ```bash
+   # Create src/i18n/messages/es.json
+   {
+     "common": {
+       "loading": "Cargando...",
+       "error": "Ocurrió un error"
+     },
+     "chat": {
+       "title": "Asistente de Chat IA",
+       "placeholder": "Escribe tu mensaje..."
+     }
+   }
+   ```
+
+3. **Update middleware:**
+
+   ```typescript
+   // middleware.ts
+   export const config = {
+     matcher: ['/', '/(en|es)/:path*'],
+   };
+   ```
+
+4. **Add language switcher component** (optional)
+
+### Context Integration
+
+The system automatically passes user language context to Dify AI for smarter responses:
+
+```typescript
+// Language context is automatically included
+const context = {
+  language: { code: 'es', locale: 'es-ES' },
+  timestamp: '2024-12-19T10:30:00Z',
+  timezone: 'Europe/Madrid',
+};
+```
+
+This helps the AI provide responses in the user's preferred language and cultural context.
 
 ## 🚀 Deployment
 
