@@ -11,10 +11,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "prepare": "husky",
-    "setup": "node scripts/setup.js",
-    "setup:check": "node scripts/setup.js --check",
-    "postinstall": "npm run setup:check"
+    "prepare": "husky"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",

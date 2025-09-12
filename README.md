@@ -43,23 +43,7 @@ A secure Next.js 15 boilerplate for integrating [Dify.ai](https://dify.ai) with 
 
 ## 🛠️ Setup Instructions
 
-### 1. Quick Setup (Recommended)
-
-```bash
-git clone <repository-url>
-cd dify-firebase-boilerplate
-npm run setup
-```
-
-This automated setup will:
-- ✅ Install all dependencies
-- ✅ Create `.env.local` from template
-- ✅ Check Node.js version (18+ required)
-- ✅ Install Git hooks
-- ✅ Guide you through Firebase CLI setup
-- ✅ Verify everything is ready
-
-### 1b. Manual Install (Alternative)
+### 1. Installation
 
 ```bash
 git clone <repository-url>
@@ -67,13 +51,33 @@ cd dify-firebase-boilerplate
 npm install
 ```
 
-### 2. Firebase Setup
+### 2. Firebase Project Setup
 
-1. Create a new Firebase project at [Firebase Console](https://console.firebase.google.com/)
-2. Enable **Authentication** and add **Email/Password** provider
-3. Enable **Firestore Database** in production mode
-4. Generate a **Service Account Key** for Firebase Admin SDK
-5. Copy Firebase configuration from Project Settings
+1. **Create Firebase Project**
+   - Visit [Firebase Console](https://console.firebase.google.com/)
+   - Click "Create a project"
+   - Follow the setup wizard
+
+2. **Enable Authentication**
+   - Go to Authentication → Sign-in method
+   - Enable **Email/Password** provider
+   - (Optional) Enable **Google** provider for OAuth
+
+3. **Setup Firestore Database**
+   - Go to Firestore Database
+   - Click "Create database"
+   - Choose "Production mode"
+   - Select your preferred location
+
+4. **Generate Service Account Key**
+   - Go to Project Settings → Service accounts
+   - Click "Generate new private key"
+   - Download the JSON file (keep it secure)
+
+5. **Enable Analytics** (Optional)
+   - Go to Analytics → Dashboard
+   - Follow setup steps if not already enabled
+   - Copy the Measurement ID from Data Streams
 
 ### 3. Environment Configuration
 
@@ -119,25 +123,40 @@ SUPPORT_EMAIL=support@yourdomain.com
 NEXT_PUBLIC_SUPPORT_EMAIL=support@yourdomain.com
 ```
 
-### 4. Deploy Firestore Security Rules
+### 4. Firestore Security Rules Setup
 
-Deploy the security rules from `firestore.rules`:
+Deploy the security rules to protect your data:
 
 ```bash
-# Install Firebase CLI if you haven't
+# Install Firebase CLI globally
 npm install -g firebase-tools
 
 # Login to Firebase
 firebase login
 
-# Initialize project (select existing project)
+# Initialize Firestore in your project
 firebase init firestore
+# - Select your existing Firebase project
+# - Keep default firestore.rules file
+# - Keep default firestore.indexes.json file
 
-# Deploy rules
+# Deploy the security rules
 firebase deploy --only firestore:rules
 ```
 
-### 5. Start Development Server
+### 5. Dify.ai Setup
+
+1. **Get Dify API Key**
+   - Visit [Dify.ai](https://dify.ai) and create account
+   - Create a new app or use existing one
+   - Copy the API key from app settings
+
+2. **Configure App Settings**
+   - Ensure your Dify app supports the required endpoints
+   - Configure any necessary conversation settings
+   - Test the API key works with your app
+
+### 6. Start Development Server
 
 ```bash
 npm run dev
@@ -180,9 +199,7 @@ Automated quality checks run on every commit and push:
 ### Available Scripts
 
 ```bash
-# Setup & Development
-npm run setup        # Automated environment setup (run once)
-npm run setup:check  # Verify setup completeness
+# Development
 npm run dev          # Start development server with hot reload
 npm run build        # Build for production
 npm run start        # Start production server
@@ -385,8 +402,11 @@ User Action → Optimistic Update → API Call → Cache Update → UI Update
 import { useConversationMessages } from '@/lib/hooks/useConversationMessages';
 
 export function ChatComponent() {
-  const { messages, isLoading, addMessageOptimistically, invalidate } =
-    useConversationMessages(conversationId, userId, apiKey);
+  const { messages, isLoading, addMessageOptimistically, invalidate } = useConversationMessages(
+    conversationId,
+    userId,
+    apiKey
+  );
 
   const handleSendMessage = async (content: string) => {
     const tempMessage = { id: 'temp', content, role: 'user' };
@@ -399,7 +419,7 @@ export function ChatComponent() {
   return (
     <div>
       {isLoading && <div>Loading conversation...</div>}
-      {messages.map(message => (
+      {messages.map((message) => (
         <div key={message.id}>{message.content}</div>
       ))}
     </div>
@@ -452,10 +472,7 @@ export function ChatPage() {
 
 ```tsx
 // Add to your Firebase functions
-export const syncConversationToFirestore = async (
-  conversationId: string,
-  messages: unknown[]
-) => {
+export const syncConversationToFirestore = async (conversationId: string, messages: unknown[]) => {
   await db.collection('conversations').doc(conversationId).set({
     messages,
     lastUpdated: new Date(),
@@ -474,10 +491,7 @@ await syncConversationToFirestore(result.data.conversation_id, messages);
 // Add to useConversationMessages hook
 useEffect(() => {
   if (data) {
-    localStorage.setItem(
-      `conversation-${conversationId}`,
-      JSON.stringify(data)
-    );
+    localStorage.setItem(`conversation-${conversationId}`, JSON.stringify(data));
   }
 }, [data, conversationId]);
 ```
@@ -489,7 +503,7 @@ useEffect(() => {
 const useRealtimeMessages = (conversationId: string) => {
   useEffect(() => {
     const ws = new WebSocket(`/ws/conversations/${conversationId}`);
-    ws.onmessage = event => {
+    ws.onmessage = (event) => {
       const newMessage = JSON.parse(event.data);
       addMessageOptimistically(newMessage);
     };
