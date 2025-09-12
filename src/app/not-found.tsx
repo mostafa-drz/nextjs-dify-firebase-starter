@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Home, ArrowLeft, Search, AlertTriangle } from 'lucide-react';
+import { Home, Search, AlertTriangle } from 'lucide-react';
+import { GoBackButton } from './GoBackButton';
 
 export default function NotFound() {
   return (
@@ -44,14 +45,7 @@ export default function NotFound() {
                   </Link>
                 </Button>
 
-                <Button
-                  variant="ghost"
-                  onClick={() => window.history.back()}
-                  className="w-full justify-start"
-                >
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Go Back
-                </Button>
+                <GoBackButton />
               </div>
             </div>
           </CardContent>
