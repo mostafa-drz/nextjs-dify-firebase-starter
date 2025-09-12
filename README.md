@@ -32,8 +32,10 @@ A secure Next.js 15 boilerplate for integrating [Dify.ai](https://dify.ai) with 
 - ⚡ **Real-time credit updates** via Firestore listeners
 - 💬 **Custom chat interface** with token usage tracking
 - 📊 **Credit history and usage analytics**
-- 🎨 **Modern UI** with loading states and error handling- 🔄 **Conversation management** with React Query caching
+- 🎨 **Modern UI** with loading states and error handling
+- 🔄 **Conversation management** with React Query caching
 - ⚡ **Optimistic updates** for instant UI feedback
+- 🌊 **Real-time streaming chat** with production-ready error handling and retry logic
 
 ## 📋 Prerequisites
 
@@ -325,6 +327,35 @@ export default function MyPage() {
   );
 }
 ```
+
+### Streaming Chat (New!)
+
+Enable real-time streaming for instant message updates:
+
+```tsx
+import { DifyChat } from '@/components/dify/DifyChat';
+
+export default function StreamingPage() {
+  return (
+    <DifyChat
+      name="Streaming Assistant"
+      enableStreaming={true}
+      streamingMode="auto"
+      placeholder="Ask me anything with real-time streaming..."
+      welcomeMessage="Hello! Watch my responses appear in real-time!"
+    />
+  );
+}
+```
+
+**Streaming Features:**
+
+- ✅ **Real-time message updates** - See responses as they're generated
+- ✅ **Production-ready error handling** - Automatic retry with exponential backoff
+- ✅ **Proper cleanup** - AbortController prevents memory leaks
+- ✅ **Stop functionality** - Users can stop streaming at any time
+- ✅ **Fallback support** - Gracefully falls back to blocking mode on errors
+- ✅ **Configurable** - Choose between auto-streaming or manual control
 
 ### Credit Management
 

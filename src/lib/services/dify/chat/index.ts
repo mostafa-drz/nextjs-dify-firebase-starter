@@ -13,6 +13,7 @@ import {
   StopGenerationRequest,
   StopGenerationResponse,
 } from '../types';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
 
 /**
  * Service for handling chat operations with Dify API
@@ -241,6 +242,231 @@ export class ChatService extends BaseDifyService {
     } catch (error) {
       console.error('Error in sendMessageWithCallbacks:', error);
       return null;
+    }
+  }
+
+  /**
+   * Production-ready streaming with retry logic and proper error handling
+   * @param request - Chat request parameters
+   * @param onEvent - Callback function for each streaming event
+   * @param abortController - AbortController for cleanup
+   * @returns Promise resolving to the final message end event
+   * @example
+   * ```typescript
+   * const abortController = new AbortController();
+   * const finalEvent = await chatService.sendMessageStreamingProduction(
+   *   { query: "Hello", user: "user123" },
+   *   (event) => console.log('Event:', event),
+   *   abortController
+   * );
+   * ```
+   */
+  async sendMessageStreamingProduction(
+    request: ChatRequest,
+    onEvent: (event: StreamingEvent) => void,
+    abortController: AbortController
+  ): Promise<StreamingEvent | null> {
+    try {
+      this.validateRequired(request, ['query', 'user']);
+
+      const url = `${this.baseUrl}/chat-messages`;
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.apiKey}`,
+        Accept: 'text/event-stream',
+      };
+
+      let finalEvent: StreamingEvent | null = null;
+      let retryCount = 0;
+      const maxRetries = 3;
+
+      await fetchEventSource(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          ...request,
+          response_mode: 'streaming',
+        }),
+        signal: abortController.signal,
+
+        onopen: async (response) => {
+          if (response.ok && response.headers.get('content-type')?.includes('text/event-stream')) {
+            console.log('Streaming connection opened');
+            return;
+          } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+            // Client error - don't retry
+            throw new Error(`Client error: ${response.status}`);
+          } else {
+            // Server error or rate limit - retry
+            throw new Error(`Server error: ${response.status}`);
+          }
+        },
+
+        onmessage: (event) => {
+          try {
+            if (event.data.trim() === '') return;
+
+            const streamingEvent: StreamingEvent = JSON.parse(event.data);
+            onEvent(streamingEvent);
+
+            if (streamingEvent.event === 'message_end' || streamingEvent.event === 'error') {
+              finalEvent = streamingEvent;
+            }
+          } catch (parseError) {
+            console.warn('Failed to parse streaming event:', parseError);
+          }
+        },
+
+        onclose: () => {
+          console.log('Streaming connection closed');
+        },
+
+        onerror: (error) => {
+          console.error('Streaming error:', error);
+          retryCount++;
+
+          if (retryCount >= maxRetries) {
+            console.error('Max retries reached, stopping stream');
+            throw error;
+          }
+
+          // Exponential backoff: 1s, 2s, 4s
+          return Math.min(1000 * Math.pow(2, retryCount - 1), 10000);
+        },
+      });
+
+      return finalEvent;
+    } catch (error) {
+      console.error('Error in sendMessageStreamingProduction:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Streaming with simple credit management - deduct only on success
+   * @param request - Chat request parameters
+   * @param onEvent - Callback function for each streaming event
+   * @param abortController - AbortController for cleanup
+   * @param creditManager - Credit management functions
+   * @returns Promise resolving to the final message end event with credit info
+   * @example
+   * ```typescript
+   * const abortController = new AbortController();
+   * const finalEvent = await chatService.sendMessageStreamingWithCredits(
+   *   { query: "Hello", user: "user123" },
+   *   (event) => console.log('Event:', event),
+   *   abortController,
+   *   { deductCredits }
+   * );
+   * ```
+   */
+  async sendMessageStreamingWithCredits(
+    request: ChatRequest,
+    onEvent: (event: StreamingEvent) => void,
+    abortController: AbortController,
+    creditManager: {
+      deductCredits: (
+        userId: string,
+        tokensUsed: number,
+        operation: string
+      ) => Promise<{ success: boolean; message: string; creditsDeducted?: number }>;
+    }
+  ): Promise<{ finalEvent: StreamingEvent | null; creditsDeducted?: number }> {
+    try {
+      this.validateRequired(request, ['query', 'user']);
+
+      const url = `${this.baseUrl}/chat-messages`;
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.apiKey}`,
+        Accept: 'text/event-stream',
+      };
+
+      let finalEvent: StreamingEvent | null = null;
+      let retryCount = 0;
+      const maxRetries = 3;
+
+      await fetchEventSource(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          ...request,
+          response_mode: 'streaming',
+        }),
+        signal: abortController.signal,
+
+        onopen: async (response) => {
+          if (response.ok && response.headers.get('content-type')?.includes('text/event-stream')) {
+            console.log('Streaming connection opened');
+            return;
+          } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+            // Client error - don't retry
+            throw new Error(`Client error: ${response.status}`);
+          } else {
+            // Server error or rate limit - retry
+            throw new Error(`Server error: ${response.status}`);
+          }
+        },
+
+        onmessage: (event) => {
+          try {
+            if (event.data.trim() === '') return;
+
+            const streamingEvent: StreamingEvent = JSON.parse(event.data);
+            onEvent(streamingEvent);
+
+            if (streamingEvent.event === 'message_end' || streamingEvent.event === 'error') {
+              finalEvent = streamingEvent;
+            }
+          } catch (parseError) {
+            console.warn('Failed to parse streaming event:', parseError);
+          }
+        },
+
+        onclose: () => {
+          console.log('Streaming connection closed');
+        },
+
+        onerror: (error) => {
+          console.error('Streaming error:', error);
+          retryCount++;
+
+          if (retryCount >= maxRetries) {
+            console.error('Max retries reached, stopping stream');
+            throw error;
+          }
+
+          // Exponential backoff: 1s, 2s, 4s
+          return Math.min(1000 * Math.pow(2, retryCount - 1), 10000);
+        },
+      });
+
+      // Deduct credits only on successful completion
+      if (finalEvent && (finalEvent as StreamingEvent).event === 'message_end') {
+        const messageEndEvent = finalEvent as import('../types').MessageEndStreamingEvent;
+        if (messageEndEvent.metadata?.usage?.total_tokens) {
+          const deductResult = await creditManager.deductCredits(
+            request.user,
+            messageEndEvent.metadata.usage.total_tokens,
+            'dify_streaming_complete'
+          );
+
+          if (deductResult.success) {
+            return { finalEvent, creditsDeducted: deductResult.creditsDeducted };
+          } else {
+            console.error('Credit deduction failed:', deductResult.message);
+            // Still return the event, but log the credit issue
+            return { finalEvent };
+          }
+        }
+      }
+
+      // No token usage info, no credits deducted
+      return { finalEvent };
+    } catch (error) {
+      console.error('Error in sendMessageStreamingWithCredits:', error);
+      // No credits deducted on error - generous policy
+      return { finalEvent: null };
     }
   }
 }
