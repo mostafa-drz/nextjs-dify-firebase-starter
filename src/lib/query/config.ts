@@ -3,7 +3,7 @@
  * Optimized for Next.js 15 and React 19 patterns
  */
 
-import { QueryClient, DefaultOptions, QueryKey } from '@tanstack/react-query';
+import { QueryClient, DefaultOptions } from '@tanstack/react-query';
 import { DifyConversation, DifyMessage } from '@/types/dify';
 
 /**

@@ -6,7 +6,7 @@ import { withErrorHandler } from '@/lib/api-error-handler';
  * POST /api/auth/clear-token
  * Clears Firebase ID token cookie
  */
-export const POST = withErrorHandler(async (request: NextRequest) => {
+export const POST = withErrorHandler(async (_request: NextRequest) => {
   const response = NextResponse.json({ success: true });
 
   // Clear the auth cookie

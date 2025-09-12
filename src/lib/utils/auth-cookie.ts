@@ -4,7 +4,6 @@
  */
 
 import { User as FirebaseUser } from 'firebase/auth';
-import { AUTH_COOKIE_NAME } from '@/lib/config/auth-config';
 
 /**
  * Set Firebase ID token in HTTP-only cookie
