@@ -1,5 +1,9 @@
 import { LoginForm } from '@/components/auth/LoginForm';
 
+/**
+ * Login Page - Server Component
+ * Static layout with client-side login form
+ */
 export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">

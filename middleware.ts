@@ -1,16 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthStatus } from '@/lib/auth/middleware-auth';
+import createIntlMiddleware from 'next-intl/middleware';
+import { locales, defaultLocale } from '@/i18n/config';
 
 /**
- * Next.js 15 Middleware for Authentication and Route Protection
- * Handles server-side auth redirects and route protection
+ * Next.js 15 Middleware for Authentication, Route Protection, and i18n
+ * Handles server-side auth redirects, route protection, and internationalization
  */
 
 // Define protected routes that require authentication
 const PROTECTED_ROUTES = ['/chat', '/conversations'];
 const AUTH_ROUTES = ['/login', '/auth/callback'];
 
+// Create i18n middleware
+const intlMiddleware = createIntlMiddleware({
+  locales,
+  defaultLocale,
+  localePrefix: 'as-needed', // Only show /en for non-default
+});
+
 export async function middleware(request: NextRequest) {
+  // Handle i18n routing first
+  const intlResponse = intlMiddleware(request);
+  if (intlResponse) {
+    return intlResponse;
+  }
   const { pathname } = request.nextUrl;
 
   // Skip middleware for static files and API routes
@@ -64,7 +78,8 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - locales (i18n files)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|locales).*)',
   ],
 };

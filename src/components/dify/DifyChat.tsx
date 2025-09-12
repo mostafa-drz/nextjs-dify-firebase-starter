@@ -19,6 +19,8 @@ import { MessageFeedback } from './MessageFeedback';
 import { SuggestedQuestions } from './SuggestedQuestions';
 import { trackChat } from '@/lib/analytics';
 import { useChatMessages } from '@/lib/hooks/useChatMessages';
+import { buildMessageContext } from '@/lib/utils/context-builder';
+import { useLocale } from 'next-intl';
 
 export function DifyChat({
   name = 'Dify Assistant',
@@ -31,6 +33,7 @@ export function DifyChat({
   const [input, setInput] = useState('');
   const [conversationId, setConversationId] = useState<string | undefined>(initialConversationId);
   const [error, setError] = useState<string | null>(null);
+  const locale = useLocale();
 
   // Use the consolidated chat messages hook
   const {
@@ -67,10 +70,14 @@ export function DifyChat({
     setError(null);
 
     try {
+      // Build context with user language and other info
+      const context = await buildMessageContext(locale);
+
       const result = await sendMessage.mutateAsync({
         query: userMessage.content,
         conversation_id: conversationId,
         response_mode: 'blocking',
+        context,
       });
 
       if (result.data?.message_id && result.data?.answer) {
@@ -107,6 +114,7 @@ export function DifyChat({
     addAssistantMessage,
     removeMessage,
     conversationId,
+    locale,
   ]);
 
   const handleKeyPress = useCallback(

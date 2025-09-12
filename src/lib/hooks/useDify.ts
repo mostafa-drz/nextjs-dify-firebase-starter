@@ -127,6 +127,7 @@ export function useDifyMutations(userId: string) {
       query: string;
       conversation_id?: string;
       response_mode?: 'blocking' | 'streaming';
+      context?: Record<string, unknown>;
     }) => {
       const result = await sendDifyMessage(userId, { ...params, user: userId });
       if (!result.success) throw new Error(result.error?.message || 'Failed to send message');

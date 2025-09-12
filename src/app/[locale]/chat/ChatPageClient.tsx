@@ -10,7 +10,11 @@ import { ChatMainArea } from '@/components/chat/ChatMainArea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 
-export default function ChatPage() {
+/**
+ * Client-side chat page component
+ * Handles interactive chat functionality
+ */
+export function ChatPageClient() {
   const { user } = useUser();
   const [currentConversationId, setCurrentConversationId] = useState<string | undefined>();
 

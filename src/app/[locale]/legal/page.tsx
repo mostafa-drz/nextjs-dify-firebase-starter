@@ -1,6 +1,3 @@
-'use client';
-
-import { useState } from 'react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,9 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Shield, FileText, Calendar, Mail, ExternalLink } from 'lucide-react';
 
+/**
+ * Legal Page - Server Component
+ * Static legal documents with tabs (no client-side state needed)
+ */
 export default function LegalPage() {
-  const [activeTab, setActiveTab] = useState('terms');
-
   return (
     <PageLayout>
       <div className="container mx-auto max-w-4xl py-8">
@@ -32,7 +31,7 @@ export default function LegalPage() {
           </div>
 
           {/* Legal Documents */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs defaultValue="terms" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="terms" className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />

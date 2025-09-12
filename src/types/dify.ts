@@ -61,6 +61,7 @@ export interface DifyChatRequest {
   conversation_id?: string;
   user: string;
   inputs?: Record<string, unknown>;
+  context?: Record<string, unknown>; // Simple context object for AI awareness
   response_mode?: 'streaming' | 'blocking';
   files?: Array<{
     type: 'image' | 'document';
