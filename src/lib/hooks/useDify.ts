@@ -184,3 +184,6 @@ export function useDifyMutations(userId: string) {
     },
   };
 }
+
+// Re-export file upload hooks
+export * from './useFileUpload';

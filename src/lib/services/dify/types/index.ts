@@ -432,32 +432,73 @@ export interface TextToAudioRequest {
 export type TextToAudioResponse = Blob;
 
 /**
- * Request parameters for file upload
+ * Request parameters for file upload (matches Dify API exactly)
  */
 export interface FileUploadRequest {
-  /** File to upload */
+  /** File to upload (multipart/form-data) */
   file: File;
-  /** User identifier */
+  /** User identifier, defined by developer's rules, must be unique within the application */
   user: string;
 }
 
 /**
- * Response for file upload
+ * Response for file upload (matches Dify API exactly)
  */
 export interface FileUploadResponse {
-  /** Uploaded file ID */
+  /** ID of the uploaded file (UUID format) */
   id: string;
   /** File name */
   name: string;
   /** File size in bytes */
   size: number;
-  /** File type */
-  type: string;
-  /** File URL */
-  url: string;
-  /** Upload timestamp */
+  /** File extension */
+  extension: string;
+  /** File mime-type */
+  mime_type: string;
+  /** End-user ID who uploaded the file (UUID format) */
+  created_by: string;
+  /** Creation timestamp (Unix epoch) */
   created_at: number;
 }
+
+/**
+ * Request parameters for file preview
+ */
+export interface FilePreviewRequest {
+  /** The unique identifier of the file to preview (UUID format) */
+  file_id: string;
+  /** Whether to force download the file as an attachment (default: false) */
+  as_attachment?: boolean;
+}
+
+/**
+ * Response for file preview (returns binary file content)
+ */
+export type FilePreviewResponse = Blob;
+
+/**
+ * Supported file types for upload
+ */
+export type SupportedFileType = 'png' | 'jpg' | 'jpeg' | 'webp' | 'gif';
+
+/**
+ * File upload error codes (from Dify documentation)
+ */
+export type FileUploadErrorCode =
+  | 'no_file_uploaded'
+  | 'too_many_files'
+  | 'unsupported_preview'
+  | 'unsupported_estimate'
+  | 'file_too_large'
+  | 'unsupported_file_type'
+  | 's3_connection_failed'
+  | 's3_permission_denied'
+  | 's3_file_too_large';
+
+/**
+ * File preview error codes (from Dify documentation)
+ */
+export type FilePreviewErrorCode = 'invalid_param' | 'file_access_denied' | 'file_not_found';
 
 /**
  * Request parameters for stopping message generation

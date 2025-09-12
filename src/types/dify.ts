@@ -70,11 +70,33 @@ export interface DifyChatRequest {
   }>;
 }
 
+export interface DifyFileUploadRequest {
+  file: File;
+  user: string;
+}
+
+export interface DifyFileUploadResponse {
+  id: string;
+  name: string;
+  size: number;
+  extension: string;
+  mime_type: string;
+  created_by: string;
+  created_at: number;
+}
+
+export interface DifyFilePreviewRequest {
+  file_id: string;
+  as_attachment?: boolean;
+}
+
 export interface DifyChatProps {
   name?: string;
   className?: string;
   placeholder?: string;
   welcomeMessage?: string;
+  enableStreaming?: boolean;
+  streamingMode?: 'auto' | 'manual';
 }
 
 export interface DifyApiResponse<T = unknown> {

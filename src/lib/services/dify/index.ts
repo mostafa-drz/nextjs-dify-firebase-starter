@@ -10,6 +10,7 @@ import { ConversationService } from './conversation';
 import { FeedbackService } from './feedback';
 import { SuggestionsService } from './suggestions';
 import { AudioService } from './audio';
+import { FileService } from './files';
 
 /**
  * Main Dify service providing unified access to all Dify API functionality
@@ -80,6 +81,12 @@ export class DifyService {
   public readonly audio: AudioService;
 
   /**
+   * File service for file upload and preview operations
+   * @readonly
+   */
+  public readonly files: FileService;
+
+  /**
    * Service configuration
    * @private
    */
@@ -115,6 +122,7 @@ export class DifyService {
     this.feedback = new FeedbackService(config);
     this.suggestions = new SuggestionsService(config);
     this.audio = new AudioService(config);
+    this.files = new FileService(config);
   }
 
   /**
@@ -191,6 +199,7 @@ export class DifyService {
     (this.feedback as unknown as { userId: string }).userId = userId;
     (this.suggestions as unknown as { userId: string }).userId = userId;
     (this.audio as unknown as { userId: string }).userId = userId;
+    (this.files as unknown as { userId: string }).userId = userId;
   }
 
   /**
@@ -252,6 +261,18 @@ export class DifyService {
       );
     }
 
+    try {
+      // Test file service
+      await (
+        this.files as unknown as {
+          makeRequest: (url: string, options: unknown) => Promise<unknown>;
+        }
+      ).makeRequest('/files/upload', { method: 'POST' });
+    } catch (error) {
+      services.files = false;
+      issues.push('File service: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+
     // Other services would be tested similarly...
 
     return {
@@ -305,4 +326,5 @@ export { ConversationService } from './conversation';
 export { FeedbackService } from './feedback';
 export { SuggestionsService } from './suggestions';
 export { AudioService } from './audio';
+export { FileService } from './files';
 export { BaseDifyService, DifyApiError } from './base';
