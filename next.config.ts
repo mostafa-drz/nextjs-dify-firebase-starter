@@ -28,6 +28,18 @@ const nextConfig: NextConfig = {
 
   // Webpack optimization
   webpack: (config, { dev, isServer }) => {
+    // Exclude Firebase Admin from client-side bundles
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        crypto: false,
+        http2: false,
+      };
+    }
+
     // Optimize bundle splitting
     if (!dev && !isServer) {
       config.optimization.splitChunks = {

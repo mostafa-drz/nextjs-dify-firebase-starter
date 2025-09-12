@@ -34,7 +34,7 @@ export function useChatMessages({ conversationId, userId, welcomeMessage }: UseC
     isLoading: messagesLoading,
     error: messagesError,
     addMessage,
-  } = useDifyMessages(conversationId, userId);
+  } = useDifyMessages(userId, conversationId);
 
   // React Query hooks for app info and mutations
   const { suggestedQuestions, openingStatement } = useDifyAppInfo();
@@ -67,8 +67,8 @@ export function useChatMessages({ conversationId, userId, welcomeMessage }: UseC
     }
 
     // Load conversation messages when conversationId changes
-    if (conversationData?.data && conversationData.data.length > 0) {
-      const loadedMessages: ChatMessage[] = conversationData.data.map((msg: unknown) => {
+    if (conversationData && conversationData.length > 0) {
+      const loadedMessages: ChatMessage[] = conversationData.map((msg: unknown) => {
         const message = msg as {
           id: string;
           role: string;

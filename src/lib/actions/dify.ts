@@ -14,6 +14,8 @@ import {
 import { calculateCreditsFromTokens } from '@/lib/utils/credits';
 import { validateServerEnv } from '@/lib/config/env-validation';
 import { ExternalApiError, ValidationError } from '@/lib/errors/server-errors';
+import { checkUserRateLimitByAction } from '@/lib/utils/simple-rate-limit';
+import { validateChatInput, validateConversationId } from '@/lib/utils/input-validation';
 
 const DIFY_BASE_URL = process.env.DIFY_BASE_URL || 'https://api.dify.ai/v1';
 const DIFY_API_KEY = process.env.DIFY_API_KEY;
@@ -95,6 +97,56 @@ export async function sendDifyMessage(
   // Validate environment variables
   validateServerEnv();
 
+  // Validate input
+  const chatValidation = validateChatInput(request.query);
+  if (!chatValidation.valid) {
+    return {
+      success: false,
+      error: {
+        code: 'INVALID_INPUT',
+        message: chatValidation.error || 'Invalid input provided',
+        status: 400,
+      },
+    };
+  }
+
+  // Validate conversation ID if provided
+  let conversationValidation: { valid: boolean; sanitized?: string; error?: string } = {
+    valid: true,
+  };
+  if (request.conversation_id) {
+    conversationValidation = validateConversationId(request.conversation_id);
+    if (!conversationValidation.valid) {
+      return {
+        success: false,
+        error: {
+          code: 'INVALID_CONVERSATION_ID',
+          message: conversationValidation.error || 'Invalid conversation ID',
+          status: 400,
+        },
+      };
+    }
+  }
+
+  // Check rate limit before proceeding
+  try {
+    const rateLimitResult = await checkUserRateLimitByAction(userId, 'chat_message');
+    if (!rateLimitResult.allowed) {
+      return {
+        success: false,
+        error: {
+          code: 'RATE_LIMIT_EXCEEDED',
+          message: rateLimitResult.error || 'Rate limit exceeded. Please wait a moment.',
+          status: 429,
+        },
+      };
+    }
+  } catch (rateLimitError) {
+    console.error('Rate limit check failed:', rateLimitError);
+    // Continue with the request if rate limiting fails
+    // This prevents rate limiting from breaking the app
+  }
+
   // Generate unique reservation ID
   const reservationId = `dify_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
@@ -135,6 +187,8 @@ export async function sendDifyMessage(
           method: 'POST',
           body: JSON.stringify({
             ...request,
+            query: chatValidation.sanitized!, // Use sanitized input
+            conversation_id: request.conversation_id ? conversationValidation.sanitized : undefined,
             response_mode: 'blocking', // Always use blocking for credit tracking
           }),
         },

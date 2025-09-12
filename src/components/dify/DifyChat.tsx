@@ -21,6 +21,7 @@ import { trackChat } from '@/lib/analytics';
 import { useChatMessages } from '@/lib/hooks/useChatMessages';
 import { buildCommonInputs } from '@/lib/utils/input-builder';
 import { useLocale } from 'next-intl';
+// Rate limiting is handled server-side in the API actions
 
 export function DifyChat({
   name = 'Dify Assistant',
@@ -60,6 +61,8 @@ export function DifyChat({
 
   const handleSendMessage = useCallback(async () => {
     if (!input.trim() || sendMessage.isLoading || !canAffordMessage) return;
+
+    // Rate limiting is handled server-side in the API actions
 
     const userMessage = addUserMessage(input.trim());
 

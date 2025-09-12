@@ -673,6 +673,45 @@ npm test              # Run all tests
 npm test:watch        # Run tests in watch mode
 npm test:coverage     # Run tests with coverage report
 npm test:ui           # Run tests with UI interface
+npm test:run          # Run tests once (CI mode)
+npm test:ci           # Run tests with coverage and verbose output
+npm test:firebase     # Run tests with Firebase emulators
+npm test:dify         # Test Dify API connection
+```
+
+### Test Coverage
+
+Our test suite covers:
+
+- ✅ **Business Logic**: Credit calculations, user authentication, rate limiting
+- ✅ **Server Actions**: Credit management, user initialization, Dify API integration
+- ✅ **Utility Functions**: Credit utilities, input validation, rate limiting
+- ✅ **Dify Services**: Chat service, conversation management, API integration
+- ✅ **React Hooks**: useCredits, useChatMessages, useDify integration
+- ✅ **Error Handling**: Database errors, API failures, network issues
+- ✅ **Edge Cases**: Insufficient credits, rate limit exceeded, invalid inputs
+
+### Test Structure
+
+```
+src/
+├── __tests__/
+│   ├── setup.ts              # Test environment setup
+│   ├── mocks/                # Mock implementations
+│   │   ├── handlers.ts       # MSW API handlers
+│   │   ├── firebase-admin.ts # Firebase Admin mocks
+│   │   └── firebase-client.ts# Firebase Client mocks
+│   ├── fixtures/             # Test data fixtures
+│   │   ├── users.ts          # User test data
+│   │   └── dify-responses.ts # Dify API response mocks
+│   └── utils/                # Test utilities
+│       ├── render.tsx        # Custom render function
+│       └── auth.ts           # Auth test helpers
+├── lib/
+│   ├── actions/__tests__/    # Server action tests
+│   ├── hooks/__tests__/      # React hook tests
+│   ├── services/dify/__tests__/ # Dify service tests
+│   └── utils/__tests__/      # Utility function tests
 ```
 
 ### Test Credit System

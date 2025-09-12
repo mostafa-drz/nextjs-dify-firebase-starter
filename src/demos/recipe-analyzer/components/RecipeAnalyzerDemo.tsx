@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * @fileoverview Recipe Analyzer Demo Component
  * @author Dify Firebase Boilerplate

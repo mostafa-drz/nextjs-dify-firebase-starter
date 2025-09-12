@@ -22,7 +22,7 @@ export async function GET() {
     return NextResponse.json(healthData, { status: 200 });
   } catch (error) {
     console.error('Health check failed:', error);
-    
+
     return NextResponse.json(
       {
         status: 'unhealthy',
@@ -52,6 +52,7 @@ async function checkFirebaseHealth(): Promise<{ status: string; message: string 
 
     return { status: 'healthy', message: 'Firebase configuration present' };
   } catch (error) {
+    console.error('Firebase health check error:', error);
     return { status: 'unhealthy', message: 'Firebase check failed' };
   }
 }
@@ -62,10 +63,7 @@ async function checkFirebaseHealth(): Promise<{ status: string; message: string 
 async function checkDifyHealth(): Promise<{ status: string; message: string }> {
   try {
     // Check if Dify configuration is present
-    const hasDifyConfig = !!(
-      process.env.DIFY_API_KEY &&
-      process.env.DIFY_BASE_URL
-    );
+    const hasDifyConfig = !!(process.env.DIFY_API_KEY && process.env.DIFY_BASE_URL);
 
     if (!hasDifyConfig) {
       return { status: 'unhealthy', message: 'Dify configuration missing' };
@@ -73,6 +71,7 @@ async function checkDifyHealth(): Promise<{ status: string; message: string }> {
 
     return { status: 'healthy', message: 'Dify configuration present' };
   } catch (error) {
+    console.error('Dify health check error:', error);
     return { status: 'unhealthy', message: 'Dify check failed' };
   }
 }

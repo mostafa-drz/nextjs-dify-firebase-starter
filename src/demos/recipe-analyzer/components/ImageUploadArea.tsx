@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * @fileoverview Image upload area component for recipe analyzer demo
  * @author Dify Firebase Boilerplate

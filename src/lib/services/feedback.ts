@@ -12,21 +12,19 @@ import type { FeedbackData, FeedbackSubmissionResult } from '@/types/feedback';
 export async function submitFeedback(data: FeedbackData): Promise<FeedbackSubmissionResult> {
   try {
     // Create a user feedback event in Sentry
-    const eventId = Sentry.captureUserFeedback({
-      event_id: Sentry.captureMessage('User Feedback Submitted', 'info'),
-      name: data.name || 'Anonymous User',
-      email: data.email || 'no-email@example.com',
-      comments: data.message,
-    });
+    const eventId = Sentry.captureMessage('User Feedback Submitted', 'info');
 
     // Add additional context to the current scope
-    Sentry.configureScope((scope) => {
+    Sentry.withScope((scope) => {
       scope.setTag('feedback_category', data.category || 'general');
       scope.setTag('feedback_priority', data.priority || 'medium');
       scope.setContext('feedback_context', {
         page: data.page || 'unknown',
         userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'server',
         timestamp: new Date().toISOString(),
+        name: data.name || 'Anonymous User',
+        email: data.email || 'no-email@example.com',
+        comments: data.message,
         ...data.context,
       });
     });

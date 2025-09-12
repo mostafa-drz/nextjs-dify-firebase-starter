@@ -18,12 +18,7 @@
   "typescript.inlayHints.variableTypes.enabled": true,
 
   // ESLint
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact"
-  ],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "eslint.workingDirectories": ["."],
 
   // Files

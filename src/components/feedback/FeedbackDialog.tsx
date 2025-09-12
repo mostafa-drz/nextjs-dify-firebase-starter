@@ -91,6 +91,7 @@ export function FeedbackDialog({ open, onOpenChange, config }: FeedbackDialogPro
         });
       }
     } catch (error) {
+      console.error('Feedback submission error:', error);
       setSubmitResult({
         success: false,
         message: 'An unexpected error occurred. Please try again.',

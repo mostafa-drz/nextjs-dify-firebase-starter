@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * @fileoverview Main demos landing page component
  * @author Dify Firebase Boilerplate

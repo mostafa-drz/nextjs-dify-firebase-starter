@@ -1,19 +1,47 @@
+/**
+ * @fileoverview User provider component for authentication context
+ * @author Dify Firebase Boilerplate
+ * @version 1.0.0
+ */
+
 'use client';
 
-import React from 'react';
-import { AuthProvider, useAuth } from './AuthContext';
+import { createContext, useContext, ReactNode } from 'react';
+import { User } from '@/types/user';
 
-/**
- * UserProvider - Legacy wrapper for backward compatibility
- * Now delegates to the new AuthProvider for cleaner separation
- */
+interface UserContextType {
+  user: User | null;
+  checkCredits: (amount: number) => boolean;
+  availableCredits: number;
+}
 
-export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return <AuthProvider>{children}</AuthProvider>;
-};
+const UserContext = createContext<UserContextType | undefined>(undefined);
 
-/**
- * useUser - Legacy hook for backward compatibility
- * Now delegates to the new useAuth hook
- */
-export const useUser = useAuth;
+interface UserProviderProps {
+  children: ReactNode;
+  user?: User | null;
+}
+
+export function UserProvider({ children, user = null }: UserProviderProps) {
+  const availableCredits = user?.admin?.availableCredits || 0;
+
+  const checkCredits = (amount: number) => {
+    return availableCredits >= amount;
+  };
+
+  const value: UserContextType = {
+    user,
+    checkCredits,
+    availableCredits,
+  };
+
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+}
+
+export function useUser(): UserContextType {
+  const context = useContext(UserContext);
+  if (context === undefined) {
+    throw new Error('useUser must be used within a UserProvider');
+  }
+  return context;
+}
