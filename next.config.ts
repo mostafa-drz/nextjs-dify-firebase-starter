@@ -7,6 +7,9 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/config.ts');
 const nextConfig: NextConfig = {
   /* config options here */
 
+  // Enable standalone output for Docker
+  output: 'standalone',
+
   // Bundle optimization
   experimental: {
     optimizePackageImports: [
