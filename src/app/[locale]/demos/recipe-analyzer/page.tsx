@@ -17,8 +17,8 @@ import { DemoLayout } from '@/demos/shared/DemoLayout';
 export default function RecipeAnalyzerPage() {
   return (
     <DemoLayout
-      title="Smart Recipe Analyzer & Meal Planner"
-      description="Upload food images and get AI-powered meal planning with nutritional insights"
+      title="What Can I Cook?"
+      description="Snap a photo of your ingredients and get instant recipe suggestions"
     >
       <RecipeAnalyzerDemo />
     </DemoLayout>
