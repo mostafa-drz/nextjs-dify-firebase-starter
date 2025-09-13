@@ -1,0 +1,18 @@
+---
+alwaysApply: false
+description: Vitest testing framework and minimal testing approach guidelines
+---
+
+# 🧪 Testing Rules
+
+## Testing Framework: Vitest (NOT Jest)
+
+- Use `import { vi } from 'vitest'` for mocks
+- Use `vi.mock()`, `vi.fn()`, `vi.clearAllMocks()`
+- Add `/** @vitest-environment jsdom */` for component tests
+
+## Minimal Testing Approach
+
+- **Essential tests only** - avoid exhaustive coverage for simple bugs
+- **Focus on behavior** - test what the code should do, not implementation details
+- **One test per bug** - don't over-test, focus on specific issues

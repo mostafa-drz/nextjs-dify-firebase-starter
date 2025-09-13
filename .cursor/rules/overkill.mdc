@@ -1,0 +1,31 @@
+---
+alwaysApply: false
+description: Patterns to avoid over-engineering and keep code simple
+---
+
+# 🚫 Overkill Patterns to Avoid
+
+## Examples of Overkill:
+
+```typescript
+// ❌ Firebase Singleton Pattern (Overkill)
+class FirebaseSingleton {
+  private static instance: FirebaseSingleton | null = null;
+  // ... 200+ lines of unnecessary complexity
+}
+
+// ✅ Simple Firebase setup
+const app = getApps().length === 0 ? initializeApp(config) : getApp();
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+```
+
+## Keep It Simple:
+
+- **Direct imports** over dependency injection
+- **Environment variables** over complex config management
+- **Built-in Firebase methods** over custom wrappers
+- **Simple error handling** over complex error hierarchies
+- **Essential tests** over exhaustive test coverage
+
+**Remember**: The best code is the code you don't have to write!

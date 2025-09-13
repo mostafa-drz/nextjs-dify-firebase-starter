@@ -1,0 +1,30 @@
+---
+alwaysApply: false
+description: Next.js server/client separation and Firebase architecture guidelines
+---
+
+# 🏗️ Architecture Rules
+
+## Next.js 15 Server/Client Separation
+
+- **Server Components**: Default, no directive, access all env vars, data fetching
+- **Client Components**: Must have `'use client'`, only `NEXT_PUBLIC_*` vars, interactivity
+- **Never mix** server and client functionality in same component
+
+## Firebase Client-Side Operations Priority
+
+**Firebase best practice**: Leverage Client SDK to reduce latency, improve performance, and easier to secure.
+
+- **Use Firebase Client-Side For**: User data operations, real-time data, offline support, authentication, file uploads
+- **Use Server Actions For**: External API calls, sensitive operations, complex business logic, operations requiring server-side secrets
+
+## Environment Variables
+
+- **Client-safe**: `NEXT_PUBLIC_*` (Firebase config, public URLs)
+- **Server-only**: `API_KEY`, `SECRET`, `PRIVATE_KEY`, `TOKEN`
+- **Note**: Server components can't access `NEXT_PUBLIC_*` vars, client components can't access server-only vars
+
+## File Organization
+
+- **Server Actions**: `src/lib/actions/[service]-[operation].ts`
+- **Client Hooks**: `src/lib/hooks/` - call server actions, never direct API calls

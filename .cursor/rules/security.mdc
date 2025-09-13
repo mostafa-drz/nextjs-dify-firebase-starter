@@ -1,0 +1,32 @@
+---
+alwaysApply: false
+description: Critical security rules for API keys and server-side operations
+---
+
+# 🔒 Security Rules
+
+## API Key Security
+
+- **NEVER** use `NEXT_PUBLIC_` prefix for sensitive API keys (Dify, OpenAI, etc.)
+- **ALWAYS** use server actions for sensitive API operations
+- **NEVER** instantiate services with sensitive API keys on client-side
+
+## Required Patterns
+
+```typescript
+// ✅ Server actions for sensitive operations
+'use server';
+export async function sensitiveOperation() {
+  const apiKey = process.env.SENSITIVE_API_KEY; // Server-side only
+}
+
+// ✅ Client hooks call server actions
+('use client');
+export function useSensitiveOperation() {
+  const mutation = useMutation({
+    mutationFn: async data => {
+      return await sensitiveOperation(data); // Server action
+    },
+  });
+}
+```

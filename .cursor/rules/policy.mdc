@@ -1,0 +1,12 @@
+---
+alwaysApply: false
+description: Policy for asking permission before making code changes
+---
+
+# 🚫 Proactive Code Changes Policy
+
+**CRITICAL**: Never make proactive code changes without explicit user confirmation.
+
+- **Ask First**: Always ask for permission before adding code or making changes
+- **Keep Codebase Lean**: Avoid unnecessary additions that bloat the codebase
+- **Wait for Confirmation**: Only proceed with code changes after explicit user approval
