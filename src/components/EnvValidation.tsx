@@ -5,7 +5,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
-import { checkEnvStatus, EnvStatus } from '@/lib/config/env-validation';
+import { checkClientEnvStatus, EnvStatus } from '@/lib/config/env-validation';
 
 interface EnvValidationProps {
   showOnError?: boolean;
@@ -19,7 +19,7 @@ export function EnvValidation({ showOnError = true, className = '' }: EnvValidat
   const checkEnvironment = async () => {
     setIsChecking(true);
     try {
-      const status = checkEnvStatus();
+      const status = checkClientEnvStatus();
       setEnvStatus(status);
     } catch (error) {
       console.error('Environment validation error:', error);
@@ -125,7 +125,7 @@ export function useEnvValidation() {
   const checkEnvironment = async () => {
     setIsChecking(true);
     try {
-      const status = checkEnvStatus();
+      const status = checkClientEnvStatus();
       setEnvStatus(status);
     } catch (error) {
       console.error('Environment validation error:', error);

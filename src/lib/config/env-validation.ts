@@ -17,7 +17,7 @@ interface EnvConfig {
   FIREBASE_PRIVATE_KEY: string;
   FIREBASE_CLIENT_EMAIL: string;
 
-  // Dify Configuration (Server-side only)
+  // Dify Configuration (Server-side only - NEVER expose to client)
   DIFY_API_KEY: string;
   DIFY_BASE_URL: string;
 
@@ -142,8 +142,61 @@ export interface EnvStatus {
 }
 
 /**
+ * Checks client-side environment status without throwing
+ * Should only be called from client components
+ * Returns validation status for client-side variables only
+ */
+export function checkClientEnvStatus(): EnvStatus {
+  const missing: string[] = [];
+  const errors: string[] = [];
+
+  // Only check client vars when running on client
+  if (typeof window !== 'undefined') {
+    for (const varName of CLIENT_ENV_VARS) {
+      if (!process.env[varName]) {
+        missing.push(varName);
+        errors.push(`Client: ${varName} is missing`);
+      }
+    }
+  }
+
+  return {
+    isValid: missing.length === 0,
+    missingVars: missing,
+    errors,
+  };
+}
+
+/**
+ * Checks server-side environment status without throwing
+ * Should only be called from server components
+ * Returns validation status for server-side variables only
+ */
+export function checkServerEnvStatus(): EnvStatus {
+  const missing: string[] = [];
+  const errors: string[] = [];
+
+  // Only check server vars when running on server
+  if (typeof window === 'undefined') {
+    for (const varName of SERVER_ENV_VARS) {
+      if (!process.env[varName]) {
+        missing.push(varName);
+        errors.push(`Server: ${varName} is missing`);
+      }
+    }
+  }
+
+  return {
+    isValid: missing.length === 0,
+    missingVars: missing,
+    errors,
+  };
+}
+
+/**
  * Checks environment status without throwing
- * Returns validation status
+ * Returns validation status for both client and server variables
+ * @deprecated Use checkClientEnvStatus() or checkServerEnvStatus() instead
  */
 export function checkEnvStatus(): EnvStatus {
   const missing: string[] = [];
