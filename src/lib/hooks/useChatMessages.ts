@@ -26,6 +26,7 @@ interface UseChatMessagesProps {
 
 export function useChatMessages({ conversationId, userId, welcomeMessage }: UseChatMessagesProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messagesCleared, setMessagesCleared] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // Load conversation messages if conversationId is provided
@@ -43,6 +44,11 @@ export function useChatMessages({ conversationId, userId, welcomeMessage }: UseC
 
   // Consolidated effect for welcome messages and conversation loading
   useEffect(() => {
+    // Don't add welcome messages if user has explicitly cleared messages
+    if (messagesCleared) {
+      return;
+    }
+
     // Priority: custom welcome message > opening statement > conversation data
     if (welcomeMessage && messages.length === 0) {
       const welcomeMsg: ChatMessage = {
@@ -66,8 +72,8 @@ export function useChatMessages({ conversationId, userId, welcomeMessage }: UseC
       return;
     }
 
-    // Load conversation messages when conversationId changes
-    if (conversationData && conversationData.length > 0) {
+    // Load conversation messages only when no welcome message or opening statement
+    if (!welcomeMessage && !openingStatement && conversationData && conversationData.length > 0) {
       const loadedMessages: ChatMessage[] = conversationData.map((msg: unknown) => {
         const message = msg as {
           id: string;
@@ -111,6 +117,7 @@ export function useChatMessages({ conversationId, userId, welcomeMessage }: UseC
     welcomeMessage,
     openingStatement,
     messages.length,
+    messagesCleared,
   ]);
 
   // Auto-scroll effect
@@ -182,6 +189,7 @@ export function useChatMessages({ conversationId, userId, welcomeMessage }: UseC
 
   const clearMessages = useCallback(() => {
     setMessages([]);
+    setMessagesCleared(true);
   }, []);
 
   return {
