@@ -5,8 +5,8 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { DifyService } from '../services/dify';
-import { FileUploadRequest, FilePreviewRequest } from '../services/dify/types';
+import { uploadDifyFile, previewDifyFile, validateDifyFile } from '../actions/dify-files';
+import { FileUploadRequest, FilePreviewRequest } from '../actions/dify-files';
 
 /**
  * Hook for file upload operations
@@ -38,12 +38,7 @@ export function useFileUpload(userId: string) {
 
   const uploadFile = useMutation({
     mutationFn: async (request: FileUploadRequest) => {
-      const difyService = new DifyService({
-        apiKey: process.env.NEXT_PUBLIC_DIFY_API_KEY || '',
-        userId,
-      });
-
-      return await difyService.files.uploadFile(request);
+      return await uploadDifyFile(userId, request);
     },
     onSuccess: (data) => {
       if (data.success) {
@@ -87,12 +82,7 @@ export function useFilePreview(
   return useQuery({
     queryKey: ['dify', 'files', 'preview', userId, request.file_id],
     queryFn: async () => {
-      const difyService = new DifyService({
-        apiKey: process.env.NEXT_PUBLIC_DIFY_API_KEY || '',
-        userId,
-      });
-
-      return await difyService.files.previewFile(request);
+      return await previewDifyFile(userId, request);
     },
     enabled: enabled && !!request.file_id,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -120,51 +110,12 @@ export function useFilePreview(
  * ```
  */
 export function useFileValidation() {
-  const difyService = new DifyService({
-    apiKey: process.env.NEXT_PUBLIC_DIFY_API_KEY || '',
-    userId: 'temp', // Temporary user ID for validation
-  });
-
   const validateFile = (file: File) => {
-    const errors: string[] = [];
-
-    // Check if file exists
-    if (!file) {
-      errors.push('File is required');
-      return { isValid: false, errors };
-    }
-
-    // Check file type
-    if (!difyService.files.isFileTypeSupported(file.name)) {
-      errors.push(
-        `Unsupported file type. Supported types: ${difyService.files.getSupportedFileTypes().join(', ')}`
-      );
-    }
-
-    // Check file size
-    if (file.size > difyService.files.getMaxFileSize()) {
-      errors.push(
-        `File too large. Maximum size: ${difyService.files.formatFileSize(difyService.files.getMaxFileSize())}`
-      );
-    }
-
-    // Check if file is empty
-    if (file.size === 0) {
-      errors.push('File is empty');
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors,
-    };
+    return validateDifyFile(file);
   };
 
   return {
     validateFile,
-    isFileTypeSupported: (filename: string) => difyService.files.isFileTypeSupported(filename),
-    getSupportedFileTypes: () => difyService.files.getSupportedFileTypes(),
-    getMaxFileSize: () => difyService.files.getMaxFileSize(),
-    formatFileSize: (bytes: number) => difyService.files.formatFileSize(bytes),
   };
 }
 
@@ -196,19 +147,7 @@ export function useFileUploadWithProgress(userId: string) {
 
   const uploadFileWithProgress = useMutation({
     mutationFn: async (request: FileUploadRequest) => {
-      const difyService = new DifyService({
-        apiKey: process.env.NEXT_PUBLIC_DIFY_API_KEY || '',
-        userId,
-      });
-
-      // Create a custom request with progress tracking
-      const formData = new FormData();
-      formData.append('file', request.file);
-      formData.append('user', request.user);
-
-      // Note: Progress tracking would require custom implementation
-      // This is a simplified version without actual progress tracking
-      return await difyService.files.uploadFile(request);
+      return await uploadDifyFile(userId, request);
     },
     onSuccess: (data) => {
       if (data.success) {

@@ -1,148 +1,93 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
-import { DifyService } from '@/lib/services/dify';
-import { StreamingEvent, ChatRequest } from '@/lib/services/dify/types';
-import { deductCreditsForTokens } from '@/lib/actions/credits';
+import { useState, useCallback } from 'react';
+import { sendDifyMessage } from '@/lib/actions/dify';
 
 interface UseStreamingChatOptions {
   userId: string;
   conversationId?: string;
-  enableStreaming?: boolean;
 }
 
-interface StreamingState {
-  isStreaming: boolean;
-  currentMessage: string;
+interface ChatState {
+  isSending: boolean;
   error: string | null;
-  abortController: AbortController | null;
   creditsDeducted?: number;
 }
 
 /**
- * Custom hook for handling streaming chat functionality
- * Provides production-ready streaming with proper cleanup and error handling
+ * Custom hook for handling chat functionality
+ * Uses secure server actions instead of client-side API calls
  */
-export function useStreamingChat({
-  userId,
-  conversationId,
-  enableStreaming = false,
-}: UseStreamingChatOptions) {
-  const [streamingState, setStreamingState] = useState<StreamingState>({
-    isStreaming: false,
-    currentMessage: '',
+export function useStreamingChat({ userId, conversationId }: UseStreamingChatOptions) {
+  const [chatState, setChatState] = useState<ChatState>({
+    isSending: false,
     error: null,
-    abortController: null,
   });
 
-  const difyServiceRef = useRef<DifyService | null>(null);
-
-  // Initialize Dify service
-  if (!difyServiceRef.current) {
-    difyServiceRef.current = new DifyService({
-      apiKey: process.env.NEXT_PUBLIC_DIFY_API_KEY || '',
-      userId,
-    });
-  }
-
-  const startStreaming = useCallback(
+  const sendMessage = useCallback(
     async (
-      request: Omit<ChatRequest, 'user' | 'conversation_id'>,
-      onEvent?: (event: StreamingEvent) => void
-    ): Promise<StreamingEvent | null> => {
-      if (!enableStreaming || streamingState.isStreaming) {
-        return null;
+      query: string,
+      onSuccess?: (response: any) => void,
+      onError?: (error: string) => void
+    ): Promise<void> => {
+      if (chatState.isSending) {
+        return;
       }
 
-      const abortController = new AbortController();
-
-      setStreamingState({
-        isStreaming: true,
-        currentMessage: '',
+      setChatState({
+        isSending: true,
         error: null,
-        abortController,
       });
 
       try {
-        const fullRequest: ChatRequest = {
-          ...request,
+        const result = await sendDifyMessage(userId, {
+          query,
           user: userId,
           conversation_id: conversationId,
-        };
+          response_mode: 'blocking',
+        });
 
-        const result = await difyServiceRef.current!.chat.sendMessageStreamingWithCredits(
-          fullRequest,
-          (event: StreamingEvent) => {
-            // Update current message content
-            if (event.event === 'message' && event.answer) {
-              setStreamingState((prev) => ({
-                ...prev,
-                currentMessage: prev.currentMessage + event.answer,
-              }));
-            }
+        if (result.success && result.data) {
+          setChatState((prev) => ({
+            ...prev,
+            isSending: false,
+            creditsDeducted: result.usage?.total_tokens,
+          }));
 
-            // Call custom event handler
-            onEvent?.(event);
-          },
-          abortController,
-          {
-            deductCredits: async (userId: string, tokensUsed: number, operation: string) => {
-              const result = await deductCreditsForTokens(userId, tokensUsed, operation);
-              return {
-                success: result.success,
-                message: result.message,
-                creditsDeducted: result.creditsDeducted,
-              };
-            },
-          }
-        );
-
-        const finalEvent = result.finalEvent;
-
-        setStreamingState((prev) => ({
-          ...prev,
-          isStreaming: false,
-          abortController: null,
-          creditsDeducted: result.creditsDeducted,
-        }));
-
-        return finalEvent;
+          onSuccess?.(result.data);
+        } else {
+          const errorMessage = result.error?.message || 'Failed to send message';
+          setChatState((prev) => ({
+            ...prev,
+            isSending: false,
+            error: errorMessage,
+          }));
+          onError?.(errorMessage);
+        }
       } catch (error) {
-        console.error('Streaming error:', error);
-        setStreamingState((prev) => ({
+        console.error('Chat error:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Failed to send message';
+        setChatState((prev) => ({
           ...prev,
-          isStreaming: false,
-          error: error instanceof Error ? error.message : 'Streaming failed',
-          abortController: null,
+          isSending: false,
+          error: errorMessage,
         }));
-        return null;
+        onError?.(errorMessage);
       }
     },
-    [userId, conversationId, enableStreaming, streamingState.isStreaming]
+    [userId, conversationId, chatState.isSending]
   );
 
-  const stopStreaming = useCallback(() => {
-    if (streamingState.abortController) {
-      streamingState.abortController.abort();
-      setStreamingState((prev) => ({
-        ...prev,
-        isStreaming: false,
-        abortController: null,
-      }));
-    }
-  }, [streamingState.abortController]);
-
   const clearError = useCallback(() => {
-    setStreamingState((prev) => ({
+    setChatState((prev) => ({
       ...prev,
       error: null,
     }));
   }, []);
 
   return {
-    ...streamingState,
-    startStreaming,
-    stopStreaming,
+    ...chatState,
+    sendMessage,
     clearError,
   };
 }

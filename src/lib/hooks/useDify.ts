@@ -55,6 +55,36 @@ export function useDifyAppInfo() {
   };
 }
 
+export function useDifyConversations(userId: string) {
+  const query = useQuery({
+    queryKey: ['dify-conversations', userId],
+    queryFn: async () => {
+      // Mock implementation - return array of conversations
+      return [
+        {
+          id: 'conv-1',
+          name: 'Sample Conversation 1',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+        {
+          id: 'conv-2',
+          name: 'Sample Conversation 2',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      ];
+    },
+    enabled: !!userId,
+  });
+
+  return {
+    conversations: query.data || [],
+    isLoading: query.isLoading,
+    error: query.error,
+  };
+}
+
 export function useDifyMutations(_userId: string) {
   const queryClient = useQueryClient();
 
@@ -75,7 +105,35 @@ export function useDifyMutations(_userId: string) {
     },
   });
 
+  const renameConversationMutation = useMutation({
+    mutationFn: async ({
+      conversationId: _conversationId,
+      name: _name,
+    }: {
+      conversationId: string;
+      name: string;
+    }) => {
+      // Mock implementation
+      return { success: true };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dify-conversations'] });
+    },
+  });
+
+  const deleteConversationMutation = useMutation({
+    mutationFn: async (_conversationId: string) => {
+      // Mock implementation
+      return { success: true };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dify-conversations'] });
+    },
+  });
+
   return {
     sendMessage: sendMessageMutation.mutateAsync,
+    renameConversation: renameConversationMutation,
+    deleteConversation: deleteConversationMutation,
   };
 }
