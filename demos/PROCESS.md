@@ -19,14 +19,17 @@
 - Get user approval before proceeding
 - Ensure alignment with project goals
 
-### 3. **Setup Instructions Phase**
+### 3. **Documentation-First Phase**
 
-- Create complete Dify AI dashboard configuration guide
-- Provide step-by-step agent/chatflow setup instructions
-- Include all necessary parameters and configurations
+- **Update README.md** - Define demo purpose, features, and user flow
+- **Create Workflow Diagram** - Visual representation using Mermaid diagrams
+- **Document Dify Components** - List all required LLM, Knowledge, Code, Tool nodes
+- **Configure Properties** - Include JSON configurations for each component
+- **Write Setup Guide** - Complete step-by-step Dify dashboard configuration
 
 ### 4. **Implementation Phase**
 
+- **Code Based on Documentation** - Implement exactly what was documented
 - Build demo as separate/nested pages
 - Share code with existing app but keep isolated
 - Maintain minimal but fully functional approach
@@ -40,12 +43,27 @@
 
 ## Key Principles
 
+- **Documentation-First**: Always document before coding
+- **Visual Workflows**: Include Mermaid diagrams for all Dify workflows
+- **Component Documentation**: List all required Dify components with properties
 - **Creative & Useful**: Focus on daily tools that solve real problems
 - **Minimal & Elegant**: Keep it simple but polished
 - **Code Sharing**: Reuse existing components while maintaining isolation
 - **High Quality**: Suitable for client demonstrations
 - **Small Start**: Begin with small, focused demos
 - **Purpose-Driven**: Each demo has clear value and framework
+
+## Workflow Diagram Requirements
+
+Each demo's `dify-setup.md` must include:
+
+1. **Simplified Mermaid Diagram** - Clean visual representation focusing on core flow
+2. **Minimal Component List** - Only essential Dify nodes (avoid over-engineering)
+3. **Simple Configuration Steps** - Straightforward workflow setup
+4. **Essential Properties JSON** - Only necessary configurations
+5. **Clear Variable Definitions** - Simple input/output variables
+
+**Keep diagrams simple and focused on the core functionality.**
 
 ## Target Outcomes
 

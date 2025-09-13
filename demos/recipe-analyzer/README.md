@@ -1,43 +1,43 @@
-# Smart Recipe Analyzer & Meal Planner
+# What Can I Cook? - Simple Ingredients-to-Recipe Tool
 
-A daily tool that analyzes food images and creates personalized meal plans with nutritional insights.
+A focused demo that takes a photo of ingredients you have at home and suggests recipes you can make.
 
 ## Overview
 
-This demo showcases how to build a practical AI-powered application using Dify's multimodal capabilities. Users can upload photos of their food, fridge contents, or pantry, and get intelligent meal planning suggestions.
+This demo showcases a **simple, creative, and minimal** AI-powered tool using Dify's multimodal capabilities. Users snap a photo of ingredients they have and get instant recipe suggestions.
+
+## Core Concept
+
+**One thing, done well:** Ingredients → Recipe Suggestions
 
 ## Features
 
-- **Image Analysis**: Upload photos of food/fridge contents
-- **Smart Chat**: AI analyzes what you have and suggests recipes
-- **Meal Planning**: Conversational meal planning for the week
-- **Nutritional Insights**: Get health recommendations based on your food
-- **Shopping Lists**: Generate shopping lists from meal plans
+- **📸 Simple Photo Upload**: Snap ingredients you have at home
+- **🤖 Instant Recipe Suggestions**: AI suggests what you can cook
+- **💬 Natural Chat**: Ask "What can I cook?" and get recipes
+- **⚡ Fast & Focused**: No complex meal planning, just recipe ideas
 
 ## User Flow
 
-1. User uploads photo of their fridge/pantry/food
-2. AI analyzes the image and identifies available ingredients
-3. User chats with AI to plan meals: "What can I make with these ingredients?"
-4. AI suggests recipes and creates a meal plan
-5. User can ask follow-up questions: "Make it healthier" or "Add more protein"
-6. AI generates shopping list for missing ingredients
+1. **📸 Snap Ingredients**: User takes photo of ingredients they have
+2. **💬 Ask Simple Question**: "What can I cook with these ingredients?"
+3. **🍳 Get Recipe**: AI suggests recipes with step-by-step instructions
+4. **🔄 Ask Follow-ups**: "Make it simpler" or "Add more protein"
 
 ## Technical Implementation
 
 - **Page**: `/demos/recipe-analyzer`
 - **Dify Features Used**:
   - File upload (image analysis)
-  - Chat with context
-  - Conversation management
-  - Suggested questions
-- **UI Components**: Reuses existing chat, file upload, and conversation components
+  - Chat with image context
+  - Simple conversation flow
+- **UI Components**: Minimal, focused interface
 
 ## Setup Instructions
 
 1. Follow the [Dify Setup Guide](./dify-setup.md) to configure your Dify application
 2. Ensure your environment variables are properly configured
-3. Run the demo and start uploading food images!
+3. Run the demo and start snapping ingredient photos!
 
 ## Demo URL
 
@@ -45,7 +45,11 @@ Access the demo at: `/demos/recipe-analyzer`
 
 ## Use Cases
 
-- **Home Cooks**: Plan meals with ingredients they already have
-- **Health-Conscious Users**: Get nutritional insights and healthier alternatives
-- **Busy Professionals**: Quick meal planning without manual ingredient tracking
-- **Students**: Budget-friendly meal planning with available ingredients
+- **Home Cooks**: Quick inspiration with ingredients they have
+- **Busy People**: Fast recipe suggestions without meal planning complexity
+- **Students**: Simple cooking ideas with available ingredients
+- **Anyone**: Instant "what can I cook?" inspiration
+
+## Demo Philosophy
+
+**Keep it simple, focused, and creative.** This demo does one thing exceptionally well rather than trying to be a universal recipe tool.

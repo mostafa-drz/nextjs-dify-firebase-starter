@@ -1,12 +1,11 @@
-# Dify Setup Instructions - Smart Recipe Analyzer & Meal Planner
+# Dify Setup Instructions - What Can I Cook? Demo
 
-Complete step-by-step instructions to set up your Dify application for the Recipe Analyzer demo.
+Complete step-by-step instructions to set up your Dify application for the focused "What Can I Cook?" demo.
 
 ## Prerequisites
 
 - Dify account and access to Dify dashboard
 - Basic understanding of Dify app configuration
-- Recipe/nutritional knowledge base (optional but recommended)
 
 ## Step 1: Create New Chat Application
 
@@ -20,9 +19,9 @@ Complete step-by-step instructions to set up your Dify application for the Recip
    - Choose "Advanced Chat" for multimodal capabilities
 
 3. **Basic Configuration**
-   - **App Name**: `Smart Recipe Analyzer`
-   - **App Description**: `AI-powered meal planning with image analysis`
-   - **App Icon**: Choose a food/chef related icon
+   - **App Name**: `What Can I Cook?`
+   - **App Description**: `Simple ingredients-to-recipe suggestion tool`
+   - **App Icon**: Choose a simple cooking/food icon
 
 ## Step 2: Configure App Settings
 
@@ -39,22 +38,115 @@ Complete step-by-step instructions to set up your Dify application for the Recip
 - **File Upload**: Enable (Required for image analysis)
 - **File Types**: Images only (PNG, JPG, JPEG, WEBP, GIF)
 
-## Step 3: Configure System Prompt
+## Step 3: Configure Agent Workflow
 
-Replace the default system prompt with this specialized prompt:
+### Workflow Diagram
+
+Here's the simplified visual representation of the "What Can I Cook?" demo workflow:
+
+```mermaid
+graph TD
+    A[User Uploads Image] --> B[Image Analysis LLM]
+    B --> C[User Asks Question]
+    C --> D[Chat LLM with Image Context]
+    D --> E[Internet Recipe Search]
+    E --> F[Recipe Response]
+
+    subgraph "Dify Components"
+        G[LLM Node - Vision]
+        H[Tool Calling - Web Search]
+    end
+
+    B --> G
+    D --> G
+    E --> H
+
+    style A fill:#e1f5fe
+    style F fill:#e8f5e8
+    style G fill:#fff3e0
+    style H fill:#fce4ec
+```
+
+### Required Dify Components
+
+For this demo, you'll need to configure these components in your Dify workflow:
+
+1. **LLM Node** - For image analysis and recipe generation
+2. **Tool Calling** - For internet-based recipe search
+
+### Workflow Configuration Steps
+
+1. **Create Workflow**
+   - Go to "Workflow" section in Dify dashboard
+   - Create new "Agent Workflow"
+   - Name it "What Can I Cook Workflow"
+
+2. **Add LLM Node**
+   - Drag LLM node to canvas
+   - Configure model: GPT-4 Vision or Claude 3 Vision
+   - Set prompt: "Analyze the uploaded image and identify all visible ingredients"
+
+3. **Add Tool Calling**
+   - Drag Tool Calling node
+   - Configure web search tool for recipe lookup
+   - Set search parameters for recipe websites
+
+4. **Connect Nodes**
+   - Connect LLM → Tool Calling → Response
+   - Set up simple linear flow
+
+5. **Configure Variables**
+   - Input: `user_query` (string)
+   - Input: `uploaded_image` (file)
+   - Output: `recipe_suggestion` (string)
+
+### Dify Properties Configuration
+
+#### LLM Node Properties
+
+```json
+{
+  "model": "gpt-4-vision-preview",
+  "temperature": 0.7,
+  "max_tokens": 2000,
+  "vision_enabled": true,
+  "system_prompt": "You are a helpful cooking assistant..."
+}
+```
+
+#### Tool Calling Properties
+
+```json
+{
+  "tools_enabled": true,
+  "max_tool_calls": 2,
+  "tool_timeout": 15,
+  "available_tools": ["web_search"],
+  "search_domains": ["allrecipes.com", "foodnetwork.com", "epicurious.com"]
+}
+```
+
+## Step 4: Configure System Prompt
+
+Replace the default system prompt with this focused prompt:
 
 ```
-You are a Smart Recipe Analyzer and Meal Planner AI assistant. Your role is to help users plan meals based on the food images they upload and provide nutritional insights.
+You are a simple "What Can I Cook?" assistant. Your job is to help users figure out what they can cook with the ingredients they have.
 
-## Core Capabilities:
-1. **Image Analysis**: Analyze uploaded food images to identify ingredients, quantities, and freshness
-2. **Recipe Suggestions**: Recommend recipes based on available ingredients
-3. **Meal Planning**: Create weekly meal plans considering nutritional balance
-4. **Nutritional Insights**: Provide health recommendations and dietary advice
-5. **Shopping Lists**: Generate shopping lists for missing ingredients
+## Core Purpose:
+Help users turn their available ingredients into delicious recipes.
+
+## What You Do:
+1. **Analyze Ingredients**: Look at uploaded photos and identify what ingredients are available
+2. **Suggest Recipes**: Recommend simple, practical recipes they can make
+3. **Provide Instructions**: Give clear, step-by-step cooking instructions
+4. **Answer Questions**: Help with cooking tips and modifications
 
 ## Guidelines:
-- Always be encouraging and helpful about cooking
+- Keep suggestions simple and practical
+- Focus on recipes that are actually doable with their ingredients
+- Be encouraging and helpful
+- Don't overcomplicate - this is about quick inspiration, not complex meal planning
 - Consider dietary restrictions and preferences when asked
 - Provide practical, achievable recipes
 - Include nutritional information when relevant

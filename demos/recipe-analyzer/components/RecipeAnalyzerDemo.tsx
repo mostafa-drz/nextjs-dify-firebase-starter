@@ -12,29 +12,37 @@ import { RecipeAnalyzerChat } from './RecipeAnalyzerChat';
 
 export function RecipeAnalyzerDemo() {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
+  const [uploadedFileId, setUploadedFileId] = useState<string | undefined>();
+
+  const handleImageUpload = (file: File, fileId?: string) => {
+    setUploadedImage(file);
+    setUploadedFileId(fileId);
+  };
 
   return (
     <div className="space-y-6">
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Upload Recipe Image</CardTitle>
-            <CardDescription>
-              Upload an image of a recipe or food item to get AI-powered analysis
-            </CardDescription>
+            <CardTitle>📸 Snap Your Ingredients</CardTitle>
+            <CardDescription>Take a photo of ingredients you have at home</CardDescription>
           </CardHeader>
           <CardContent>
-            <ImageUploadArea onImageUpload={setUploadedImage} />
+            <ImageUploadArea
+              onImageUpload={handleImageUpload}
+              uploadedFile={uploadedImage}
+              uploadedFileId={uploadedFileId}
+            />
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>AI Analysis</CardTitle>
-            <CardDescription>Chat with our AI assistant about your uploaded recipe</CardDescription>
+            <CardTitle>🍳 Get Recipe Suggestions</CardTitle>
+            <CardDescription>Ask what you can cook with your ingredients</CardDescription>
           </CardHeader>
           <CardContent>
-            <RecipeAnalyzerChat uploadedImage={uploadedImage} />
+            <RecipeAnalyzerChat uploadedImage={uploadedImage} uploadedFileId={uploadedFileId} />
           </CardContent>
         </Card>
       </div>

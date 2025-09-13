@@ -16,10 +16,10 @@ export default function DemosPage() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <DemoCard
-          title="Recipe Analyzer"
-          description="Upload food images and get AI-powered meal planning with nutritional insights"
+          title="What Can I Cook?"
+          description="Snap a photo of your ingredients and get instant recipe suggestions"
           href="/demos/recipe-analyzer"
-          status="coming-soon"
+          status="available"
         />
       </div>
     </div>
