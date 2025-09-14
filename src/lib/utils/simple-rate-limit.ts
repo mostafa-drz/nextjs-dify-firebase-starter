@@ -7,7 +7,7 @@
  * Designed for MVP with 10k users - simple, effective, and production-safe.
  */
 
-import { getFirestoreAdmin, FieldValue } from '@/lib/utils/firebase-admin';
+import { getFirestoreAdmin, FieldValue } from '@/lib/firebase/admin';
 
 /**
  * Rate limit configuration interface

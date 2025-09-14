@@ -1,6 +1,6 @@
 'use server';
 
-import { getFirestoreAdmin, FieldValue } from '@/lib/utils/firebase-admin';
+import { getFirestoreAdmin, FieldValue } from '@/lib/firebase/admin';
 import { calculateCreditsFromTokens } from '@/lib/utils/credits';
 import { CreditTransaction } from '@/types/user';
 

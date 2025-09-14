@@ -10,10 +10,10 @@ import {
   checkUserRateLimitByAction,
   RATE_LIMIT_CONFIGS,
 } from '../simple-rate-limit';
-import { getFirestoreAdmin } from '@/lib/utils/firebase-admin';
+import { getFirestoreAdmin } from '@/lib/firebase/admin';
 
 // Mock Firebase Admin
-vi.mock('@/lib/utils/firebase-admin', () => ({
+vi.mock('@/lib/firebase/admin', () => ({
   getFirestoreAdmin: vi.fn(),
   FieldValue: {
     serverTimestamp: vi.fn(() => 'mock-timestamp'),

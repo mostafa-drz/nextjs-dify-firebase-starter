@@ -1,7 +1,7 @@
 'use client';
 
 import { logEvent } from 'firebase/analytics';
-import { getFirebaseAnalytics } from './utils/firebase-client';
+import { getFirebaseAnalytics } from './firebase/client';
 
 /**
  * Simple Analytics for Dify Firebase Boilerplate
