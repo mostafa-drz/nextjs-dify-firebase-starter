@@ -5,8 +5,9 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { uploadDifyFile, previewDifyFile, validateDifyFile } from '../actions/dify-files';
-import { FileUploadRequest, FilePreviewRequest } from '../actions/dify-files';
+import { uploadDifyFile, previewDifyFile } from '@/lib/actions/dify-files';
+import { validateDifyFile } from '@/lib/utils/file-validation';
+import { FileUploadRequest, FilePreviewRequest } from '@/lib/actions/dify-files';
 
 /**
  * Hook for file upload operations

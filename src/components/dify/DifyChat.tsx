@@ -42,6 +42,7 @@ export function DifyChat({
     scrollAreaRef,
     suggestedQuestions,
     sendMessage,
+    sendMessageMutation,
     addUserMessage,
     addAssistantMessage,
     removeMessage,
@@ -60,7 +61,7 @@ export function DifyChat({
   const canAffordMessage = checkCredits(estimatedCredits);
 
   const handleSendMessage = useCallback(async () => {
-    if (!input.trim() || sendMessage.isLoading || !canAffordMessage) return;
+    if (!input.trim() || sendMessageMutation.isPending || !canAffordMessage) return;
 
     // Rate limiting is handled server-side in the API actions
 
@@ -75,7 +76,7 @@ export function DifyChat({
     try {
       // Build inputs using flexible input builder
       // Developers can customize this based on their specific needs
-      const inputs = buildCommonInputs(
+      const _inputs = buildCommonInputs(
         user ? { ...user } : {}, // User object (handle null case)
         locale, // User's locale
         {
@@ -84,20 +85,15 @@ export function DifyChat({
         }
       );
 
-      const result = await sendMessage.mutateAsync({
-        query: userMessage.content,
-        conversation_id: conversationId,
-        response_mode: 'blocking',
-        inputs,
-      });
+      const result = await sendMessage(userMessage.content);
 
       if (result.data?.message_id && result.data?.answer) {
         addAssistantMessage({
           id: result.data.message_id,
           content: result.data.answer,
-          tokensUsed: result.usage?.total_tokens,
-          creditsDeducted: result.usage?.total_tokens
-            ? Math.ceil(result.usage.total_tokens / 1000)
+          tokensUsed: result.data.metadata?.usage?.total_tokens,
+          creditsDeducted: result.data.metadata?.usage?.total_tokens
+            ? Math.ceil(result.data.metadata.usage.total_tokens / 1000)
             : undefined,
         });
       }
@@ -270,7 +266,7 @@ export function DifyChat({
               ))}
 
               {/* Loading indicator */}
-              {sendMessage.isLoading && (
+              {sendMessageMutation.isPending && (
                 <div className="flex items-start space-x-3">
                   <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-full">
                     <Bot className="h-4 w-4" />
@@ -293,15 +289,15 @@ export function DifyChat({
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder={placeholder}
-              disabled={sendMessage.isLoading}
+              disabled={sendMessageMutation.isPending}
               className="flex-1"
             />
             <Button
               onClick={handleSendMessage}
-              disabled={!input.trim() || sendMessage.isLoading || !canAffordMessage}
+              disabled={!input.trim() || sendMessageMutation.isPending || !canAffordMessage}
               size="icon"
             >
-              {sendMessage.isLoading ? (
+              {sendMessageMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Send className="h-4 w-4" />
@@ -327,7 +323,7 @@ export function DifyChat({
                 setInput(question);
                 handleSendMessage();
               }}
-              loading={sendMessage.isLoading}
+              loading={sendMessageMutation.isPending}
             />
           )}
         </CardContent>

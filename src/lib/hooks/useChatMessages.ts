@@ -40,7 +40,7 @@ export function useChatMessages({ conversationId, userId, welcomeMessage }: UseC
   // React Query hooks for app info and mutations
   const { suggestedQuestions, openingStatement } = useDifyAppInfo();
 
-  const { sendMessage } = useDifyMutations(userId);
+  const { sendMessage, sendMessageMutation } = useDifyMutations(userId);
 
   // Consolidated effect for welcome messages and conversation loading
   useEffect(() => {
@@ -199,6 +199,7 @@ export function useChatMessages({ conversationId, userId, welcomeMessage }: UseC
     suggestedQuestions,
     openingStatement,
     sendMessage,
+    sendMessageMutation,
     addUserMessage,
     addAssistantMessage,
     removeMessage,

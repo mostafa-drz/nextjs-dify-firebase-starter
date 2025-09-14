@@ -20,6 +20,10 @@ export function useDifyMessages(userId: string, conversationId?: string) {
       return [];
     },
     enabled: !!conversationId,
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    staleTime: 2 * 60 * 1000, // 2 minutes
   });
 
   const addMessage = (message: DifyMessage) => {
@@ -31,7 +35,7 @@ export function useDifyMessages(userId: string, conversationId?: string) {
 
   return {
     data: query.data,
-    isLoading: query.isLoading,
+    isLoading: query.isPending,
     error: query.error,
     addMessage,
   };
@@ -47,6 +51,10 @@ export function useDifyAppInfo() {
         openingStatement: 'Hello! How can I help you today?',
       };
     },
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    staleTime: 10 * 60 * 1000, // 10 minutes - app info rarely changes
   });
 
   return {
@@ -64,23 +72,33 @@ export function useDifyConversations(userId: string) {
         {
           id: 'conv-1',
           name: 'Sample Conversation 1',
+          inputs: {},
+          status: 'active',
+          introduction: 'A sample conversation',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         },
         {
           id: 'conv-2',
           name: 'Sample Conversation 2',
+          inputs: {},
+          status: 'active',
+          introduction: 'Another sample conversation',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         },
       ];
     },
     enabled: !!userId,
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   return {
     conversations: query.data || [],
-    isLoading: query.isLoading,
+    isLoading: query.isPending,
     error: query.error,
   };
 }
@@ -133,6 +151,7 @@ export function useDifyMutations(_userId: string) {
 
   return {
     sendMessage: sendMessageMutation.mutateAsync,
+    sendMessageMutation,
     renameConversation: renameConversationMutation,
     deleteConversation: deleteConversationMutation,
   };
