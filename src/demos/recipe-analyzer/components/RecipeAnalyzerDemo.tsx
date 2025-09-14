@@ -11,9 +11,22 @@ import { Button as _Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ImageUploadArea } from './ImageUploadArea';
 import { RecipeAnalyzerChat } from './RecipeAnalyzerChat';
+import { useAuth } from '@/components/auth/AuthContext';
 
 export function RecipeAnalyzerDemo() {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
+  const [uploadedFileId, setUploadedFileId] = useState<string | null>(null);
+  const { user } = useAuth();
+
+  const handleImageUpload = (file: File) => {
+    setUploadedImage(file);
+    // Reset file ID when new image is uploaded
+    setUploadedFileId(null);
+  };
+
+  const handleFileUploaded = (fileId: string) => {
+    setUploadedFileId(fileId);
+  };
 
   return (
     <div className="space-y-6">
@@ -26,7 +39,7 @@ export function RecipeAnalyzerDemo() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ImageUploadArea onImageUpload={setUploadedImage} />
+            <ImageUploadArea onImageUpload={handleImageUpload} />
           </CardContent>
         </Card>
 
@@ -36,7 +49,12 @@ export function RecipeAnalyzerDemo() {
             <CardDescription>Chat with our AI assistant about your uploaded recipe</CardDescription>
           </CardHeader>
           <CardContent>
-            <RecipeAnalyzerChat uploadedImage={uploadedImage} />
+            <RecipeAnalyzerChat
+              uploadedImage={uploadedImage}
+              uploadedFileId={uploadedFileId}
+              onFileUploaded={handleFileUploaded}
+              userId={user?.uid || 'demo-user'}
+            />
           </CardContent>
         </Card>
       </div>
