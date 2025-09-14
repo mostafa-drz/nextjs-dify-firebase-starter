@@ -8,6 +8,7 @@
 
 import { createContext, useContext, ReactNode } from 'react';
 import { User } from '@/types/user';
+import { useAuth } from './AuthContext';
 
 interface UserContextType {
   user: User | null;
@@ -19,10 +20,11 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 interface UserProviderProps {
   children: ReactNode;
-  user?: User | null;
 }
 
-export function UserProvider({ children, user = null }: UserProviderProps) {
+export function UserProvider({ children }: UserProviderProps) {
+  const { user } = useAuth();
+
   const availableCredits = user?.admin?.availableCredits || 0;
 
   const checkCredits = (amount: number) => {

@@ -2,7 +2,11 @@
 
 import { QueryProvider } from './QueryProvider';
 import { UserProvider } from '@/components/auth/UserProvider';
+import { AuthProvider } from '@/components/auth/AuthContext';
 import { AnalyticsProvider } from './AnalyticsProvider';
+import { FirebaseProvider } from './FirebaseProvider';
+import { NextIntlClientProvider } from 'next-intl';
+import { defaultLocale } from '@/i18n/config';
 import { EnvValidation } from '@/components/EnvValidation';
 
 /**
@@ -15,17 +19,32 @@ import { EnvValidation } from '@/components/EnvValidation';
  * because it contains client-side providers and components.
  *
  * @param children - The child components to wrap with providers
+ * @param messages - NextIntl messages for internationalization
  */
-export function ClientProviders({ children }: { children: React.ReactNode }) {
+export function ClientProviders({
+  children,
+  messages,
+}: {
+  children: React.ReactNode;
+  messages: any;
+}) {
+  // Since we only have one locale (en) and use localePrefix: 'as-needed',
+  // we can just use the default locale directly
   return (
-    <QueryProvider>
-      <UserProvider>
-        <AnalyticsProvider>
-          {/* Client-side environment validation */}
-          <EnvValidation />
-          {children}
-        </AnalyticsProvider>
-      </UserProvider>
-    </QueryProvider>
+    <NextIntlClientProvider messages={messages} locale={defaultLocale}>
+      <FirebaseProvider>
+        <AuthProvider>
+          <QueryProvider>
+            <UserProvider>
+              <AnalyticsProvider>
+                {/* Client-side environment validation */}
+                <EnvValidation />
+                {children}
+              </AnalyticsProvider>
+            </UserProvider>
+          </QueryProvider>
+        </AuthProvider>
+      </FirebaseProvider>
+    </NextIntlClientProvider>
   );
 }
