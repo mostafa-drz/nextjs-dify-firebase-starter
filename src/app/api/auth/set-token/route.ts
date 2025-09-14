@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuth } from 'firebase-admin/auth';
+import { getAuthAdmin } from '@/lib/firebase/admin';
 import {
   AUTH_COOKIE_NAME,
   AUTH_COOKIE_MAX_AGE,
@@ -28,7 +28,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
 
   try {
     // Verify the Firebase ID token
-    const decodedToken = await getAuth().verifyIdToken(idToken);
+    const decodedToken = await getAuthAdmin().verifyIdToken(idToken);
 
     // Set HTTP-only cookie
     const response = NextResponse.json({

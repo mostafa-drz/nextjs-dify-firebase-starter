@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import { LazyDifyChat } from '@/components/lazy/LazyComponents';
+import { DifyChat } from '@/components/dify/DifyChat';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { History, MessageSquare } from 'lucide-react';
@@ -30,7 +30,7 @@ export function ChatMainArea({ currentConversationId }: ChatMainAreaProps) {
         </TabsList>
 
         <TabsContent value="chat" className="mt-6">
-          <LazyDifyChat
+          <DifyChat
             name="Demo Assistant"
             placeholder={t('placeholder')}
             welcomeMessage={t('welcome')}

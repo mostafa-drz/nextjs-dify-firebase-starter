@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getAuth } from 'firebase-admin/auth';
+import { getAuthAdmin } from '@/lib/firebase/admin';
 import { AUTH_COOKIE_NAME } from '@/lib/config/auth-config';
 
 /**
@@ -24,9 +24,7 @@ export async function verifyFirebaseToken(request: NextRequest): Promise<AuthRes
     if (!token) {
       return { isAuthenticated: false };
     }
-
-    // ✅ Proper JWT verification with Firebase Admin SDK
-    const decodedToken = await getAuth().verifyIdToken(token);
+    const decodedToken = await getAuthAdmin().verifyIdToken(token);
 
     return {
       isAuthenticated: true,

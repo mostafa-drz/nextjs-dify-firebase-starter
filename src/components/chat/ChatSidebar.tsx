@@ -1,4 +1,5 @@
-import { LazyCreditDisplay, LazyConversationList } from '@/components/lazy/LazyComponents';
+import { CreditDisplay } from '@/components/credits/CreditDisplay';
+import { ConversationList } from '@/components/dify/ConversationList';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 /**
@@ -21,10 +22,10 @@ export function ChatSidebar({
   return (
     <div className="space-y-6 lg:col-span-1">
       {/* Credit Display */}
-      <LazyCreditDisplay variant="card" />
+      <CreditDisplay variant="card" />
 
       {/* Conversation List */}
-      <LazyConversationList
+      <ConversationList
         userId={userId}
         currentConversationId={currentConversationId}
         onConversationSelect={onConversationSelect}

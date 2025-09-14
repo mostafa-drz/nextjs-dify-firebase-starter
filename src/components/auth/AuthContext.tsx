@@ -10,7 +10,7 @@ import {
   User as FirebaseUser,
 } from 'firebase/auth';
 import { doc, onSnapshot, DocumentSnapshot } from 'firebase/firestore';
-import { getFirebaseServices } from '@/lib/utils/firebase-client';
+import { getFirebaseServices } from '@/lib/firebase/client';
 import { initializeNewUser, updateLastLogin } from '@/lib/auth/server-auth';
 import { trackAuth } from '@/lib/analytics';
 import { User } from '@/types/user';
@@ -88,6 +88,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
+      // Set loading to false immediately when we get auth state
+      setLoading(false);
+
       if (firebaseUser && firebaseUser.email) {
         try {
           // Set HTTP-only cookie with Firebase ID token
@@ -133,7 +136,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await clearAuthCookie();
         setUser(null);
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -247,7 +249,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     availableCredits,
     subscription,
   };
-
+  console.group('AuthContext');
+  console.log('value', value);
+  console.groupEnd();
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
