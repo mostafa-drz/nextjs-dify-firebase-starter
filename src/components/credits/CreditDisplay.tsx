@@ -1,6 +1,6 @@
 'use client';
 
-import { useUser } from '@/components/auth/UserProvider';
+import { useAuth } from '@/components/auth/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCredits, shouldWarnLowCredits } from '@/lib/utils/credits';
 import { CREDIT_CONFIG, APP_CONFIG } from '@/lib/config/constants';
@@ -19,7 +19,7 @@ export function CreditDisplay({
   showHistory = false,
   className = '',
 }: CreditDisplayProps) {
-  const { user, availableCredits, subscription } = useUser();
+  const { user, availableCredits, subscription } = useAuth();
 
   if (!user) {
     return null;

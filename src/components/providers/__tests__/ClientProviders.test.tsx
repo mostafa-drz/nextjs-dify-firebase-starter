@@ -6,11 +6,6 @@ import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import { ClientProviders } from '../ClientProviders';
 
-// Mock the EnvValidation component
-vi.mock('@/components/EnvValidation', () => ({
-  EnvValidation: () => <div data-testid="env-validation">Environment Validation</div>,
-}));
-
 // Mock the QueryProvider
 vi.mock('@/components/providers/QueryProvider', () => ({
   QueryProvider: ({ children }: { children: React.ReactNode }) => (
@@ -44,7 +39,6 @@ describe('ClientProviders', () => {
     expect(screen.getByTestId('query-provider')).toBeInTheDocument();
     expect(screen.getByTestId('user-provider')).toBeInTheDocument();
     expect(screen.getByTestId('analytics-provider')).toBeInTheDocument();
-    expect(screen.getByTestId('env-validation')).toBeInTheDocument();
     expect(screen.getByTestId('app-content')).toBeInTheDocument();
   });
 
@@ -58,13 +52,11 @@ describe('ClientProviders', () => {
     const queryProvider = screen.getByTestId('query-provider');
     const userProvider = screen.getByTestId('user-provider');
     const analyticsProvider = screen.getByTestId('analytics-provider');
-    const envValidation = screen.getByTestId('env-validation');
     const appContent = screen.getByTestId('app-content');
 
-    // Check nesting order: QueryProvider > UserProvider > AnalyticsProvider > EnvValidation > AppContent
+    // Check nesting order: QueryProvider > UserProvider > AnalyticsProvider > AppContent
     expect(queryProvider).toContainElement(userProvider);
     expect(userProvider).toContainElement(analyticsProvider);
-    expect(analyticsProvider).toContainElement(envValidation);
     expect(analyticsProvider).toContainElement(appContent);
   });
 

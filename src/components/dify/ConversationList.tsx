@@ -258,15 +258,15 @@ export function ConversationList({
             <Button
               variant="outline"
               onClick={handleRenameDialogClose}
-              disabled={renameConversation.isLoading}
+              disabled={renameConversation.isPending}
             >
               Cancel
             </Button>
             <Button
               onClick={handleRename}
-              disabled={renameConversation.isLoading || !newName.trim()}
+              disabled={renameConversation.isPending || !newName.trim()}
             >
-              {renameConversation.isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {renameConversation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Rename
             </Button>
           </DialogFooter>
@@ -288,16 +288,16 @@ export function ConversationList({
             <Button
               variant="outline"
               onClick={handleDeleteDialogClose}
-              disabled={deleteConversation.isLoading}
+              disabled={deleteConversation.isPending}
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleDelete}
-              disabled={deleteConversation.isLoading}
+              disabled={deleteConversation.isPending}
             >
-              {deleteConversation.isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {deleteConversation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Delete
             </Button>
           </DialogFooter>

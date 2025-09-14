@@ -1,6 +1,5 @@
 'use server';
 
-import { validateServerEnv } from '@/lib/config/env-validation';
 import { ExternalApiError, ValidationError } from '@/lib/errors/server-errors';
 import { checkUserRateLimitByAction } from '@/lib/utils/simple-rate-limit';
 
@@ -116,8 +115,6 @@ export async function uploadDifyFile(
   request: FileUploadRequest
 ): Promise<DifyApiResponse<FileUploadResponse>> {
   try {
-    validateServerEnv();
-
     // Check rate limit before proceeding
     try {
       const rateLimitResult = await checkUserRateLimitByAction(userId, 'file_upload');
@@ -210,8 +207,6 @@ export async function previewDifyFile(
   request: FilePreviewRequest
 ): Promise<DifyApiResponse<Blob>> {
   try {
-    validateServerEnv();
-
     const response = await fetch(`${DIFY_BASE_URL}/files/${request.file_id}/preview`, {
       method: 'GET',
       headers: {

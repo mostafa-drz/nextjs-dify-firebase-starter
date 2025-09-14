@@ -21,7 +21,8 @@
     "test:dify": "node scripts/test-dify-connection.js",
     "validate:production": "node scripts/validate-production.js",
     "setup:environments": "node scripts/setup-environments.js",
-    "prepare": "husky"
+    "prepare": "husky",
+    "firestore:rules:deploy": "firebase deploy --only firestore:rules"
   },
   "dependencies": {
     "@microsoft/fetch-event-source": "^2.0.1",

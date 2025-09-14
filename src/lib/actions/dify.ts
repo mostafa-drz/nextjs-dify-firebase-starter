@@ -12,7 +12,6 @@ import {
   releaseReservedCredits,
 } from '@/lib/actions/credits';
 import { calculateCreditsFromTokens } from '@/lib/utils/credits';
-import { validateServerEnv } from '@/lib/config/env-validation';
 import { ExternalApiError, ValidationError } from '@/lib/errors/server-errors';
 import { checkUserRateLimitByAction } from '@/lib/utils/simple-rate-limit';
 import { validateChatInput, validateConversationId } from '@/lib/utils/input-validation';
@@ -94,9 +93,6 @@ export async function sendDifyMessage(
   userId: string,
   request: DifyChatRequest
 ): Promise<DifyApiResponse<DifyConversationResponse>> {
-  // Validate environment variables
-  validateServerEnv();
-
   // Validate input
   const chatValidation = validateChatInput(request.query);
   if (!chatValidation.valid) {

@@ -7,7 +7,6 @@ import { AnalyticsProvider } from './AnalyticsProvider';
 import { FirebaseProvider } from './FirebaseProvider';
 import { NextIntlClientProvider } from 'next-intl';
 import { defaultLocale } from '@/i18n/config';
-import { EnvValidation } from '@/components/EnvValidation';
 
 /**
  * ClientProviders - Client-side provider wrapper
@@ -36,11 +35,7 @@ export function ClientProviders({
         <AuthProvider>
           <QueryProvider>
             <UserProvider>
-              <AnalyticsProvider>
-                {/* Client-side environment validation */}
-                <EnvValidation />
-                {children}
-              </AnalyticsProvider>
+              <AnalyticsProvider>{children}</AnalyticsProvider>
             </UserProvider>
           </QueryProvider>
         </AuthProvider>
