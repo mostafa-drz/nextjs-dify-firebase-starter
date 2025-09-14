@@ -1,6 +1,6 @@
 'use server';
 
-import { getFirestoreAdmin, FieldValue } from '@/lib/utils/firebase-admin';
+import { getFirestoreAdmin, FieldValue } from '@/lib/firebase/admin';
 import { CREDIT_CONFIG } from '@/lib/config/constants';
 
 /**

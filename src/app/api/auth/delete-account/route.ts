@@ -1,5 +1,7 @@
+// TODO: This approach is wrong. We should delete user data from Firestore , then Firebase Auth and Dify conevrsations : I need to revisit this later, but this implemntation here doesn't match even firestore schema
+
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb, adminAuth } from '@/lib/utils/firebase-admin';
+import { adminDb, adminAuth } from '@/lib/firebase/admin';
 import { QueryDocumentSnapshot } from 'firebase-admin/firestore';
 
 /**

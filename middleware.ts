@@ -20,11 +20,6 @@ const intlMiddleware = createIntlMiddleware({
 });
 
 export async function middleware(request: NextRequest) {
-  // Handle i18n routing first
-  const intlResponse = intlMiddleware(request);
-  if (intlResponse) {
-    return intlResponse;
-  }
   const { pathname } = request.nextUrl;
 
   // Skip middleware for static files and API routes
@@ -37,14 +32,20 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Get authentication status using Firebase token verification
-  const authResult = await getAuthStatus(request);
-  const isAuthenticated = authResult.isAuthenticated;
-
-  // Handle auth callback route
+  // Handle auth callback route BEFORE i18n middleware
   if (pathname === '/auth/callback') {
     return NextResponse.next();
   }
+
+  // Handle i18n routing
+  const intlResponse = intlMiddleware(request);
+  if (intlResponse) {
+    return intlResponse;
+  }
+
+  // Get authentication status using Firebase token verification
+  const authResult = await getAuthStatus(request);
+  const isAuthenticated = authResult.isAuthenticated;
 
   // Redirect authenticated users away from auth pages
   if (isAuthenticated && AUTH_ROUTES.includes(pathname)) {
