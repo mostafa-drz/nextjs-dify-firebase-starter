@@ -21,7 +21,7 @@ export default function DemosPage() {
           title="Recipe Analyzer"
           description="Upload food images and get AI-powered meal planning with nutritional insights"
           href="/demos/recipe-analyzer"
-          status="coming-soon"
+          status="available"
         />
       </div>
     </div>

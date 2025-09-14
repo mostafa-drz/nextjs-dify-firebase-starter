@@ -7,8 +7,6 @@ import { PageContainer } from '@/components/layout/PageContainer';
 import { ChatHeader } from '@/components/chat/ChatHeader';
 import { ChatSidebar } from '@/components/chat/ChatSidebar';
 import { ChatMainArea } from '@/components/chat/ChatMainArea';
-import { Card, CardContent } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
 
 /**
  * Client-side chat page component
@@ -16,21 +14,10 @@ import { Loader2 } from 'lucide-react';
  */
 export function ChatPageClient() {
   const { user } = useUser();
+  console.log('user', user);
   const [currentConversationId, setCurrentConversationId] = useState<string | undefined>();
-
-  // Middleware handles auth redirects, so user should always be available here
-  // But we keep this as a safety check
   if (!user) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Card className="mx-auto w-full max-w-md">
-          <CardContent className="flex flex-col items-center justify-center py-8">
-            <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
-            <p className="text-muted-foreground mt-4 text-sm">Loading...</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return null;
   }
 
   const handleConversationSelect = (conversationId: string) => {

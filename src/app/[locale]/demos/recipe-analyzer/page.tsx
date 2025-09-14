@@ -4,8 +4,7 @@
  * @version 1.0.0
  */
 
-import { RecipeAnalyzerDemo } from '@/demos/recipe-analyzer/components/RecipeAnalyzerDemo';
-import { DemoLayout } from '@/demos/shared/DemoLayout';
+import { RecipeAnalyzerDemoClient } from './RecipeAnalyzerDemoClient';
 
 /**
  * Smart Recipe Analyzer & Meal Planner demo page
@@ -15,12 +14,5 @@ import { DemoLayout } from '@/demos/shared/DemoLayout';
  * @returns JSX element for the recipe analyzer demo page
  */
 export default function RecipeAnalyzerPage() {
-  return (
-    <DemoLayout
-      title="What Can I Cook?"
-      description="Snap a photo of your ingredients and get instant recipe suggestions"
-    >
-      <RecipeAnalyzerDemo />
-    </DemoLayout>
-  );
+  return <RecipeAnalyzerDemoClient />;
 }
