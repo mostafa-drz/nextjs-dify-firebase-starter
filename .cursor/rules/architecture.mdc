@@ -24,6 +24,30 @@ description: Next.js server/client separation and Firebase architecture guidelin
 - **Server-only**: `API_KEY`, `SECRET`, `PRIVATE_KEY`, `TOKEN`
 - **Note**: Server components can't access `NEXT_PUBLIC_*` vars, client components can't access server-only vars
 
+## Provider Architecture (CRITICAL)
+
+**Provider placement is critical for SSR/client-side hydration:**
+
+- **Root Layout (`src/app/layout.tsx`)**: Server-side only
+  - ✅ Error boundaries, HTML structure, fonts, metadata
+  - ❌ NEVER put `'use client'` components here
+  - ❌ NEVER put components using client hooks (`usePathname`, `useState`, etc.)
+
+- **ClientProviders (`src/components/providers/ClientProviders.tsx`)**: Client-side only
+  - ✅ All `'use client'` components
+  - ✅ Components using client hooks (`usePathname`, `useState`, `useEffect`)
+  - ✅ Firebase providers, analytics, internationalization
+  - ✅ Any component that needs browser APIs
+
+**Common mistakes that cause hydration errors:**
+
+- Putting `FirebaseProvider` (has `'use client'`) in root layout
+- Putting `NextIntlClientProvider` in root layout instead of ClientProviders
+- Putting `AnalyticsProvider` (uses `usePathname`) in root layout
+- Forgetting to pass `locale` prop to `NextIntlClientProvider` when moved to client-side
+- Using `localePrefix: 'as-needed'` means default locale (`en`) doesn't appear in URLs
+- Root page should redirect to `/chat`, not `/${defaultLocale}/chat`
+
 ## File Organization
 
 - **Server Actions**: `src/lib/actions/[service]-[operation].ts`

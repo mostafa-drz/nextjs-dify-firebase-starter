@@ -28,4 +28,11 @@ export const db = getFirestore(app);
 - **Simple error handling** over complex error hierarchies
 - **Essential tests** over exhaustive test coverage
 
-**Remember**: The best code is the code you don't have to write!
+## MVP Focus:
+
+- **Only add code that is absolutely necessary** for the MVP
+- **Avoid bulletproofing** - don't add extra safety layers unless critical
+- **Focus on 10k Dify AI integration** - anything beyond this scope is overkill
+- **Extra code is not appreciated** - keep the boilerplate minimal and focused
+
+**Remember**: The best code is the code you don't have to write! This is an MVP boilerplate, not a production enterprise system.

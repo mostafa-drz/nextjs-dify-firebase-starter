@@ -1,0 +1,66 @@
+# AI Task Commands
+
+This document defines common AI task commands and their expected workflows.
+
+## "stage them in related groups"
+
+**Command**: "stage them in related groups" or "stage changes in logical groups"
+
+**Expected Workflow**:
+
+1. **Analyze** all unstaged changes and group them logically by purpose/functionality
+2. **Stage ONE group at a time** using `git add`
+3. **Wait for user approval** before proceeding to next group
+4. **Present each group** with clear description of what it contains
+5. **Only stage next group** after user says "ok", "approved", "next", etc.
+
+**Example Groups**:
+
+- Bug fixes
+- Feature additions
+- Refactoring
+- Configuration changes
+- Documentation updates
+- Test updates
+
+**What NOT to do**:
+
+- ❌ Stage all groups at once
+- ❌ Assume user wants everything staged
+- ❌ Skip waiting for approval between groups
+
+**What TO do**:
+
+- ✅ Stage one logical group
+- ✅ Explain what's in the group
+- ✅ Wait for user approval
+- ✅ Only then proceed to next group
+
+## "review them"
+
+**Command**: "review them" or "review changes"
+
+**Expected Workflow**:
+
+1. Show git diff for staged changes
+2. Explain what each change does
+3. Highlight any potential issues
+4. Wait for user decision (commit, unstage, modify)
+
+## "commit them separately"
+
+**Command**: "commit them separately"
+
+**Expected Workflow**:
+
+1. Create individual commits for each logical group
+2. Use descriptive commit messages
+3. One commit per group, not one big commit
+4. Wait for approval before each commit
+
+## General Principles
+
+- **Always wait for user approval** before proceeding to next step
+- **One task at a time** - don't batch multiple operations
+- **Explain what you're doing** before doing it
+- **Ask for clarification** if unsure about grouping or approach
