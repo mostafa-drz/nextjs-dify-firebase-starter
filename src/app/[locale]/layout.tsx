@@ -1,23 +1,5 @@
 import type { Metadata } from 'next';
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import { Geist, Geist_Mono } from 'next/font/google';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { AuthErrorBoundary } from '@/components/error-boundaries/AuthErrorBoundary';
-import { FirebaseProvider } from '@/components/providers/FirebaseProvider';
-import { ClientProviders } from '@/components/providers/ClientProviders';
 import { locales } from '@/i18n/config';
-import '../globals.css';
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
 
 type Props = {
   children: React.ReactNode;
@@ -37,23 +19,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function LocaleLayout({ children, params }: Props) {
-  const { locale } = await params;
-  const messages = await getMessages();
-
-  return (
-    <html lang={locale}>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ErrorBoundary>
-          <NextIntlClientProvider messages={messages}>
-            <FirebaseProvider>
-              <AuthErrorBoundary>
-                <ClientProviders>{children}</ClientProviders>
-              </AuthErrorBoundary>
-            </FirebaseProvider>
-          </NextIntlClientProvider>
-        </ErrorBoundary>
-      </body>
-    </html>
-  );
+export default async function LocaleLayout({ children }: Props) {
+  return <>{children}</>;
 }
