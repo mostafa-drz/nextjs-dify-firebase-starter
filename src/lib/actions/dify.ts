@@ -62,6 +62,15 @@ async function makeDifyRequest(
         errorData = { message: `HTTP ${response.status}: ${response.statusText}` };
       }
 
+      // Log detailed error information for debugging
+      console.error('Dify API Error Details:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: url,
+        errorData: errorData,
+        requestBody: options.body ? JSON.parse(options.body as string) : null,
+      });
+
       throw new DifyApiError(
         errorData.message || `HTTP ${response.status}: ${response.statusText}`,
         response.status,
@@ -176,17 +185,29 @@ export async function sendDifyMessage(
     let data: DifyConversationResponse;
 
     try {
+      // Prepare the request payload
+      const requestPayload: any = {
+        query: chatValidation.sanitized!, // Use sanitized input
+        user: userId,
+        inputs: request.inputs || {}, // Include inputs parameter (required by Dify API)
+        conversation_id: request.conversation_id ? conversationValidation.sanitized : undefined,
+        response_mode: 'blocking', // Always use blocking for credit tracking
+      };
+
+      // Only include files if they exist (not all conversations have file uploads)
+      if (request.files && request.files.length > 0) {
+        requestPayload.files = request.files;
+      }
+
+      // Log the request payload for debugging
+      console.log('Dify API Request Payload:', JSON.stringify(requestPayload, null, 2));
+
       // Make API call - only pass official Dify parameters
       apiResponse = await makeDifyRequest(
         '/chat-messages',
         {
           method: 'POST',
-          body: JSON.stringify({
-            ...request,
-            query: chatValidation.sanitized!, // Use sanitized input
-            conversation_id: request.conversation_id ? conversationValidation.sanitized : undefined,
-            response_mode: 'blocking', // Always use blocking for credit tracking
-          }),
+          body: JSON.stringify(requestPayload),
         },
         DIFY_API_KEY || ''
       );

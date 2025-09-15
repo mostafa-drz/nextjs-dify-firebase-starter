@@ -249,9 +249,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     availableCredits,
     subscription,
   };
-  console.group('AuthContext');
-  console.log('value', value);
-  console.groupEnd();
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 

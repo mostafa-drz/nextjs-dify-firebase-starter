@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { useFileUpload } from '@/lib/hooks/useFileUpload';
 import { sendDifyMessage } from '@/lib/actions/dify';
 import { DifyChatRequest } from '@/types/dify';
+import { buildCommonInputs } from '@/lib/utils/input-builder';
 
 interface RecipeAnalyzerChatProps {
   uploadedImage: File | null;
@@ -89,9 +90,16 @@ export function RecipeAnalyzerChat({
     setError(null);
 
     try {
+      // Build inputs for the Dify request
+      const inputs = buildCommonInputs(
+        { id: userId }, // User object
+        'en' // Locale
+      );
+
       const chatRequest: DifyChatRequest = {
         query: message.trim(),
         user: userId,
+        inputs,
         files: [
           {
             type: 'image',
