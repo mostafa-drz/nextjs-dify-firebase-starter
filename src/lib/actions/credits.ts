@@ -45,11 +45,11 @@ export async function deductCredits(
 
       // Create transaction record
       const transactionRecord: Omit<CreditTransaction, 'id' | 'timestamp'> & {
-        timestamp: FieldValue;
+        timestamp: number;
       } = {
         amount: -creditsToDeduct,
         operation,
-        timestamp: FieldValue.serverTimestamp(),
+        timestamp: Date.now(),
         metadata,
       };
 
@@ -104,11 +104,11 @@ export async function addCredits(
 
       // Create transaction record
       const transactionRecord: Omit<CreditTransaction, 'id' | 'timestamp'> & {
-        timestamp: FieldValue;
+        timestamp: number;
       } = {
         amount: creditsToAdd,
         operation: reason,
-        timestamp: FieldValue.serverTimestamp(),
+        timestamp: Date.now(),
         metadata,
       };
 
@@ -209,7 +209,7 @@ export async function reserveCredits(
         reservationId,
         amount: creditsToReserve,
         operation,
-        timestamp: FieldValue.serverTimestamp(),
+        timestamp: Date.now(),
         metadata,
       };
 
@@ -286,11 +286,11 @@ export async function confirmReservedCredits(
 
       // Create transaction record
       const transactionRecord: Omit<CreditTransaction, 'id' | 'timestamp'> & {
-        timestamp: FieldValue;
+        timestamp: number;
       } = {
         amount: -actualCreditsNeeded,
         operation,
-        timestamp: FieldValue.serverTimestamp(),
+        timestamp: Date.now(),
         metadata: {
           ...metadata,
           reservationId,
