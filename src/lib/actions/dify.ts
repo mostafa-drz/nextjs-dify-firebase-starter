@@ -156,7 +156,7 @@ export async function sendDifyMessage(
       reservationId,
       {
         difyAppToken: DIFY_API_KEY?.substring(0, 8) + '...',
-        sessionId: request.conversation_id,
+        ...(request.conversation_id && { sessionId: request.conversation_id }),
         estimatedTokens: 50,
       }
     );
@@ -208,7 +208,7 @@ export async function sendDifyMessage(
         {
           difyAppToken: DIFY_API_KEY?.substring(0, 8) + '...',
           conversationId: data.conversation_id,
-          sessionId: request.conversation_id,
+          ...(request.conversation_id && { sessionId: request.conversation_id }),
         }
       );
 

@@ -6,6 +6,59 @@ import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import { ClientProviders } from '../ClientProviders';
 
+// Mock Firebase Auth
+vi.mock('firebase/auth', () => ({
+  getAuth: vi.fn(() => ({
+    onAuthStateChanged: vi.fn(() => vi.fn()), // Returns unsubscribe function
+    signInWithEmailLink: vi.fn(),
+    signOut: vi.fn(),
+    currentUser: null,
+  })),
+  onAuthStateChanged: vi.fn(() => vi.fn()),
+  signInWithEmailLink: vi.fn(),
+  signOut: vi.fn(),
+}));
+
+// Mock Firebase client to prevent analytics initialization
+vi.mock('@/lib/firebase/client', () => ({
+  auth: {
+    onAuthStateChanged: vi.fn(() => vi.fn()), // Returns unsubscribe function
+    signInWithEmailLink: vi.fn(),
+    signOut: vi.fn(),
+    currentUser: null,
+  },
+  db: {},
+  analytics: null,
+  getFirebaseServices: () => ({
+    auth: {
+      onAuthStateChanged: vi.fn(() => vi.fn()),
+      signInWithEmailLink: vi.fn(),
+      signOut: vi.fn(),
+      currentUser: null,
+    },
+    db: {},
+    analytics: null,
+  }),
+  getFirebaseAnalytics: () => null,
+  default: {},
+}));
+
+// Mock Firebase Analytics
+vi.mock('firebase/analytics', () => ({
+  getAnalytics: vi.fn(() => null),
+  logEvent: vi.fn(),
+}));
+
+// Mock the analytics module
+vi.mock('@/lib/analytics', () => ({
+  trackPageView: vi.fn(),
+  trackEvent: vi.fn(),
+  trackAuth: vi.fn(),
+  trackCredits: vi.fn(),
+  trackChat: vi.fn(),
+  trackExternalLink: vi.fn(),
+}));
+
 // Mock the QueryProvider
 vi.mock('@/components/providers/QueryProvider', () => ({
   QueryProvider: ({ children }: { children: React.ReactNode }) => (
