@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Bot, User, Send, Square, AlertTriangle } from 'lucide-react';
+import { Bot, User, Send, AlertTriangle } from 'lucide-react';
 
 /**
  * Example component showing streaming chat with proper credit management
@@ -21,20 +21,17 @@ export function StreamingWithCreditsExample() {
   >([]);
 
   const {
-    isStreaming,
-    currentMessage,
+    isSending,
     error: streamingError,
-    startStreaming,
-    stopStreaming,
+    sendMessage,
     clearError,
     creditsDeducted,
   } = useStreamingChat({
     userId: user?.uid || '',
-    enableStreaming: true,
   });
 
   const handleSendMessage = useCallback(async () => {
-    if (!input.trim() || isStreaming || !user) return;
+    if (!input.trim() || isSending || !user) return;
 
     const userMessage = {
       id: `user-${Date.now()}`,
@@ -43,35 +40,30 @@ export function StreamingWithCreditsExample() {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const messageContent = input.trim();
     setInput('');
     clearError();
 
     try {
-      const finalEvent = await startStreaming(
-        {
-          query: userMessage.content,
+      await sendMessage(
+        messageContent,
+        (response) => {
+          const assistantMessage = {
+            id: `assistant-${Date.now()}`,
+            role: 'assistant' as const,
+            content: response.answer || '',
+            creditsDeducted: creditsDeducted,
+          };
+          setMessages((prev) => [...prev, assistantMessage]);
         },
-        (event) => {
-          // Handle streaming events
-          if (event.event === 'message_end' && event.metadata?.usage) {
-            const assistantMessage = {
-              id: event.message_id || `assistant-${Date.now()}`,
-              role: 'assistant' as const,
-              content: currentMessage,
-              creditsDeducted: Math.ceil(event.metadata.usage.total_tokens / 1000),
-            };
-            setMessages((prev) => [...prev, assistantMessage]);
-          }
+        (error) => {
+          console.error('Chat error:', error);
         }
       );
-
-      if (finalEvent?.event === 'error') {
-        console.error('Streaming error:', finalEvent);
-      }
     } catch (error) {
       console.error('Failed to send message:', error);
     }
-  }, [input, isStreaming, user, startStreaming, currentMessage, clearError]);
+  }, [input, isSending, user, sendMessage, clearError, creditsDeducted]);
 
   const handleKeyPress = useCallback(
     (e: React.KeyboardEvent) => {
@@ -148,15 +140,14 @@ export function StreamingWithCreditsExample() {
           ))}
 
           {/* Streaming message */}
-          {isStreaming && currentMessage && (
+          {isSending && (
             <div className="flex items-start space-x-3">
               <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-full">
                 <Bot className="h-4 w-4" />
               </div>
               <div className="bg-muted max-w-[80%] rounded-lg px-3 py-2">
-                <div className="text-sm whitespace-pre-wrap">{currentMessage}</div>
-                <div className="mt-1 text-xs opacity-70">
-                  <span>Streaming...</span>
+                <div className="text-sm">
+                  <span>Sending message...</span>
                 </div>
               </div>
             </div>
@@ -170,23 +161,17 @@ export function StreamingWithCreditsExample() {
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Ask me anything with streaming..."
-            disabled={isStreaming}
+            disabled={isSending}
             className="flex-1"
           />
-          {isStreaming ? (
-            <Button onClick={stopStreaming} variant="destructive" size="icon">
-              <Square className="h-4 w-4" />
-            </Button>
-          ) : (
-            <Button onClick={handleSendMessage} disabled={!input.trim() || isStreaming} size="icon">
-              <Send className="h-4 w-4" />
-            </Button>
-          )}
+          <Button onClick={handleSendMessage} disabled={!input.trim() || isSending} size="icon">
+            <Send className="h-4 w-4" />
+          </Button>
         </div>
 
         {/* Credit Info */}
         <div className="text-muted-foreground text-xs">
-          {isStreaming && <span className="text-green-600">• Streaming active</span>}
+          {isSending && <span className="text-green-600">• Sending message</span>}
           {creditsDeducted && <span className="ml-2">• Credits deducted: {creditsDeducted}</span>}
           <div className="mt-1 text-xs text-blue-600">
             💡 Credits are only deducted on successful completion

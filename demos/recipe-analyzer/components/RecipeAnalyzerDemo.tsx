@@ -42,7 +42,7 @@ export function RecipeAnalyzerDemo() {
             <CardDescription>Ask what you can cook with your ingredients</CardDescription>
           </CardHeader>
           <CardContent>
-            <RecipeAnalyzerChat uploadedImage={uploadedImage} uploadedFileId={uploadedFileId} />
+            <RecipeAnalyzerChat uploadedImage={uploadedImage} />
           </CardContent>
         </Card>
       </div>

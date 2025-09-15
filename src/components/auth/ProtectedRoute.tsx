@@ -1,6 +1,6 @@
 'use client';
 
-import { useUser } from './UserProvider';
+import { useAuth } from './AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import { LoginForm } from './LoginForm';
@@ -11,7 +11,7 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, fallback }: ProtectedRouteProps) {
-  const { user, loading } = useUser();
+  const { user, loading } = useAuth();
 
   // Show loading state
   if (loading) {

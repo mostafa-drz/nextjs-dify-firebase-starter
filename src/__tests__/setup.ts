@@ -41,12 +41,6 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
-// Mock Next.js internationalization
-vi.mock('next-intl', () => ({
-  useLocale: () => 'en',
-  useTranslations: () => (key: string) => key,
-}));
-
 // Suppress console errors in tests unless explicitly testing them
 const originalError = console.error;
 beforeAll(() => {

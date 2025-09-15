@@ -91,6 +91,7 @@ export function ImageUploadArea({
       <Card className="border-2 border-green-300 bg-green-50">
         <CardContent className="p-4">
           <div className="flex items-center space-x-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={URL.createObjectURL(uploadedFile)}
               alt="Uploaded recipe"
@@ -99,6 +100,9 @@ export function ImageUploadArea({
             <div className="flex-1">
               <h3 className="text-sm font-semibold text-green-800">Ingredients Ready! 🍳</h3>
               <p className="text-xs text-green-600">{uploadedFile.name}</p>
+              {uploadedFileId && (
+                <p className="font-mono text-xs text-gray-500">ID: {uploadedFileId}</p>
+              )}
               <p className="text-xs text-green-600">Now ask what you can cook!</p>
             </div>
           </div>

@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AuthErrorBoundary } from '@/components/error-boundaries/AuthErrorBoundary';
 import { ClientProviders } from '@/components/providers/ClientProviders';
-import { getMessages } from 'next-intl/server';
 import './globals.css';
 
 const geistSans = Geist({
@@ -26,14 +25,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const messages = await getMessages();
-
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ErrorBoundary>
           <AuthErrorBoundary>
-            <ClientProviders messages={messages}>{children}</ClientProviders>
+            <ClientProviders>{children}</ClientProviders>
           </AuthErrorBoundary>
         </ErrorBoundary>
       </body>

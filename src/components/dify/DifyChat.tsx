@@ -20,7 +20,6 @@ import { SuggestedQuestions } from './SuggestedQuestions';
 import { trackChat } from '@/lib/analytics';
 import { useChatMessages } from '@/lib/hooks/useChatMessages';
 import { buildCommonInputs } from '@/lib/utils/input-builder';
-import { useLocale } from 'next-intl';
 // Rate limiting is handled server-side in the API actions
 
 export function DifyChat({
@@ -34,7 +33,7 @@ export function DifyChat({
   const [input, setInput] = useState('');
   const [conversationId, setConversationId] = useState<string | undefined>(initialConversationId);
   const [error, setError] = useState<string | null>(null);
-  const locale = useLocale();
+  const locale = 'en'; // Hardcoded to English
 
   // Use the consolidated chat messages hook
   const {

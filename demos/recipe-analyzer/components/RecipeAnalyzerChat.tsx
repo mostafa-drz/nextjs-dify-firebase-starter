@@ -19,10 +19,9 @@ import {
 
 interface RecipeAnalyzerChatProps {
   uploadedImage: File | null;
-  uploadedFileId?: string;
 }
 
-export function RecipeAnalyzerChat({ uploadedImage, uploadedFileId }: RecipeAnalyzerChatProps) {
+export function RecipeAnalyzerChat({ uploadedImage }: RecipeAnalyzerChatProps) {
   const [message, setMessage] = useState('');
   const { user } = useAuth();
   const userId = user?.uid || 'demo-user';
