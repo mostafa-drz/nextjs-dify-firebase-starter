@@ -29,21 +29,21 @@ export const mockDifyChatResponseWithFiles: DifyConversationResponse = {
 export const mockDifyConversations: DifyConversation[] = [
   {
     id: 'conv-1',
-    name: 'Test Conversation 1',
+    name: 'Recipe Analysis',
     inputs: {},
-    status: 'normal',
-    introduction: 'Welcome to the conversation',
+    status: 'active',
+    introduction: 'Analysis of pasta recipe with nutritional information',
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-01T00:00:00Z',
   },
   {
     id: 'conv-2',
-    name: 'Test Conversation 2',
+    name: 'Another Recipe Analysis',
     inputs: {
       user_preference: 'detailed_explanations',
     },
-    status: 'normal',
-    introduction: 'Welcome to the conversation',
+    status: 'active',
+    introduction: 'Discussion about cooking techniques for chicken',
     created_at: '2024-01-02T00:00:00Z',
     updated_at: '2024-01-02T00:00:00Z',
   },

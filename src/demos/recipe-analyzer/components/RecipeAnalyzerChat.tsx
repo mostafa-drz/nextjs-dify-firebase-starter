@@ -6,11 +6,11 @@
  * @version 1.0.0
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useFileUpload } from '@/lib/hooks/useFileUpload';
-import { sendDifyMessage } from '@/lib/actions/dify';
+import { sendDifyMessage, getDifyConversationMessages } from '@/lib/actions/dify';
 import { DifyChatRequest } from '@/types/dify';
 import { buildCommonInputs } from '@/lib/utils/input-builder';
 
@@ -19,6 +19,7 @@ interface RecipeAnalyzerChatProps {
   uploadedFileId: string | null;
   onFileUploaded: (fileId: string) => void;
   userId: string;
+  conversationId?: string;
 }
 
 interface ChatMessage {
@@ -33,6 +34,7 @@ export function RecipeAnalyzerChat({
   uploadedFileId,
   onFileUploaded,
   userId,
+  conversationId,
 }: RecipeAnalyzerChatProps) {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -41,6 +43,32 @@ export function RecipeAnalyzerChat({
   const [error, setError] = useState<string | null>(null);
 
   const { uploadFile } = useFileUpload(userId);
+
+  // Load conversation messages when conversationId changes
+  useEffect(() => {
+    const loadConversationMessages = async () => {
+      if (!conversationId || !userId) return;
+
+      try {
+        const result = await getDifyConversationMessages(userId, conversationId, 50);
+
+        if (result.success && result.data?.data) {
+          const conversationMessages = result.data.data.map((msg: any) => ({
+            id: msg.id,
+            text: msg.query || msg.answer || '',
+            sender: (msg.query ? 'user' : 'ai') as 'user' | 'ai',
+            timestamp: msg.created_at,
+          }));
+          setMessages(conversationMessages);
+        }
+      } catch (err) {
+        console.error('Failed to load conversation messages:', err);
+        setError('Failed to load conversation history');
+      }
+    };
+
+    loadConversationMessages();
+  }, [conversationId, userId]);
 
   const handleFileUpload = useCallback(async () => {
     if (!uploadedImage || uploadedFileId) return; // Already uploaded or no image
@@ -108,6 +136,7 @@ export function RecipeAnalyzerChat({
           },
         ],
         response_mode: 'blocking',
+        ...(conversationId && { conversation_id: conversationId }),
       };
 
       const result = await sendDifyMessage(userId, chatRequest);
@@ -128,7 +157,7 @@ export function RecipeAnalyzerChat({
     } finally {
       setIsSending(false);
     }
-  }, [message, uploadedFileId, userId, isSending]);
+  }, [message, uploadedFileId, userId, isSending, conversationId]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -144,6 +173,12 @@ export function RecipeAnalyzerChat({
 
   return (
     <div className="space-y-4">
+      {conversationId && (
+        <div className="rounded-lg bg-blue-50 p-4 text-sm text-blue-800">
+          💬 Loaded conversation: {conversationId}
+        </div>
+      )}
+
       {!uploadedImage ? (
         <div className="rounded-lg bg-yellow-50 p-4 text-sm text-yellow-800">
           Please upload an image first to start the analysis.
