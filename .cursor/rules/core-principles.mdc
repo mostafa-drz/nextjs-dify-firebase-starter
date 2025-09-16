@@ -1,0 +1,35 @@
+---
+alwaysApply: true
+description: This defines our core principles in building software, always consider them
+---
+
+# Minimal Implementation Rule
+
+## Core Principle
+
+**Always ask "What is the most minimal standard thing I can implement?" before adding any feature or script.**
+
+## Guidelines
+
+- For any extra functionality, confirm with the user first
+- Think minimal - that's the gateway to success
+- Avoid creating multiple scripts when one simple solution will do
+- Prefer inline solutions over separate files when possible
+
+## Examples
+
+- ✅ **Good**: One simple script `dev:clean` that clears caches, installs deps, and starts dev
+- ❌ **Bad**: Multiple separate scripts for cleaning, fresh installs, cache clearing, etc.
+
+## Implementation Checklist
+
+Before implementing anything:
+
+1. What is the most minimal standard approach?
+2. Can this be done with existing tools/scripts?
+3. Do I need to ask the user before adding extra features?
+4. Is this the simplest solution that works?
+
+## Remember
+
+**Minimal. Standard. Done.**
