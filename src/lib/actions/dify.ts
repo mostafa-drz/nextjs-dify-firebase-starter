@@ -453,7 +453,9 @@ export async function deleteDifyConversation(
       DIFY_API_KEY || ''
     );
 
-    const data = await response.json();
+    // Check if response has content before parsing JSON
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : { result: 'success' };
 
     return {
       success: true,

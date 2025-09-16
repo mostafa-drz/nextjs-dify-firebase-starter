@@ -8,7 +8,12 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DifyMessage, DifyConversationResponse } from '@/types/dify';
-import { getDifyConversations, getDifyConversationMessages } from '@/lib/actions/dify';
+import {
+  getDifyConversations,
+  getDifyConversationMessages,
+  renameDifyConversation,
+  deleteDifyConversation,
+} from '@/lib/actions/dify';
 
 export function useDifyMessages(userId: string, conversationId?: string) {
   const queryClient = useQueryClient();
@@ -138,7 +143,7 @@ export function useDifyConversations(userId: string) {
   };
 }
 
-export function useDifyMutations(_userId: string) {
+export function useDifyMutations(userId: string) {
   const queryClient = useQueryClient();
 
   const sendMessageMutation = useMutation({
@@ -159,15 +164,8 @@ export function useDifyMutations(_userId: string) {
   });
 
   const renameConversationMutation = useMutation({
-    mutationFn: async ({
-      conversationId: _conversationId,
-      name: _name,
-    }: {
-      conversationId: string;
-      name: string;
-    }) => {
-      // Mock implementation
-      return { success: true };
+    mutationFn: async ({ conversationId, name }: { conversationId: string; name: string }) => {
+      return await renameDifyConversation(userId, conversationId, name);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dify-conversations'] });
@@ -175,9 +173,8 @@ export function useDifyMutations(_userId: string) {
   });
 
   const deleteConversationMutation = useMutation({
-    mutationFn: async (_conversationId: string) => {
-      // Mock implementation
-      return { success: true };
+    mutationFn: async (conversationId: string) => {
+      return await deleteDifyConversation(userId, conversationId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dify-conversations'] });

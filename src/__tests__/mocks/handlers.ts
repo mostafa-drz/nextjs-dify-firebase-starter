@@ -54,6 +54,20 @@ export const handlers = [
     });
   }),
 
+  // Dify conversation rename endpoint
+  http.post('https://api.dify.ai/v1/conversations/:conversationId/name', () => {
+    return HttpResponse.json({
+      result: 'success',
+    });
+  }),
+
+  // Dify conversation delete endpoint
+  http.delete('https://api.dify.ai/v1/conversations/:conversationId', () => {
+    return HttpResponse.json({
+      result: 'success',
+    });
+  }),
+
   // Mock Firebase Auth endpoints
   http.post('https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode', () => {
     return HttpResponse.json({

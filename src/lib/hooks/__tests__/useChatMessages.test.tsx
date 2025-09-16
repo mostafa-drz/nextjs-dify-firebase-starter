@@ -60,7 +60,12 @@ describe('useChatMessages', () => {
     });
 
     vi.mocked(useDifyAppInfo).mockReturnValue(mockAppInfo);
-    vi.mocked(useDifyMutations).mockReturnValue(mockMutations);
+    vi.mocked(useDifyMutations).mockReturnValue({
+      ...mockMutations,
+      sendMessageMutation: {} as any,
+      renameConversation: {} as any,
+      deleteConversation: {} as any,
+    });
   });
 
   describe('initialization', () => {
