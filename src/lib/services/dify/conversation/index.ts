@@ -45,6 +45,18 @@ export class ConversationService extends BaseDifyService {
     } = {}
   ): Promise<DifyApiResponse<ConversationsListResponse>> {
     try {
+      // Validate that userId is provided
+      if (!this.userId) {
+        return {
+          success: false,
+          error: {
+            code: 'INVALID_USER_ID',
+            message: 'User ID is required',
+            status: 400,
+          },
+        };
+      }
+
       const params = new URLSearchParams({
         user: this.userId,
         ...(options.limit && { limit: options.limit.toString() }),
@@ -97,6 +109,18 @@ export class ConversationService extends BaseDifyService {
     } = {}
   ): Promise<DifyApiResponse<ConversationHistoryResponse>> {
     try {
+      // Validate that userId is provided
+      if (!this.userId) {
+        return {
+          success: false,
+          error: {
+            code: 'INVALID_USER_ID',
+            message: 'User ID is required',
+            status: 400,
+          },
+        };
+      }
+
       this.validateRequired({ conversationId }, ['conversationId']);
 
       const params = new URLSearchParams({

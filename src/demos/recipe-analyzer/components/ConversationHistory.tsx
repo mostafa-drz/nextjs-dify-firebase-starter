@@ -6,14 +6,12 @@
  * @version 1.0.0
  */
 
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { getDifyConversations } from '@/lib/actions/dify';
-import { DifyConversation } from '@/types/dify';
+import { useDifyConversations } from '@/lib/hooks/useDify';
 import { History, MessageSquare, Plus, Loader2, AlertTriangle } from 'lucide-react';
 
 interface ConversationHistoryProps {
@@ -30,34 +28,9 @@ export function ConversationHistory({
   onCreateNew,
 }: ConversationHistoryProps) {
   const router = useRouter();
-  const [conversations, setConversations] = useState<DifyConversation[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadConversations = async () => {
-      if (!userId) return;
-
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const result = await getDifyConversations(userId, 20);
-
-        if (result.success && result.data?.data) {
-          setConversations(result.data.data);
-        } else {
-          setError(result.error?.message || 'Failed to load conversations');
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load conversations');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadConversations();
-  }, [userId]);
+  // Use React Query hook for conversations
+  const { conversations, isLoading, error } = useDifyConversations(userId);
 
   const handleConversationClick = (conversationId: string) => {
     onConversationSelect(conversationId);
@@ -113,7 +86,9 @@ export function ConversationHistory({
         ) : error ? (
           <div className="flex flex-col items-center justify-center px-4 py-8">
             <AlertTriangle className="text-destructive mb-2 h-6 w-6" />
-            <p className="text-destructive text-center text-sm">{error}</p>
+            <p className="text-destructive text-center text-sm">
+              {error instanceof Error ? error.message : 'Failed to load conversations'}
+            </p>
           </div>
         ) : conversations.length === 0 ? (
           <div className="flex flex-col items-center justify-center px-4 py-8">
@@ -153,7 +128,7 @@ export function ConversationHistory({
                       )}
                     </div>
                     <div className="text-muted-foreground shrink-0 text-xs">
-                      {formatDate(conversation.updated_at)}
+                      {formatDate(conversation.updated_at.toString())}
                     </div>
                   </div>
                 </div>

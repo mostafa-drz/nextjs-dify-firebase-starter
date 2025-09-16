@@ -115,6 +115,7 @@ export function DifyChat({
   }, [
     input,
     sendMessage,
+    sendMessageMutation.isPending,
     canAffordMessage,
     addUserMessage,
     addAssistantMessage,

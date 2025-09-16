@@ -10,8 +10,9 @@ import { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useFileUpload } from '@/lib/hooks/useFileUpload';
-import { sendDifyMessage, getDifyConversationMessages } from '@/lib/actions/dify';
-import { DifyChatRequest } from '@/types/dify';
+import { useDifyMessages } from '@/lib/hooks/useDify';
+import { sendDifyMessage } from '@/lib/actions/dify';
+import { DifyChatRequest, DifyMessage } from '@/types/dify';
 import { buildCommonInputs } from '@/lib/utils/input-builder';
 
 interface RecipeAnalyzerChatProps {
@@ -22,12 +23,7 @@ interface RecipeAnalyzerChatProps {
   conversationId?: string;
 }
 
-interface ChatMessage {
-  id: string;
-  text: string;
-  sender: 'user' | 'ai';
-  timestamp: number;
-}
+// Using DifyMessage directly - no need for custom ChatMessage interface
 
 export function RecipeAnalyzerChat({
   uploadedImage,
@@ -37,38 +33,36 @@ export function RecipeAnalyzerChat({
   conversationId,
 }: RecipeAnalyzerChatProps) {
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<DifyMessage[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const { uploadFile } = useFileUpload(userId);
 
+  // Use React Query hook for conversation messages
+  const {
+    data: conversationMessages,
+    isLoading: isLoadingMessages,
+    error: messagesError,
+  } = useDifyMessages(userId, conversationId);
+
   // Load conversation messages when conversationId changes
   useEffect(() => {
-    const loadConversationMessages = async () => {
-      if (!conversationId || !userId) return;
+    if (conversationMessages) {
+      setMessages(conversationMessages);
+    } else if (conversationId && !isLoadingMessages) {
+      // Clear messages if we're switching to a conversation with no messages
+      setMessages([]);
+    }
+  }, [conversationMessages, conversationId, isLoadingMessages]);
 
-      try {
-        const result = await getDifyConversationMessages(userId, conversationId, 50);
-
-        if (result.success && result.data?.data) {
-          const conversationMessages = result.data.data.map((msg: any) => ({
-            id: msg.id,
-            text: msg.query || msg.answer || '',
-            sender: (msg.query ? 'user' : 'ai') as 'user' | 'ai',
-            timestamp: msg.created_at,
-          }));
-          setMessages(conversationMessages);
-        }
-      } catch (err) {
-        console.error('Failed to load conversation messages:', err);
-        setError('Failed to load conversation history');
-      }
-    };
-
-    loadConversationMessages();
-  }, [conversationId, userId]);
+  // Set error from messages loading
+  useEffect(() => {
+    if (messagesError) {
+      setError('Failed to load conversation history');
+    }
+  }, [messagesError]);
 
   const handleFileUpload = useCallback(async () => {
     if (!uploadedImage || uploadedFileId) return; // Already uploaded or no image
@@ -85,11 +79,11 @@ export function RecipeAnalyzerChat({
       if (result.success && result.data?.id) {
         onFileUploaded(result.data.id);
         // Add welcome message
-        const welcomeMessage: ChatMessage = {
+        const welcomeMessage: DifyMessage = {
           id: `welcome-${Date.now()}`,
-          text: `Great! I can see your recipe image "${uploadedImage.name}". Ask me anything about it - I can help analyze ingredients, suggest modifications, estimate nutritional values, or answer cooking questions!`,
-          sender: 'ai',
-          timestamp: Date.now(),
+          role: 'assistant',
+          content: `Great! I can see your recipe image "${uploadedImage.name}". Ask me anything about it - I can help analyze ingredients, suggest modifications, estimate nutritional values, or answer cooking questions!`,
+          created_at: new Date().toISOString(),
         };
         setMessages([welcomeMessage]);
       } else {
@@ -105,11 +99,11 @@ export function RecipeAnalyzerChat({
   const handleSendMessage = useCallback(async () => {
     if (!message.trim() || !uploadedFileId || isSending) return;
 
-    const userMessage: ChatMessage = {
+    const userMessage: DifyMessage = {
       id: `user-${Date.now()}`,
-      text: message.trim(),
-      sender: 'user',
-      timestamp: Date.now(),
+      role: 'user',
+      content: message.trim(),
+      created_at: new Date().toISOString(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -142,11 +136,11 @@ export function RecipeAnalyzerChat({
       const result = await sendDifyMessage(userId, chatRequest);
 
       if (result.success && result.data?.answer) {
-        const aiMessage: ChatMessage = {
+        const aiMessage: DifyMessage = {
           id: `ai-${Date.now()}`,
-          text: result.data.answer,
-          sender: 'ai',
-          timestamp: Date.now(),
+          role: 'assistant',
+          content: result.data.answer,
+          created_at: new Date().toISOString(),
         };
         setMessages((prev) => [...prev, aiMessage]);
       } else {
@@ -175,7 +169,11 @@ export function RecipeAnalyzerChat({
     <div className="space-y-4">
       {conversationId && (
         <div className="rounded-lg bg-blue-50 p-4 text-sm text-blue-800">
-          💬 Loaded conversation: {conversationId}
+          {isLoadingMessages ? (
+            <>⏳ Loading conversation messages...</>
+          ) : (
+            <>💬 Loaded conversation: {conversationId}</>
+          )}
         </div>
       )}
 
@@ -201,26 +199,32 @@ export function RecipeAnalyzerChat({
       {error && <div className="rounded-lg bg-red-50 p-4 text-sm text-red-800">Error: {error}</div>}
 
       <div className="h-64 space-y-2 overflow-y-auto rounded-lg border p-4">
-        {messages.length === 0 ? (
+        {isLoadingMessages ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="text-sm text-gray-500">Loading conversation messages...</div>
+          </div>
+        ) : messages.length === 0 ? (
           <p className="text-sm text-gray-500">
-            {uploadedFileId
-              ? 'Start a conversation about your recipe...'
-              : 'Upload an image to begin...'}
+            {conversationId
+              ? 'No messages in this conversation yet.'
+              : uploadedFileId
+                ? 'Start a conversation about your recipe...'
+                : 'Upload an image to begin...'}
           </p>
         ) : (
           messages.map((msg) => (
             <div
               key={msg.id}
               className={`rounded-lg p-3 ${
-                msg.sender === 'user'
+                msg.role === 'user'
                   ? 'ml-8 bg-blue-100 text-blue-900'
                   : 'mr-8 bg-gray-100 text-gray-900'
               }`}
             >
               <div className="text-sm font-medium">
-                {msg.sender === 'user' ? 'You' : 'AI Recipe Analyzer'}
+                {msg.role === 'user' ? 'You' : 'AI Recipe Analyzer'}
               </div>
-              <div className="mt-1 whitespace-pre-wrap">{msg.text}</div>
+              <div className="mt-1 whitespace-pre-wrap">{msg.content}</div>
             </div>
           ))
         )}

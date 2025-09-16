@@ -29,6 +29,13 @@ export function RecipeAnalyzerDemo({
   const [uploadedFileId, setUploadedFileId] = useState<string | null>(null);
   const { user } = useAuth();
 
+  // Since this component is wrapped in ProtectedRoute, user is guaranteed to exist
+  if (!user?.uid) {
+    throw new Error(
+      'User ID is required but not available. This should not happen in a protected route.'
+    );
+  }
+
   const handleImageUpload = (file: File) => {
     setUploadedImage(file);
     // Reset file ID when new image is uploaded
@@ -45,7 +52,7 @@ export function RecipeAnalyzerDemo({
         {/* Conversation History Sidebar */}
         <div className="lg:col-span-1">
           <ConversationHistory
-            userId={user?.uid || 'demo-user'}
+            userId={user.uid}
             currentConversationId={conversationId}
             onConversationSelect={onConversationSelect}
             onCreateNew={onCreateNew}
@@ -79,7 +86,7 @@ export function RecipeAnalyzerDemo({
                   uploadedImage={uploadedImage}
                   uploadedFileId={uploadedFileId}
                   onFileUploaded={handleFileUploaded}
-                  userId={user?.uid || 'demo-user'}
+                  userId={user.uid}
                   conversationId={conversationId}
                 />
               </CardContent>

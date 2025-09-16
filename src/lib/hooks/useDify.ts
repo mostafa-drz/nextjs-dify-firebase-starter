@@ -8,18 +8,62 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DifyMessage, DifyConversationResponse } from '@/types/dify';
+import { getDifyConversations, getDifyConversationMessages } from '@/lib/actions/dify';
 
-// Mock implementation for testing
 export function useDifyMessages(userId: string, conversationId?: string) {
   const queryClient = useQueryClient();
 
   const query = useQuery({
     queryKey: ['dify-messages', conversationId, userId],
     queryFn: async (): Promise<DifyMessage[]> => {
-      // Mock implementation - return array of messages directly
-      return [];
+      if (!conversationId) return [];
+
+      // Validate userId (should always be valid in protected routes)
+      if (!userId) {
+        throw new Error('User ID is required');
+      }
+
+      const result = await getDifyConversationMessages(userId, conversationId, 50);
+
+      if (!result.success) {
+        throw new Error(result.error?.message || 'Failed to fetch conversation messages');
+      }
+
+      if (!result.data?.data) {
+        return [];
+      }
+
+      // Transform conversation messages to DifyMessage[]
+      const messages: DifyMessage[] = [];
+
+      result.data.data.forEach((msg: any) => {
+        // Add user message if query exists
+        if (msg.query) {
+          messages.push({
+            id: `${msg.id}-user`,
+            role: 'user',
+            content: msg.query,
+            created_at: new Date(msg.created_at).toISOString(),
+          });
+        }
+
+        // Add assistant message if answer exists
+        if (msg.answer) {
+          messages.push({
+            id: `${msg.id}-assistant`,
+            role: 'assistant',
+            content: msg.answer,
+            created_at: new Date(msg.created_at).toISOString(),
+          });
+        }
+      });
+
+      // Sort messages by creation time to maintain chronological order
+      messages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+
+      return messages;
     },
-    enabled: !!conversationId,
+    enabled: !!conversationId && !!userId,
     retry: false,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -67,27 +111,18 @@ export function useDifyConversations(userId: string) {
   const query = useQuery({
     queryKey: ['dify-conversations', userId],
     queryFn: async () => {
-      // Mock implementation - return array of conversations
-      return [
-        {
-          id: 'conv-1',
-          name: 'Sample Conversation 1',
-          inputs: {},
-          status: 'active',
-          introduction: 'A sample conversation',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        {
-          id: 'conv-2',
-          name: 'Sample Conversation 2',
-          inputs: {},
-          status: 'active',
-          introduction: 'Another sample conversation',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ];
+      // Validate userId (should always be valid in protected routes)
+      if (!userId) {
+        throw new Error('User ID is required');
+      }
+
+      const result = await getDifyConversations(userId, 20);
+
+      if (!result.success) {
+        throw new Error(result.error?.message || 'Failed to fetch conversations');
+      }
+
+      return result.data?.data || [];
     },
     enabled: !!userId,
     retry: false,

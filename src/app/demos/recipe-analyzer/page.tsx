@@ -4,6 +4,7 @@
  * @version 1.0.0
  */
 
+import { Suspense } from 'react';
 import { RecipeAnalyzerDemoClient } from './RecipeAnalyzerDemoClient';
 
 /**
@@ -14,5 +15,9 @@ import { RecipeAnalyzerDemoClient } from './RecipeAnalyzerDemoClient';
  * @returns JSX element for the recipe analyzer demo page
  */
 export default function RecipeAnalyzerPage() {
-  return <RecipeAnalyzerDemoClient />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RecipeAnalyzerDemoClient />
+    </Suspense>
+  );
 }
