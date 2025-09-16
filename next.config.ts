@@ -2,29 +2,11 @@ import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
-
   // Enable standalone output for Docker
   output: 'standalone',
 
-  // Bundle optimization
-  experimental: {
-    optimizePackageImports: [
-      '@radix-ui/react-dialog',
-      '@radix-ui/react-dropdown-menu',
-      '@radix-ui/react-label',
-      '@radix-ui/react-scroll-area',
-      '@radix-ui/react-select',
-      '@radix-ui/react-separator',
-      '@radix-ui/react-slot',
-      '@radix-ui/react-tabs',
-      '@radix-ui/react-toast',
-      'lucide-react',
-    ],
-  },
-
   // Webpack optimization
-  webpack: (config, { dev, isServer }) => {
+  webpack: (config, { isServer }) => {
     // Exclude Firebase Admin from client-side bundles
     if (!isServer) {
       config.resolve.fallback = {
@@ -36,67 +18,17 @@ const nextConfig: NextConfig = {
         http2: false,
       };
     }
-
-    // Optimize bundle splitting
-    if (!dev && !isServer) {
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          // React vendor chunk
-          react: {
-            test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
-            name: 'react',
-            chunks: 'all',
-            priority: 20,
-          },
-          // UI library chunk
-          ui: {
-            test: /[\\/]node_modules[\\/]@radix-ui[\\/]/,
-            name: 'ui',
-            chunks: 'all',
-            priority: 15,
-          },
-          // Firebase chunk
-          firebase: {
-            test: /[\\/]node_modules[\\/](firebase|firebase-admin)[\\/]/,
-            name: 'firebase',
-            chunks: 'all',
-            priority: 10,
-          },
-          // Utils chunk
-          utils: {
-            test: /[\\/]node_modules[\\/](clsx|tailwind-merge|class-variance-authority)[\\/]/,
-            name: 'utils',
-            chunks: 'all',
-            priority: 5,
-          },
-          // Default vendor chunk
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendor',
-            chunks: 'all',
-            priority: 1,
-          },
-        },
-      };
-    }
-
     return config;
   },
-
-  // Compression
-  compress: true,
 
   // Image optimization
   images: {
     formats: ['image/webp', 'image/avif'],
-    minimumCacheTTL: 60,
   },
 
-  // Security and caching headers
+  // Security headers
   async headers() {
     return [
-      // Security headers for all routes
       {
         source: '/(.*)',
         headers: [
@@ -111,29 +43,6 @@ const nextConfig: NextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
-          },
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(), payment=()',
-          },
-        ],
-      },
-      // Cache headers for static assets
-      {
-        source: '/_next/static/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        source: '/fonts/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
           },
         ],
       },
