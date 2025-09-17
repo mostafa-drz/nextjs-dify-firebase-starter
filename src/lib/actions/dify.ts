@@ -346,13 +346,14 @@ export async function getDifyConversationMessages(
 ): Promise<DifyApiResponse<{ data: unknown[]; has_more: boolean; first_id: string }>> {
   try {
     const params = new URLSearchParams({
+      conversation_id: conversationId,
       user: userId,
       limit: limit.toString(),
       ...(firstId && { first_id: firstId }),
     });
 
     const response = await makeDifyRequest(
-      `/conversations/${conversationId}/messages?${params}`,
+      `/messages?${params}`,
       { method: 'GET' },
       DIFY_API_KEY || ''
     );

@@ -28,45 +28,65 @@ export function useDifyMessages(userId: string, conversationId?: string) {
         throw new Error('User ID is required');
       }
 
-      const result = await getDifyConversationMessages(userId, conversationId, 50);
+      try {
+        const result = await getDifyConversationMessages(userId, conversationId, 50);
 
-      if (!result.success) {
-        throw new Error(result.error?.message || 'Failed to fetch conversation messages');
-      }
-
-      if (!result.data?.data) {
-        return [];
-      }
-
-      // Transform conversation messages to DifyMessage[]
-      const messages: DifyMessage[] = [];
-
-      result.data.data.forEach((msg: any) => {
-        // Add user message if query exists
-        if (msg.query) {
-          messages.push({
-            id: `${msg.id}-user`,
-            role: 'user',
-            content: msg.query,
-            created_at: new Date(msg.created_at).toISOString(),
-          });
+        if (!result.success) {
+          // Handle 404 errors gracefully - conversation doesn't exist
+          if (result.error?.status === 404) {
+            console.warn(`Conversation ${conversationId} not found`);
+            return [];
+          }
+          throw new Error(result.error?.message || 'Failed to fetch conversation messages');
         }
 
-        // Add assistant message if answer exists
-        if (msg.answer) {
-          messages.push({
-            id: `${msg.id}-assistant`,
-            role: 'assistant',
-            content: msg.answer,
-            created_at: new Date(msg.created_at).toISOString(),
-          });
+        if (!result.data?.data) {
+          return [];
         }
-      });
 
-      // Sort messages by creation time to maintain chronological order
-      messages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        // Transform conversation messages to DifyMessage[]
+        const messages: DifyMessage[] = [];
 
-      return messages;
+        result.data.data.forEach((msg: any) => {
+          // Add user message if query exists
+          if (msg.query) {
+            messages.push({
+              id: `${msg.id}-user`,
+              role: 'user',
+              content: msg.query,
+              created_at: new Date(msg.created_at).toISOString(),
+            });
+          }
+
+          // Add assistant message if answer exists
+          if (msg.answer) {
+            messages.push({
+              id: `${msg.id}-assistant`,
+              role: 'assistant',
+              content: msg.answer,
+              created_at: new Date(msg.created_at).toISOString(),
+            });
+          }
+        });
+
+        // Sort messages by creation time to maintain chronological order
+        messages.sort(
+          (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+
+        return messages;
+      } catch (error) {
+        // Handle any other errors (including network errors) gracefully
+        console.error('Error fetching conversation messages:', error);
+
+        // If it's a DifyApiError with 404 status, return empty array instead of throwing
+        if (error instanceof Error && error.message.includes('HTTP 404')) {
+          console.warn(`Conversation ${conversationId} not found (404)`);
+          return [];
+        }
+
+        throw error;
+      }
     },
     enabled: !!conversationId && !!userId,
     retry: false,

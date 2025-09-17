@@ -43,6 +43,31 @@ export const handlers = [
     });
   }),
 
+  // Dify conversation messages endpoint (corrected)
+  http.get('https://api.dify.ai/v1/messages', () => {
+    return HttpResponse.json({
+      data: [
+        {
+          id: 'msg-1',
+          conversation_id: 'conv-1',
+          query: 'Hello, how are you?',
+          answer: 'I am doing well, thank you! How can I help you today?',
+          created_at: 1640995200,
+        },
+        {
+          id: 'msg-2',
+          conversation_id: 'conv-1',
+          query: 'What can you do?',
+          answer:
+            'I can help you with various tasks including analysis, answering questions, and more!',
+          created_at: 1640995260,
+        },
+      ],
+      has_more: false,
+      limit: 20,
+    });
+  }),
+
   // Dify file upload endpoint
   http.post('https://api.dify.ai/v1/files/upload', () => {
     return HttpResponse.json({

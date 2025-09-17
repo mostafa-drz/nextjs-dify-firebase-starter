@@ -88,6 +88,7 @@ export function RecipeAnalyzerDemo({
                   onFileUploaded={handleFileUploaded}
                   userId={user.uid}
                   conversationId={conversationId}
+                  onCreateNew={onCreateNew}
                 />
               </CardContent>
             </Card>

@@ -21,6 +21,7 @@ interface RecipeAnalyzerChatProps {
   onFileUploaded: (fileId: string) => void;
   userId: string;
   conversationId?: string;
+  onCreateNew?: () => void;
 }
 
 // Using DifyMessage directly - no need for custom ChatMessage interface
@@ -31,6 +32,7 @@ export function RecipeAnalyzerChat({
   onFileUploaded,
   userId,
   conversationId,
+  onCreateNew,
 }: RecipeAnalyzerChatProps) {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<DifyMessage[]>([]);
@@ -60,7 +62,13 @@ export function RecipeAnalyzerChat({
   // Set error from messages loading
   useEffect(() => {
     if (messagesError) {
-      setError('Failed to load conversation history');
+      console.error('Messages loading error:', messagesError);
+      setError('Failed to load conversation history. This conversation may not exist.');
+      // Clear messages when there's an error loading
+      setMessages([]);
+    } else {
+      // Clear error when messages load successfully
+      setError(null);
     }
   }, [messagesError]);
 
@@ -168,8 +176,18 @@ export function RecipeAnalyzerChat({
   return (
     <div className="space-y-4">
       {conversationId && (
-        <div className="rounded-lg bg-blue-50 p-4 text-sm text-blue-800">
-          {isLoadingMessages ? (
+        <div
+          className={`rounded-lg p-4 text-sm ${
+            messagesError
+              ? 'bg-red-50 text-red-800'
+              : isLoadingMessages
+                ? 'bg-blue-50 text-blue-800'
+                : 'bg-green-50 text-green-800'
+          }`}
+        >
+          {messagesError ? (
+            <>❌ Failed to load conversation: {conversationId}</>
+          ) : isLoadingMessages ? (
             <>⏳ Loading conversation messages...</>
           ) : (
             <>💬 Loaded conversation: {conversationId}</>
@@ -199,7 +217,21 @@ export function RecipeAnalyzerChat({
       {error && <div className="rounded-lg bg-red-50 p-4 text-sm text-red-800">Error: {error}</div>}
 
       <div className="h-64 space-y-2 overflow-y-auto rounded-lg border p-4">
-        {isLoadingMessages ? (
+        {messagesError ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="text-center">
+              <div className="mb-2 text-sm text-red-600">❌ Failed to load conversation</div>
+              <div className="mb-4 text-xs text-gray-500">
+                This conversation may have been deleted or doesn't exist.
+              </div>
+              {onCreateNew && (
+                <Button variant="outline" size="sm" onClick={onCreateNew} className="text-xs">
+                  Start New Conversation
+                </Button>
+              )}
+            </div>
+          </div>
+        ) : isLoadingMessages ? (
           <div className="flex items-center justify-center py-8">
             <div className="text-sm text-gray-500">Loading conversation messages...</div>
           </div>

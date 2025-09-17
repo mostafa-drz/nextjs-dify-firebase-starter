@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { sendDifyMessage } from '../dify';
+import { sendDifyMessage, getDifyConversationMessages } from '../dify';
 import { reserveCredits, confirmReservedCredits, releaseReservedCredits } from '../credits';
 import { checkUserRateLimitByAction } from '@/lib/utils/simple-rate-limit';
 import { validateChatInput, validateConversationId } from '@/lib/utils/input-validation';
@@ -502,6 +502,24 @@ describe('Dify Server Actions', () => {
       const reserveCall = vi.mocked(reserveCredits).mock.calls[0];
       const metadata = reserveCall[4] as Record<string, unknown>;
       expect(metadata.sessionId).toBeUndefined();
+    });
+  });
+
+  describe('getDifyConversationMessages', () => {
+    it('should successfully fetch conversation messages using correct endpoint', async () => {
+      const mockUserId = 'test-user-123';
+      const mockConversationId = 'conv-456';
+
+      const result = await getDifyConversationMessages(mockUserId, mockConversationId, 20);
+
+      // Verify successful response (using MSW handler data)
+      expect(result.success).toBe(true);
+      expect(result.data?.data).toBeDefined();
+      expect(Array.isArray(result.data?.data)).toBe(true);
+
+      // Verify the response structure matches expected format
+      expect(result.data).toHaveProperty('has_more');
+      expect(result.data).toHaveProperty('limit');
     });
   });
 });
