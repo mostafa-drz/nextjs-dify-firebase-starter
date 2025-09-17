@@ -14,6 +14,7 @@ import { useDifyMessages } from '@/lib/hooks/useDify';
 import { sendDifyMessage } from '@/lib/actions/dify';
 import { DifyChatRequest, DifyMessage } from '@/types/dify';
 import { buildCommonInputs } from '@/lib/utils/input-builder';
+import { formatMessageTimestamp } from '@/lib/services/dify';
 
 interface RecipeAnalyzerChatProps {
   uploadedImage: File | null;
@@ -253,8 +254,11 @@ export function RecipeAnalyzerChat({
                   : 'mr-8 bg-gray-100 text-gray-900'
               }`}
             >
-              <div className="text-sm font-medium">
-                {msg.role === 'user' ? 'You' : 'AI Recipe Analyzer'}
+              <div className="flex items-center justify-between">
+                <div className="text-sm font-medium">
+                  {msg.role === 'user' ? 'You' : 'AI Recipe Analyzer'}
+                </div>
+                <div className="text-xs opacity-70">{formatMessageTimestamp(msg.created_at)}</div>
               </div>
               <div className="mt-1 whitespace-pre-wrap">{msg.content}</div>
             </div>

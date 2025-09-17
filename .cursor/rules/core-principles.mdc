@@ -33,3 +33,13 @@ Before implementing anything:
 ## Remember
 
 **Minimal. Standard. Done.**
+
+## Read the existing patterns before you write new code.
+
+### Process:
+
+- Map existing architecture (actions → hooks → components)
+- Search for existing implementations
+- Follow established patterns, don't create new ones
+- Key Question: "How would this be done here?" not "How should this be done?"
+- Bottom Line: Context consistency > Code elegance

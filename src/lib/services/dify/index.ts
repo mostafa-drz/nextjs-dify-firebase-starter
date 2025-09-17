@@ -328,3 +328,6 @@ export { SuggestionsService } from './suggestions';
 export { AudioService } from './audio';
 export { FileService } from './files';
 export { BaseDifyService, DifyApiError } from './base';
+
+// Re-export utilities for common operations
+export * from './utils';

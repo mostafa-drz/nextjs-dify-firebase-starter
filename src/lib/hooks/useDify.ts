@@ -54,7 +54,7 @@ export function useDifyMessages(userId: string, conversationId?: string) {
               id: `${msg.id}-user`,
               role: 'user',
               content: msg.query,
-              created_at: new Date(msg.created_at).toISOString(),
+              created_at: new Date(msg.created_at * 1000).toISOString(), // Convert Unix timestamp to ISO string
             });
           }
 
@@ -64,7 +64,7 @@ export function useDifyMessages(userId: string, conversationId?: string) {
               id: `${msg.id}-assistant`,
               role: 'assistant',
               content: msg.answer,
-              created_at: new Date(msg.created_at).toISOString(),
+              created_at: new Date(msg.created_at * 1000).toISOString(), // Convert Unix timestamp to ISO string
             });
           }
         });
