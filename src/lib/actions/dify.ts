@@ -199,9 +199,6 @@ export async function sendDifyMessage(
         requestPayload.files = request.files;
       }
 
-      // Log the request payload for debugging
-      console.log('Dify API Request Payload:', JSON.stringify(requestPayload, null, 2));
-
       // Make API call - only pass official Dify parameters
       apiResponse = await makeDifyRequest(
         '/chat-messages',

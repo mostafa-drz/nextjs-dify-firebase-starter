@@ -15,6 +15,7 @@ import { sendDifyMessage } from '@/lib/actions/dify';
 import { DifyChatRequest, DifyMessage } from '@/types/dify';
 import { buildCommonInputs } from '@/lib/utils/input-builder';
 import { formatMessageTimestamp } from '@/lib/services/dify';
+import { MessageFileAttachment } from '@/components/dify/MessageFileAttachment';
 
 interface RecipeAnalyzerChatProps {
   uploadedImage: File | null;
@@ -232,7 +233,7 @@ export function RecipeAnalyzerChat({
               )}
             </div>
           </div>
-        ) : isLoadingMessages ? (
+        ) : conversationId && isLoadingMessages ? (
           <div className="flex items-center justify-center py-8">
             <div className="text-sm text-gray-500">Loading conversation messages...</div>
           </div>
@@ -261,6 +262,19 @@ export function RecipeAnalyzerChat({
                 <div className="text-xs opacity-70">{formatMessageTimestamp(msg.created_at)}</div>
               </div>
               <div className="mt-1 whitespace-pre-wrap">{msg.content}</div>
+
+              {/* File attachments */}
+              {msg.files && msg.files.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {msg.files.map((file) => (
+                    <MessageFileAttachment
+                      key={file.id}
+                      file={file}
+                      showRemove={false} // Don't show remove button in chat history
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           ))
         )}

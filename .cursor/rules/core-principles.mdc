@@ -30,6 +30,22 @@ Before implementing anything:
 3. Do I need to ask the user before adding extra features?
 4. Is this the simplest solution that works?
 
+## Human-in-the-Loop Principle
+
+**When investigations take longer than 1 minute, ask the developer for clarification and guidance.**
+
+### Guidelines
+
+- If initial debugging/investigation exceeds reasonable time, pause and ask for help
+- Share findings and ask: "Should I continue investigating or would you prefer to guide me?"
+- Don't assume - ask for clarification on expected behavior vs actual behavior
+- Prioritize developer time over exhaustive automated investigation
+
+### Examples
+
+- ✅ **Good**: "I've found X and Y issues. Should I continue investigating Z or would you like to point me in a specific direction?"
+- ❌ **Bad**: Spending 20+ minutes on deep investigation without checking if the approach is right
+
 ## Remember
 
 **Minimal. Standard. Done.**
