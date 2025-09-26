@@ -16,6 +16,7 @@ import { DifyChatRequest, DifyMessage } from '@/types/dify';
 import { buildCommonInputs } from '@/lib/utils/input-builder';
 import { formatMessageTimestamp } from '@/lib/services/dify';
 import { MessageFileAttachment } from '@/components/dify/MessageFileAttachment';
+import { MarkdownRenderer, defaultMarkdownComponents } from '@/demos/shared/MarkdownRenderer';
 
 interface RecipeAnalyzerChatProps {
   uploadedImage: File | null;
@@ -261,7 +262,17 @@ export function RecipeAnalyzerChat({
                 </div>
                 <div className="text-xs opacity-70">{formatMessageTimestamp(msg.created_at)}</div>
               </div>
-              <div className="mt-1 whitespace-pre-wrap">{msg.content}</div>
+              <div className="mt-1">
+                {msg.role === 'assistant' ? (
+                  <MarkdownRenderer
+                    content={msg.content}
+                    components={defaultMarkdownComponents}
+                    className="prose-sm"
+                  />
+                ) : (
+                  <div className="whitespace-pre-wrap">{msg.content}</div>
+                )}
+              </div>
 
               {/* File attachments */}
               {msg.files && msg.files.length > 0 && (
