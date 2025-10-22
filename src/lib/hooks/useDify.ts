@@ -55,6 +55,7 @@ export function useDifyMessages(userId: string, conversationId?: string) {
               role: 'user',
               content: msg.query,
               created_at: new Date(msg.created_at * 1000).toISOString(), // Convert Unix timestamp to ISO string
+              files: msg.message_files || [], // Include file attachments (only for user messages)
             });
           }
 
@@ -65,6 +66,7 @@ export function useDifyMessages(userId: string, conversationId?: string) {
               role: 'assistant',
               content: msg.answer,
               created_at: new Date(msg.created_at * 1000).toISOString(), // Convert Unix timestamp to ISO string
+              files: [], // Assistant messages don't have file attachments
             });
           }
         });

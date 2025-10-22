@@ -16,6 +16,12 @@ interface ChatMessage {
   timestamp: Date;
   tokensUsed?: number;
   creditsDeducted?: number;
+  files?: Array<{
+    id: string;
+    type: string;
+    url: string;
+    belongs_to: 'user' | 'assistant';
+  }>;
 }
 
 interface UseChatMessagesProps {
@@ -80,6 +86,12 @@ export function useChatMessages({ conversationId, userId, welcomeMessage }: UseC
           role: string;
           content: string;
           created_at: number;
+          files?: Array<{
+            id: string;
+            type: string;
+            url: string;
+            belongs_to: 'user' | 'assistant';
+          }>;
           metadata?: {
             usage?: {
               total_tokens: number;
@@ -95,6 +107,7 @@ export function useChatMessages({ conversationId, userId, welcomeMessage }: UseC
           timestamp: new Date(message.created_at * 1000),
           tokensUsed: message.metadata?.usage?.total_tokens,
           creditsDeducted: message.metadata?.usage?.credits_deducted,
+          files: message.files,
         };
       });
 
@@ -129,12 +142,16 @@ export function useChatMessages({ conversationId, userId, welcomeMessage }: UseC
 
   // Message handling functions
   const addUserMessage = useCallback(
-    (content: string) => {
+    (
+      content: string,
+      files?: Array<{ id: string; type: string; url: string; belongs_to: 'user' | 'assistant' }>
+    ) => {
       const userMessage: ChatMessage = {
         id: `user-${Date.now()}`,
         role: 'user',
         content: content.trim(),
         timestamp: new Date(),
+        files,
       };
 
       setMessages((prev) => [...prev, userMessage]);
@@ -145,6 +162,7 @@ export function useChatMessages({ conversationId, userId, welcomeMessage }: UseC
         role: userMessage.role,
         content: userMessage.content,
         created_at: userMessage.timestamp.toISOString(),
+        files,
       };
       addMessage(difyMessage);
       return userMessage;
@@ -158,6 +176,7 @@ export function useChatMessages({ conversationId, userId, welcomeMessage }: UseC
       content: string;
       tokensUsed?: number;
       creditsDeducted?: number;
+      files?: Array<{ id: string; type: string; url: string; belongs_to: 'user' | 'assistant' }>;
     }) => {
       const assistantMessage: ChatMessage = {
         id: messageData.id,
@@ -166,6 +185,7 @@ export function useChatMessages({ conversationId, userId, welcomeMessage }: UseC
         timestamp: new Date(),
         tokensUsed: messageData.tokensUsed,
         creditsDeducted: messageData.creditsDeducted,
+        files: messageData.files,
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
@@ -176,6 +196,7 @@ export function useChatMessages({ conversationId, userId, welcomeMessage }: UseC
         role: assistantMessage.role,
         content: assistantMessage.content,
         created_at: assistantMessage.timestamp.toISOString(),
+        files: messageData.files,
       };
       addMessage(difyMessage);
       return assistantMessage;

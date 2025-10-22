@@ -201,7 +201,7 @@ export default function LegalPage() {
                       <ul className="text-muted-foreground list-inside list-disc space-y-1">
                         <li>Access and download your data</li>
                         <li>Correct inaccurate information</li>
-                        <li>Delete your account and data</li>
+                        <li>Request deletion of your account and data (contact support)</li>
                         <li>Opt out of non-essential communications</li>
                         <li>Request data portability</li>
                       </ul>

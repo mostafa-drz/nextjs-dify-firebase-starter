@@ -80,7 +80,7 @@ export default function SupportPage() {
         {
           question: 'Can I delete my account and data?',
           answer:
-            'Absolutely. You can delete your account and all associated data at any time through your profile settings. This action is irreversible.',
+            'Account deletion functionality is planned for a future release. In the meantime, please contact support if you need your account and data removed, and we will process your request manually.',
         },
       ],
     },

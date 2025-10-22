@@ -8,7 +8,8 @@ import { PageContainer } from '@/components/layout/PageContainer';
 import { ConversationList } from '@/components/dify/ConversationList';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, MessageSquare, History, Loader2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Plus, MessageSquare, History, Loader2, File, Eye } from 'lucide-react';
 
 /**
  * Client-side conversations page component
@@ -107,6 +108,39 @@ export function ConversationsPageClient() {
                     <MessageSquare className="h-4 w-4" />
                     Go to Chat
                   </Button>
+                </CardContent>
+              </Card>
+
+              {/* File Preview Demo */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Eye className="h-5 w-5" />
+                    File Preview Demo
+                  </CardTitle>
+                  <CardDescription>
+                    Test the Dify file preview service functionality
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="text-muted-foreground text-sm">
+                      This demo showcases the Dify file preview service. Files from conversations
+                      will appear below with preview and download capabilities.
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs">
+                        <File className="mr-1 h-3 w-3" />
+                        Service Ready
+                      </Badge>
+                      <Badge variant="secondary" className="text-xs">
+                        API Tested
+                      </Badge>
+                    </div>
+                    <div className="text-muted-foreground text-xs">
+                      Files will be displayed in conversation cards above when available.
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 

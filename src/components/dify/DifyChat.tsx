@@ -17,6 +17,7 @@ import { EmptyMessages } from '@/components/ui/empty-states';
 import { Send, Bot, User, Loader2, AlertTriangle, MessageSquare, Sparkles } from 'lucide-react';
 import { MessageFeedback } from './MessageFeedback';
 import { SuggestedQuestions } from './SuggestedQuestions';
+import { MessageFileAttachment } from './MessageFileAttachment';
 import { trackChat } from '@/lib/analytics';
 import { useChatMessages } from '@/lib/hooks/useChatMessages';
 import { buildCommonInputs } from '@/lib/utils/input-builder';
@@ -239,6 +240,20 @@ export function DifyChat({
                       }`}
                     >
                       <div className="text-sm whitespace-pre-wrap">{message.content}</div>
+
+                      {/* File attachments */}
+                      {message.files && message.files.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {message.files.map((file) => (
+                            <MessageFileAttachment
+                              key={file.id}
+                              file={file}
+                              showRemove={false} // Don't show remove button in chat history
+                            />
+                          ))}
+                        </div>
+                      )}
+
                       <div className="mt-1 flex items-center justify-between text-xs opacity-70">
                         <span>{message.timestamp.toLocaleTimeString()}</span>
                         <div className="flex items-center gap-2">

@@ -13,6 +13,12 @@ export interface DifyMessage {
   role: 'user' | 'assistant';
   content: string;
   created_at: string;
+  files?: Array<{
+    id: string;
+    type: string;
+    url: string;
+    belongs_to: 'user' | 'assistant';
+  }>;
 }
 
 export interface DifyConversationResponse {

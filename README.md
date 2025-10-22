@@ -1133,6 +1133,7 @@ This will create your first automated release!
 
 ### 🔄 Planned Features
 
+- [ ] **Account deletion** - Automated account and data deletion with GDPR compliance
 - [ ] Stripe integration for credit purchases
 - [ ] Multiple Dify app management
 - [ ] Usage analytics dashboard

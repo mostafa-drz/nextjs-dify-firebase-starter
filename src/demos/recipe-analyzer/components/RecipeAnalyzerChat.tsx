@@ -88,6 +88,7 @@ export function RecipeAnalyzerChat({
       });
 
       if (result.success && result.data?.id) {
+        console.log('File upload successful, setting file ID:', result.data.id);
         onFileUploaded(result.data.id);
         // Add welcome message
         const welcomeMessage: DifyMessage = {
@@ -297,6 +298,8 @@ export function RecipeAnalyzerChat({
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Ask about your recipe..."
           disabled={!uploadedFileId || isSending}
+          // Debug: log the disabled state
+          title={`Debug: uploadedFileId=${uploadedFileId}, isSending=${isSending}`}
           onKeyPress={handleKeyPress}
         />
         <Button
