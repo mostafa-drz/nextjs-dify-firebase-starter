@@ -126,7 +126,7 @@ A secure Next.js 15 boilerplate for integrating [Dify.ai](https://dify.ai) with 
 ### 1. Installation
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/mostafa-drz/nextjs-dify-firebase-starter.git
 cd nextjs-dify-firebase-starter
 npm install
 ```
@@ -320,7 +320,7 @@ The project includes `.vscode/` configuration with:
 1. **Clone and install dependencies**:
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/mostafa-drz/nextjs-dify-firebase-starter.git
    cd nextjs-dify-firebase-starter
    npm install
    ```
