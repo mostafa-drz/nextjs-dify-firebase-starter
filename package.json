@@ -2,6 +2,37 @@
   "name": "nextjs-dify-firebase-starter",
   "version": "0.1.0",
   "private": true,
+  "description": "Production-ready Next.js 15 starter with Firebase Auth, Dify AI integration, and credit-based usage tracking for building AI-powered SaaS applications",
+  "author": {
+    "name": "Mostafa Darehzereshki",
+    "email": "hi@mostafa.xyz",
+    "url": "https://github.com/mostafa-drz"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mostafa-drz/nextjs-dify-firebase-starter.git"
+  },
+  "homepage": "https://github.com/mostafa-drz/nextjs-dify-firebase-starter#readme",
+  "bugs": {
+    "url": "https://github.com/mostafa-drz/nextjs-dify-firebase-starter/issues"
+  },
+  "keywords": [
+    "nextjs",
+    "nextjs-15",
+    "firebase",
+    "firebase-auth",
+    "dify",
+    "ai",
+    "chatbot",
+    "boilerplate",
+    "starter",
+    "typescript",
+    "tailwind",
+    "saas",
+    "credit-system",
+    "streaming-chat"
+  ],
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "dev:clean": "rm -rf .next node_modules && npm cache clean --force && npm install && npm run dev",
