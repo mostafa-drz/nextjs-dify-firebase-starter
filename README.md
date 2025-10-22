@@ -1,4 +1,4 @@
-# Dify Firebase Boilerplate
+# Next.js Dify Firebase Starter
 
 A secure Next.js 15 boilerplate for integrating [Dify.ai](https://dify.ai) with Firebase authentication and credit-based usage tracking. This project provides a complete foundation for building AI-powered applications with proper user management and cost tracking.
 
@@ -127,7 +127,7 @@ A secure Next.js 15 boilerplate for integrating [Dify.ai](https://dify.ai) with 
 
 ```bash
 git clone <repository-url>
-cd dify-firebase-boilerplate
+cd nextjs-dify-firebase-starter
 npm install
 ```
 
@@ -321,7 +321,7 @@ The project includes `.vscode/` configuration with:
 
    ```bash
    git clone <repository-url>
-   cd dify-firebase-boilerplate
+   cd nextjs-dify-firebase-starter
    npm install
    ```
 

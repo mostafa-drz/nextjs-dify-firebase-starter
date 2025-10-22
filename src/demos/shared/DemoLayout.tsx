@@ -1,6 +1,6 @@
 /**
  * @fileoverview Demo layout component for demo pages
- * @author Dify Firebase Boilerplate
+ * @author Next.js Dify Firebase Starter
  * @version 1.0.0
  */
 

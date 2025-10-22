@@ -1,6 +1,6 @@
 /**
  * @fileoverview Simple user rate limiting utility for MVP
- * @author Dify Firebase Boilerplate
+ * @author Next.js Dify Firebase Starter
  * @version 1.0.0
  *
  * Provides basic rate limiting functionality using Firestore for storage.

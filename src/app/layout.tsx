@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Dify Firebase Boilerplate',
+  title: 'Next.js Dify Firebase Starter',
   description: 'Next.js boilerplate with Dify.ai integration, Firebase auth, and credit management',
 };
 

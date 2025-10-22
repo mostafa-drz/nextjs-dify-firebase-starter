@@ -1,6 +1,6 @@
 /**
  * @fileoverview Flexible input builder utility for Dify API
- * @author Dify Firebase Boilerplate
+ * @author Next.js Dify Firebase Starter
  * @version 1.0.0
  *
  * This utility provides a flexible way to build inputs for Dify API calls.

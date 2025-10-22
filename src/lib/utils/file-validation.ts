@@ -1,6 +1,6 @@
 /**
  * @fileoverview File validation utilities for Dify file uploads
- * @author Dify Firebase Boilerplate
+ * @author Next.js Dify Firebase Starter
  * @version 1.0.0
  */
 

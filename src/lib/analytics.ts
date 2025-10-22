@@ -4,7 +4,7 @@ import { logEvent } from 'firebase/analytics';
 import { getFirebaseAnalytics } from './firebase/client';
 
 /**
- * Simple Analytics for Dify Firebase Boilerplate
+ * Simple Analytics for Next.js Dify Firebase Starter
  * Focuses on essential business metrics only
  */
 

@@ -1,6 +1,6 @@
 /**
  * @fileoverview Test environment setup for Vitest
- * @author Dify Firebase Boilerplate
+ * @author Next.js Dify Firebase Starter
  * @version 1.0.0
  */
 

@@ -1,6 +1,6 @@
 /**
  * @fileoverview Firebase Admin SDK mocks for testing
- * @author Dify Firebase Boilerplate
+ * @author Next.js Dify Firebase Starter
  * @version 1.0.0
  */
 

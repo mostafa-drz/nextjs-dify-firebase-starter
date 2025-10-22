@@ -1,6 +1,6 @@
 /**
  * @fileoverview Comprehensive type definitions for Dify API services
- * @author Dify Firebase Boilerplate
+ * @author Next.js Dify Firebase Starter
  * @version 1.0.0
  */
 

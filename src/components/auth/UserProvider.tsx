@@ -1,6 +1,6 @@
 /**
  * @fileoverview User provider component for authentication context
- * @author Dify Firebase Boilerplate
+ * @author Next.js Dify Firebase Starter
  * @version 1.0.0
  */
 

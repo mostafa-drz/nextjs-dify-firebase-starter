@@ -1,6 +1,6 @@
 /**
  * @fileoverview User test data fixtures
- * @author Dify Firebase Boilerplate
+ * @author Next.js Dify Firebase Starter
  * @version 1.0.0
  */
 

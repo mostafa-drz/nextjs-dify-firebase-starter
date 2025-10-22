@@ -1,6 +1,6 @@
 /**
  * @fileoverview Main Dify service facade - provides unified access to all Dify API services
- * @author Dify Firebase Boilerplate
+ * @author Next.js Dify Firebase Starter
  * @version 1.0.0
  */
 

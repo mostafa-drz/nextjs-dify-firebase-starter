@@ -2,7 +2,7 @@
 
 /**
  * @fileoverview Recipe analyzer chat component with Dify integration
- * @author Dify Firebase Boilerplate
+ * @author Next.js Dify Firebase Starter
  * @version 1.0.0
  */
 

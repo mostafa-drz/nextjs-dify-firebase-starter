@@ -124,14 +124,14 @@ For self-hosted or cloud provider deployments:
 
 ```bash
 # Build the Docker image
-docker build -t dify-firebase-boilerplate .
+docker build -t nextjs-dify-firebase-starter .
 
 # Run with environment variables
 docker run -p 3000:3000 \
   -e NEXT_PUBLIC_FIREBASE_API_KEY=your_key \
   -e FIREBASE_PROJECT_ID=your_project \
   # ... other environment variables
-  dify-firebase-boilerplate
+  nextjs-dify-firebase-starter
 ```
 
 #### Using Docker Compose:

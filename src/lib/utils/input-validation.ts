@@ -1,6 +1,6 @@
 /**
  * @fileoverview Input validation and sanitization utilities for MVP
- * @author Dify Firebase Boilerplate
+ * @author Next.js Dify Firebase Starter
  * @version 1.0.0
  *
  * Provides basic input validation and sanitization to prevent common attacks.

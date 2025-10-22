@@ -1,6 +1,6 @@
 /**
  * @fileoverview Suggestions service for Dify API - handles suggested questions
- * @author Dify Firebase Boilerplate
+ * @author Next.js Dify Firebase Starter
  * @version 1.0.0
  */
 

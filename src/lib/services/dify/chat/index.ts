@@ -1,6 +1,6 @@
 /**
  * @fileoverview Chat service for Dify API - handles message sending and streaming
- * @author Dify Firebase Boilerplate
+ * @author Next.js Dify Firebase Starter
  * @version 1.0.0
  */
 

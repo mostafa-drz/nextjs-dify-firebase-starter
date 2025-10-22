@@ -75,7 +75,7 @@ function makeRequest(path, method = 'GET', data = null) {
       headers: {
         Authorization: `Bearer ${DIFY_API_KEY}`,
         'Content-Type': 'application/json',
-        'User-Agent': 'dify-firebase-boilerplate/1.0.0',
+        'User-Agent': 'nextjs-dify-firebase-starter/1.0.0',
       },
     };
 

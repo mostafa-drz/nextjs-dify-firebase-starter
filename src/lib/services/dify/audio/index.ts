@@ -1,6 +1,6 @@
 /**
  * @fileoverview Audio service for Dify API - handles speech-to-text and text-to-audio
- * @author Dify Firebase Boilerplate
+ * @author Next.js Dify Firebase Starter
  * @version 1.0.0
  */
 
