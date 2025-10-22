@@ -52,7 +52,6 @@
     "test:firebase": "firebase emulators:exec --only firestore 'npm run test:run'",
     "test:dify": "node scripts/test-dify-connection.js",
     "validate:production": "node scripts/validate-production.js",
-    "setup:environments": "node scripts/setup-environments.js",
     "prepare": "husky",
     "firestore:rules:deploy": "firebase deploy --only firestore:rules"
   },
