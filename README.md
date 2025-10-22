@@ -742,8 +742,6 @@ This project follows focused, self-descriptive testing principles that prioritiz
 - ❌ Styling and visual appearance
 - ❌ Trivial getters/setters without business logic
 
-For detailed testing principles, see [Testing Principles Documentation](./docs/testing-principles.md).
-
 ### Run Tests
 
 ```bash
@@ -1050,8 +1048,7 @@ For support and questions:
 - Check the [Dify Documentation](https://docs.dify.ai/)
 - Review [Firebase Documentation](https://firebase.google.com/docs)
 
-## 📚 Additional Documentation
+## 📚 Additional Resources
 
-- **[Feedback Service](./docs/feedback-service.md)** - User feedback collection with Sentry and Slack integration
 - **[Dify API Documentation](./difyDocs/)** - Complete API reference and integration guides
 - **[Demo Applications](./demos/)** - Example apps showcasing Dify capabilities
